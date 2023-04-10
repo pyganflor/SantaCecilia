@@ -2,7 +2,7 @@
     <div class="col-md-2">
         <select name="filtro_predeterminado_planta" id="filtro_predeterminado_planta"
                 class="form-control"
-                onchange="select_planta($(this).val(), 'id_variedad', '', '<option value= selected>Seleccione</option>')">
+                onchange="select_planta_global($(this).val(), 'id_variedad', '', '<option value= selected>Seleccione</option>')">
             <option value="">Planta</option>
             @foreach(getPlantas() as $p)
                 <option value="{{$p->id_planta}}">{{$p->nombre}}</option>
