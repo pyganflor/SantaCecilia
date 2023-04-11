@@ -34,7 +34,7 @@
     <!-- Main content -->
     <section class="content">
         <div id="div_content_recepciones">
-            <table width="100%" style="margin-bottom: 0">
+            <table width="100%">
                 <tr>
                     <td>
                         <div class="input-group">
@@ -56,7 +56,7 @@
                     </td>
                 </tr>
             </table>
-            <div id="div_listado_recepciones" style="overflow-y: scroll; overflow-x: scroll; height: 450px;"></div>
+            <div id="div_listado_recepciones" style="overflow-y: scroll; overflow-x: scroll; height: 450px; margin-top: 5px"></div>
         </div>
     </section>
 @endsection
