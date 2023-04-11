@@ -136,7 +136,7 @@
         for (i = 1; i <= cant_forms; i++) {
             mallas = $('#new_mallas_' + i).val();
             tallos_x_malla = $('#new_tallos_x_malla_' + i).val();
-            if (mallas > 0 && tallos_x_malla > 0 && cosechador != '') {
+            if (mallas > 0 && tallos_x_malla > 0) {
                 planta = $('#new_planta_' + i).val();
                 variedad = $('#new_variedad_' + i).val();
                 modulo = $('#new_modulo_' + i).val();
