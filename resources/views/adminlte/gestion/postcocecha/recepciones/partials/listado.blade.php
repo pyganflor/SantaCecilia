@@ -21,9 +21,6 @@
                     Tallos x Malla
                 </th>
                 <th class="text-center th_yura_green">
-                    Cosechador
-                </th>
-                <th class="text-center th_yura_green">
                 </th>
             </tr>
         </thead>
@@ -80,17 +77,6 @@
                         </span>
                     </td>
                     <td class="text-center" style="border-color: #9d9d9d">
-                        <select id="edit_cosechador_{{ $item->id_desglose_recepcion }}" style="width: 100%">
-                            <option value="">Seleccione</option>
-                            @foreach ($cosechadores as $c)
-                                <option value="{{ $c->id_cosechador }}"
-                                    {{ $c->id_cosechador == $item->id_cosechador ? 'selected' : '' }}>
-                                    {{ $c->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td class="text-center" style="border-color: #9d9d9d">
                         <div class="btn-group">
                             <button type="button" class="btn btn-xs btn-yura_warning" title="Modificar"
                                 onclick="update_desglose('{{ $item->id_desglose_recepcion }}')">
@@ -113,7 +99,7 @@
                 <th class="text-center th_yura_green" colspan="2">
                     {{ $total_tallos }} Tallos
                 </th>
-                <th class="text-center th_yura_green" colspan="2">
+                <th class="text-center th_yura_green">
                 </th>
             </tr>
         </tfoot>

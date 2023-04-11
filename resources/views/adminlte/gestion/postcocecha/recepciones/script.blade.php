@@ -30,7 +30,6 @@
             modulo: $('#edit_modulo_' + id).val(),
             mallas: $('#edit_mallas_' + id).val(),
             tallos_x_malla: $('#edit_tallos_x_malla_' + id).val(),
-            cosechador: $('#edit_cosechador_' + id).val(),
             id: id,
         }
         if (datos['mallas'] > 0 && datos['tallos_x_malla'] > 0 && datos['mallas'] != '') {

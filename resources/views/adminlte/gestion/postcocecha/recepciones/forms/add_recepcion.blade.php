@@ -16,9 +16,6 @@
             Tallos x Malla
         </th>
         <th class="text-center th_yura_green">
-            Cosechador
-        </th>
-        <th class="text-center th_yura_green">
             <div class="btn-group">
                 <button type="button" class="btn btn-xs btn-yura_dark" onclick="add_new_row()">
                     <i class="fa fa-fw fa-plus"></i>
@@ -62,14 +59,6 @@
             <input type="number" id="new_tallos_x_malla_1" class="text-center" min="0" value="0" required
                 style="width: 100%">
         </td>
-        <td style="border-color: #9d9d9d" colspan="2">
-            <select id="new_cosechador_1" style="width: 100%">
-                <option value="">Seleccione</option>
-                @foreach ($cosechadores as $c)
-                    <option value="{{ $c->id_cosechador }}">{{ $c->nombre }}</option>
-                @endforeach
-            </select>
-        </td>
     </tr>
 </table>
 
@@ -103,7 +92,6 @@
     function add_new_row() {
         cant_forms++;
         select_plantas = $('#new_planta_1').html();
-        select_cosechadores = $('#new_cosechador_1').html();
         parametros_select_planta = [
             "'new_variedad_" + cant_forms + "'",
             "'<option value = selected>Seleccione</option>'",
@@ -138,11 +126,6 @@
             '" class="text-center" min="0" value="0" required' +
             ' style="width: 100%">' +
             '</td>' +
-            '<td style="border-color: #9d9d9d" colspan="2">' +
-            '<select id="new_cosechador_' + cant_forms + '" required style="width: 100%">' +
-            select_cosechadores +
-            '</select>' +
-            '</td>' +
             '</tr>');
         select_planta($('#new_planta_' + cant_forms).val(), 'new_variedad_' + cant_forms, 'new_variedad_' + cant_forms,
             '<option value= selected>Seleccione</option>');
@@ -153,7 +136,6 @@
         for (i = 1; i <= cant_forms; i++) {
             mallas = $('#new_mallas_' + i).val();
             tallos_x_malla = $('#new_tallos_x_malla_' + i).val();
-            cosechador = $('#new_cosechador_' + i).val();
             if (mallas > 0 && tallos_x_malla > 0 && cosechador != '') {
                 planta = $('#new_planta_' + i).val();
                 variedad = $('#new_variedad_' + i).val();
@@ -164,7 +146,6 @@
                     modulo: modulo,
                     mallas: mallas,
                     tallos_x_malla: tallos_x_malla,
-                    cosechador: cosechador,
                 });
             }
         }

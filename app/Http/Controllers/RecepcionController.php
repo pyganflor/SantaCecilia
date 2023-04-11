@@ -70,13 +70,9 @@ class RecepcionController extends Controller
             ->where('c.id_empresa', $finca)
             ->orderBy('nombre')
             ->get();
-        $cosechadores = Cosechador::where('id_empresa', $finca)
-            ->orderBy('nombre')
-            ->get();
         return view('adminlte.gestion.postcocecha.recepciones.partials.listado', [
             'listado' => $listado,
             'plantas' => $plantas,
-            'cosechadores' => $cosechadores,
         ]);
     }
 
@@ -94,12 +90,8 @@ class RecepcionController extends Controller
             ->where('c.id_empresa', $finca)
             ->orderBy('nombre')
             ->get();
-        $cosechadores = Cosechador::where('id_empresa', $finca)
-            ->orderBy('nombre')
-            ->get();
         return view('adminlte.gestion.postcocecha.recepciones.forms.add_recepcion', [
             'plantas' => $plantas,
-            'cosechadores' => $cosechadores,
         ]);
     }
 
@@ -155,7 +147,7 @@ class RecepcionController extends Controller
             $desglose->id_modulo = $d['modulo'];
             $desglose->tallos_x_malla = $d['tallos_x_malla'];
             $desglose->cantidad_mallas = $d['mallas'];
-            $desglose->id_cosechador = $d['cosechador'];
+            $desglose->id_cosechador = -1;
             $desglose->id_recepcion = $recepcion->id_recepcion;
             $desglose->fecha_registro = date('Y-m-d H:i:s');
             $desglose->id_empresa = $finca;
@@ -179,7 +171,6 @@ class RecepcionController extends Controller
         $desglose->id_modulo = $request->modulo;
         $desglose->tallos_x_malla = $request->tallos_x_malla;
         $desglose->cantidad_mallas = $request->mallas;
-        $desglose->id_cosechador = $request->cosechador;
         $desglose->save();
 
         /* ======= ACTUALIZAR LA TABLA COSECHA_DIARIA ========== */

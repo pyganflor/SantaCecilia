@@ -37,7 +37,7 @@
             <table width="100%" style="margin-bottom: 0">
                 <tr>
                     <td>
-                        <div class="form-group input-group">
+                        <div class="input-group">
                             <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                                 <i class="fa fa-fw fa-calendar"></i> Fecha de Cosecha
                             </div>
