@@ -71,75 +71,67 @@ class SectoresModulosPerennesController extends Controller
         if (!$valida->fails()) {
             DB::beginTransaction();
             try {
-                if (count(Modulo::All()->where('nombre', '=', str_limit(mb_strtoupper(espacios($request->modulo)), 25))
-                    ->where('id_sector', '=', $request->sector)) == 0) {
-                    $semana = getSemanaByDateVariedad($request->fecha_inicio, $request->variedad);
-                    if ($semana != '') {
-                        $modulo = new Modulo();
-                        $modulo->nombre = str_limit(mb_strtoupper(espacios($request->modulo)), 25);
-                        $modulo->id_sector = $request->sector;
-                        $modulo->area = $request->area;
-                        $modulo->descripcion = '';
-                        $modulo->fecha_registro = date('Y-m-d H:i:s');
-                        $modulo->id_empresa = Sector::find($request->sector)->id_empresa;
+                $semana = getSemanaByDateVariedad($request->fecha_inicio, $request->variedad);
+                if ($semana != '') {
+                    $modulo = new Modulo();
+                    $modulo->nombre = str_limit(mb_strtoupper(espacios($request->modulo)), 25);
+                    $modulo->id_sector = $request->sector;
+                    $modulo->area = $request->area;
+                    $modulo->descripcion = '';
+                    $modulo->fecha_registro = date('Y-m-d H:i:s');
+                    $modulo->id_empresa = Sector::find($request->sector)->id_empresa;
 
-                        $modulo->save();
-                        $modulo = Modulo::All()->last();
-                        bitacora('modulo', $modulo->id_modulo, 'I', 'Insercion satisfactoria de un nuevo modulo');
+                    $modulo->save();
+                    $modulo = Modulo::All()->last();
+                    bitacora('modulo', $modulo->id_modulo, 'I', 'Insercion satisfactoria de un nuevo modulo');
 
-                        /* ================= ACTIVAR CICLO ================ */
-                        $ciclo = new Ciclo();
-                        $ciclo->id_modulo = $modulo->id_modulo;
-                        $ciclo->id_variedad = $request->variedad;
-                        $ciclo->area = $request->area;
-                        $ciclo->fecha_inicio = $request->fecha_inicio;
-                        $ciclo->poda_siembra = $request->poda_siembra;
-                        $ciclo->fecha_fin = date('Y-m-d');
-                        $ciclo->plantas_muertas = $request->plantas_muertas;
+                    /* ================= ACTIVAR CICLO ================ */
+                    $ciclo = new Ciclo();
+                    $ciclo->id_modulo = $modulo->id_modulo;
+                    $ciclo->id_variedad = $request->variedad;
+                    $ciclo->area = $request->area;
+                    $ciclo->fecha_inicio = $request->fecha_inicio;
+                    $ciclo->poda_siembra = $request->poda_siembra;
+                    $ciclo->fecha_fin = date('Y-m-d');
+                    $ciclo->plantas_muertas = $request->plantas_muertas;
 
-                        $ciclo->desecho = $semana->desecho != '' ? $semana->desecho : 0;
-                        $ciclo->curva = $semana->curva;
-                        if ($ciclo->poda_siembra == 'P') {
-                            $ciclo->semana_poda_siembra = $semana->semana_poda;
-                            $ciclo->conteo = $request->conteo > 0 ? $request->conteo : $semana->tallos_planta_poda;
-                        } else {
-                            $ciclo->semana_poda_siembra = $semana->semana_siembra;
-                            $ciclo->conteo = $request->conteo > 0 ? $request->conteo : $semana->tallos_planta_siembra;
-                        }
-                        $ciclo->plantas_iniciales = $request->plantas_iniciales;
-                        $ciclo->id_empresa = $modulo->id_empresa;
-
-                        $ciclo->save();
-                        $ciclo = Ciclo::All()->last();
-                        $success = true;
-                        $msg = '<div class="alert alert-success text-center">' .
-                            '<p> Se ha guardado un nuevo ciclo satisfactoriamente</p>'
-                            . '</div>';
-                        bitacora('ciclo', $ciclo->id_ciclo, 'I', 'Insercion satisfactoria de un nuevo ciclo');
-
-                        /* ---------------- ACTUALIZR SEMANA_PROYECCION_PERENNE ------------------- */
-                        $semanas = Semana::where('id_variedad', $ciclo->id_variedad)
-                            ->where('codigo', '>=', $semana->codigo)
-                            ->get();
-                        foreach ($semanas as $sem)
-                            jobActualizarSemProyPerenne::dispatch($sem->codigo, $sem->id_variedad, $ciclo->id_empresa)->onQueue('proy_cosecha');
-
-                        /* ---------------- ACTUALIZR PROYECCIONES ------------------- */
-                        jobActualizarProyeccion::dispatch($ciclo->id_variedad, '', $semana, $ciclo->id_empresa)->onQueue('proy_cosecha');
-
-                        /* ======================== ACTUALIZAR LA TABLA RESUMEN_AREA_SEMANAL ====================== */
-                        jobResumenAreaSemanal::dispatch($semana, $ciclo->id_variedad, $ciclo->id_empresa)
-                            ->onQueue('actualizar_resumen_job');
+                    $ciclo->desecho = $semana->desecho != '' ? $semana->desecho : 0;
+                    $ciclo->curva = $semana->curva;
+                    if ($ciclo->poda_siembra == 'P') {
+                        $ciclo->semana_poda_siembra = $semana->semana_poda;
+                        $ciclo->conteo = $request->conteo > 0 ? $request->conteo : $semana->tallos_planta_poda;
                     } else {
-                        $success = false;
-                        $msg = '<div class="alert alert-warning text-center">' .
-                            '<p> No se ha creado la semana para esta variedad</p>'
-                            . '</div>';
+                        $ciclo->semana_poda_siembra = $semana->semana_siembra;
+                        $ciclo->conteo = $request->conteo > 0 ? $request->conteo : $semana->tallos_planta_siembra;
                     }
+                    $ciclo->plantas_iniciales = $request->plantas_iniciales;
+                    $ciclo->id_empresa = $modulo->id_empresa;
+
+                    $ciclo->save();
+                    $ciclo = Ciclo::All()->last();
+                    $success = true;
+                    $msg = '<div class="alert alert-success text-center">' .
+                        '<p> Se ha guardado un nuevo ciclo satisfactoriamente</p>'
+                        . '</div>';
+                    bitacora('ciclo', $ciclo->id_ciclo, 'I', 'Insercion satisfactoria de un nuevo ciclo');
+
+                    /* ---------------- ACTUALIZR SEMANA_PROYECCION_PERENNE ------------------- */
+                    $semanas = Semana::where('id_variedad', $ciclo->id_variedad)
+                        ->where('codigo', '>=', $semana->codigo)
+                        ->get();
+                    foreach ($semanas as $sem)
+                        jobActualizarSemProyPerenne::dispatch($sem->codigo, $sem->id_variedad, $ciclo->id_empresa)->onQueue('proy_cosecha');
+
+                    /* ---------------- ACTUALIZR PROYECCIONES ------------------- */
+                    jobActualizarProyeccion::dispatch($ciclo->id_variedad, '', $semana, $ciclo->id_empresa)->onQueue('proy_cosecha');
+
+                    /* ======================== ACTUALIZAR LA TABLA RESUMEN_AREA_SEMANAL ====================== */
+                    jobResumenAreaSemanal::dispatch($semana, $ciclo->id_variedad, $ciclo->id_empresa)
+                        ->onQueue('actualizar_resumen_job');
                 } else {
                     $success = false;
                     $msg = '<div class="alert alert-warning text-center">' .
-                        '<p> El modulo "' . espacios($request->modulo) . '" ya se encuentra en este sector</p>'
+                        '<p> No se ha creado la semana para esta variedad</p>'
                         . '</div>';
                 }
                 DB::commit();
