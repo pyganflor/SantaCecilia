@@ -55,7 +55,7 @@ class SectoresModulosPerennesController extends Controller
         $valida = Validator::make($request->all(), [
             'variedad' => 'required',
             'sector' => 'required|',
-            'modulo' => 'required|max:25',
+            'modulo' => 'required|max:250',
             'fecha_inicio' => 'required|',
             'area' => 'required|',
             'poda_siembra' => 'required|',
