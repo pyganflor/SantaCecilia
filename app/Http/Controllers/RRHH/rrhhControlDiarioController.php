@@ -104,6 +104,7 @@ class rrhhControlDiarioController extends Controller
                 'p.nombre',
                 'p.apellido',
                 'p.cedula_identidad',
+                'cp.time_lunch',
                 'cp.desde',
                 'cp.hasta',
                 'cp.id_control_personal',
@@ -223,6 +224,7 @@ class rrhhControlDiarioController extends Controller
                         $objControlPersonal->id_personal_detalle = $asistencia['id_personal_detalle'];
                         $objControlPersonal->id_mano_obra = $asistencia['id_mano_obra'];
                         $objControlPersonal->fecha = now()->toDateString();
+                        $objControlPersonal->time_lunch = $asistencia['time_lunch'];
                         $objControlPersonal->desde = $asistencia['desde'];
                         $objControlPersonal->hasta = $asistencia['hasta'];
                         $objControlPersonal->save();

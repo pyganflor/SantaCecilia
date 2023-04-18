@@ -64,7 +64,7 @@ function obtener_atividad_mano_obra(tipo) {
 }
 
 function add_control_personal(identificacion =null){
-   
+   debugger;
     let data= {
         fecha: $("#fecha_search_control_diario").val(),
         identificacion,
@@ -129,9 +129,11 @@ function store_control_asistencia(){
 
     $.each($("input.input-date-cd"),function(i,j){
         console.log($(j).parent().parent().find('select.id_mano_obra'))
+        const time_lunch = $(j).parent().parent().find('input.input-time_lunch').val();
         datos.push({
             id_control_personal: $(j).parent().parent().find('input.input_control_personal').val(),
             id_personal_detalle: $(j).parent().parent().find('input.id_personal_detalle').val(),
+            time_lunch,
             desde: $(j).val(),
             hasta: $(j).parent().next().find('input.input-date-ch').val(),
             id_mano_obra: $(j).parent().parent().find('select.id_mano_obra').val()
