@@ -21,6 +21,9 @@
     </td>
     <td style="border-color: #9d9d9d" class="text-center persona_detalle"></td>
     <td style="border-color: #9d9d9d" class="text-center">
+        <input type="text" class="w-100 input-time_lunch" value="{{$time_lunch}}" oninput="this.value = this.value.trim().replace(/^0+/, '').replace(/[^0-9]/g, '');">
+    </td>
+    <td style="border-color: #9d9d9d" class="text-center">
         <input type="time" class="w-100 input-date-cd" value="{{$desde}}" >
     </td>
     <td style="border-color: #9d9d9d" class="text-center">

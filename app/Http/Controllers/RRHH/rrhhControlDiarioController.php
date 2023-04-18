@@ -164,6 +164,7 @@ class rrhhControlDiarioController extends Controller
             ])->orderBy('nombre','asc')->get(),
             'asignacionMasivaHoras' => Carbon::parse($request->fecha)->diffInDays(now()),
             'personalEncontrado' => $personalEncontrado,
+            'time_lunch' => '',
             'desde' => $request->hora_desde,
             'hasta' => $request->hora_hasta,
         ]);

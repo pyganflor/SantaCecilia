@@ -64,7 +64,7 @@ function obtener_atividad_mano_obra(tipo) {
 }
 
 function add_control_personal(identificacion =null){
-   debugger;
+
     let data= {
         fecha: $("#fecha_search_control_diario").val(),
         identificacion,

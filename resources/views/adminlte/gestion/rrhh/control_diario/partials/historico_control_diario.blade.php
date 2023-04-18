@@ -69,8 +69,8 @@
                 <td style="border-color: #9d9d9d" class="text-center">{{$p->nombre}} {{$p->apellido}}</td>
                 <td style="border-color: #9d9d9d" class="text-center">{{$p->cedula_identidad}}</td>
                 <td style="border-color: #9d9d9d" class="text-center">
-                    <input type="time_lunch" class="w-100 input-time_lunch" type="number"
-                            id="cp-{{$p->id_personal_detalle}}-time_lunch" value="{{$p->time_lunch}}">
+                    <input type="text" class="w-100 input-time_lunch"
+                            id="cp-{{$p->id_personal_detalle}}-time_lunch" value="{{$p->time_lunch}}" oninput="this.value = this.value.trim().replace(/^0+/, '').replace(/[^0-9]/g, '');">
                 </td>
                 <td style="border-color: #9d9d9d" class="text-center">
                     <input type="time" class="w-100 input-date-cd"
