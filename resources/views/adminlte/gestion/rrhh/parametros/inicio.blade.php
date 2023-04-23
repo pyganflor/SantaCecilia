@@ -33,6 +33,7 @@
             <span class="input-group-addon span-input-group-yura-fixed bg-yura_dark">Tipo</span>
             <select name="tipo_parametro" id="tipo_parametro" class="form-control input-yura_default" onchange="listar_parametro()">
                 <option value="">Seleccione</option>
+                <option value="generales">Parametros Generales</option>
                 <option value="ausentismos">Ausentismos</option>
                 <option value="banco">Banco</option>
                 <option value="cargo">Cargos</option>

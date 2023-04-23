@@ -8,6 +8,12 @@ Route::get('parametros/actualizar_salario', 'RRHH\rrhhParametrosController@actua
 Route::post('parametros/store_ausentismo', 'RRHH\rrhhParametrosController@store_ausentismo');
 Route::post('parametros/update_estado','RRHH\rrhhParametrosController@actualizarEstadoausentismo')->name('update_estado.ausentismo');
 Route::post('parametros/editar_ausentismo', 'RRHH\rrhhParametrosController@editar_ausentismo');
+
+/* =================== Parametros generales ==================*/
+
+Route::post('parametros/store_parametros_generales', 'RRHH\rrhhParametrosController@store_parametros_generales');
+Route::post('parametros/editar_parametros_generales', 'RRHH\rrhhParametrosController@editar_parametros_generales');
+
 /* =================== BANCO ==================*/
 
 Route::post('parametros/store_banco', 'RRHH\rrhhParametrosController@store_banco');

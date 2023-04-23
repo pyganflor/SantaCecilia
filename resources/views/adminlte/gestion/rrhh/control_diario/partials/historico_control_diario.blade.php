@@ -18,26 +18,17 @@
         </div>
     @endif
     <div class="col-md-3 col-xs-6">
+        <div class="form-group input-group">
+            <span class="input-group-addon bg-yura_dark">Minutos de Almuerzo</span>
+            <input type="text" class="form-control" id="minutos_almuerzo" oninput="this.value = this.value.trim().replace(/^0+/, '').replace(/[^0-9]/g, '');">
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-6">
         <button class="btn btn-md th_yura_green" onclick="store_control_asistencia()">
             <i class="fa fa-floppy-o"></i>
             Guardar asistencia
         </button>
-
     </div>
-    <div class="col-md-3 col-xs-6 col-sm-6" id="div_iniciar_captura">
-        <button class="btn btn-md th_yura_green" onclick="modal_camara()">
-            <i class="fa fa-camera"></i>
-            Abrir camara
-        </button>
-        
-    </div>
-    {{-- <div class="col-md-3 col-xs-6 hide" id="div_fin_captura">
-        <button class="btn btn-md btn-warning" onclick="cerrar_camara()">
-            <i class="fa fa-camera"></i>
-            Cerrar camara
-        </button>
-    </div> --}}
-    
 </div>
 <table width="100%" class="table-responsive table-bordered" id="tabla_control_personal" style="font-size: 0.8em; border-color: #9d9d9d">
     <thead>
@@ -49,7 +40,6 @@
             @endif
             <th class="text-center th_yura_green">PERSONAL</th>
             <th class="text-center th_yura_green">IDENTIFICACIÓN</th>
-            <th class="text-center th_yura_green">MINUTOS DE ALMUERZO</th>
             <th class="text-center th_yura_green">DESDE</th>
             <th class="text-center th_yura_green">HASTA</th>
             <th class="text-center th_yura_green">LABOR</th>
@@ -61,6 +51,7 @@
             <tr id="row_planta_4" style="">
                 <input type="hidden" class="id_personal_detalle" value="{{ $p->id_personal_detalle }}">
                 <input type="hidden" class="input_control_personal" value="{{ $p->id_control_personal }}">
+                <input type="hidden" class="w-100 input-time_lunch time_lunch_{{$p->cedula_identidad}}" id="cp-{{$p->id_personal_detalle}}-time_lunch" value="{{$p->time_lunch}}">
                 @if(!$asignacionMasivaHoras)
                     <td style="border-color: #9d9d9d" class="text-center">
                         <input type="checkbox" class="check_select_personal" checked>
@@ -68,10 +59,6 @@
                 @endif
                 <td style="border-color: #9d9d9d" class="text-center">{{$p->nombre}} {{$p->apellido}}</td>
                 <td style="border-color: #9d9d9d" class="text-center">{{$p->cedula_identidad}}</td>
-                <td style="border-color: #9d9d9d" class="text-center">
-                    <input type="text" class="w-100 input-time_lunch"
-                            id="cp-{{$p->id_personal_detalle}}-time_lunch" value="{{$p->time_lunch}}" oninput="this.value = this.value.trim().replace(/^0+/, '').replace(/[^0-9]/g, '');">
-                </td>
                 <td style="border-color: #9d9d9d" class="text-center">
                     <input type="time" class="w-100 input-date-cd"
                             id="cp-{{$p->id_personal_detalle}}" value="{{$p->desde}}">

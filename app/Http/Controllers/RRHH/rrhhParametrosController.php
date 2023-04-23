@@ -7,6 +7,7 @@ use yura\Http\Controllers\Controller;
 use yura\Modelos\Ausentismos;
 use yura\Modelos\Banco;
 use yura\Modelos\Cargo;
+use yura\Modelos\ParametrosGenerales;
 use yura\Modelos\Profesion;
 use yura\Modelos\Tipo_rol;
 use yura\Modelos\CausaDesvinculacion;
@@ -40,6 +41,11 @@ class rrhhParametrosController extends Controller
         if ($request->tipo == 'ausentismos') {
             return view('adminlte.gestion.rrhh.parametros.partials.listado_ausentismos', [
                 'listado' => Ausentismos::All()->sortBy('nombre')
+            ]);
+        }
+        if ($request->tipo == 'generales') {
+            return view('adminlte.gestion.rrhh.parametros.partials.listado_parametros_generales', [
+                'listado' => ParametrosGenerales::All()->sortBy('nombre')
             ]);
         }
         if ($request->tipo == 'banco') {
@@ -129,6 +135,46 @@ class rrhhParametrosController extends Controller
         return '';
     }
    
+    /* /////////////////   PARAMETROS GENERALES  //////////////////////////////*/
+
+
+
+    public function store_parametros_generales(Request $request)
+    {
+ //dd($request->all());
+        $model = new ParametrosGenerales();
+        $model->rrhh_minutos_almuerzo = $request->rrhh_minutos_almuerzo;
+        if ($model->save()) {
+            $msg = '<div class="alert alert-success text-center">Se ha guardado el Parámetros Generales satisfactoriamente</div>';
+            $success = true;
+        } else {
+            $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la informacion</div>';
+            $success = false;
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function editar_parametros_generales(Request $request){
+        // dd($request->all());
+       
+        $parametros_generales = ParametrosGenerales::find($request->id_parametros_generales);
+        $parametros_generales->rrhh_minutos_almuerzo = $request->rrhh_minutos_almuerzo;
+        if ($parametros_generales->save()) {
+            $msg = '<div class="alert alert-success text-center">Se han modificado los Parámetros satisfactoriamente</div>';
+            $success = true;
+        } else {
+            $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la informacion</div>';
+            $success = false;
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
    
     /* /////////////////   B A N C O //////////////////////////////*/
 

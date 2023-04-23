@@ -91,6 +91,19 @@
                 </select>
             </div>
         </div>
+        @php
+        // Obtenemos la fecha actual
+        $fechaActual = date('Y-m-d');
+        // Agregamos un día porque no se puede colocar una fecha de ingreso superior al día actual
+        $fechaMaxima = date('Y-m-d', strtotime($fechaActual . ' +2 day'));
+        @endphp
+        <div class="col-md-3">
+            <div class="form-group">
+            <label for="fecha_ingreso">Fecha Ingreso</label>
+                <input type="date" id="fecha_ingreso" name="fecha_ingreso" max="{{$fechaMaxima}}" class="form-control input-yura_default" required
+                    maxlength="250" autocomplete="off" value="{{ !empty($dataPersonal->fecha_ingreso) ? $dataPersonal->fecha_ingreso : $fechaActual }}">
+            </div>
+        </div>
         <div class="col-md-12">
             <div class="form-group">
                 <div class="input-group">
