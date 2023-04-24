@@ -24,7 +24,9 @@
         
     </div>
     <div class="col-md-3 col-xs-6">
-        Buscador de personal:
+        <div class="div-parent-buscador">
+            Buscador de personal:
+        </div>
     </div>
     <div class="col-md-3 col-xs-6">
         <input type="text" class="form-control" placeholder="Búsqueda de personal" id="busqueda_personal" name="busqueda_personal" onkeyup="buscarPersonal(event)">
@@ -97,10 +99,10 @@
         </tbody>
     </table>
 </div>
-<div class="col-md-3 col-xs-6">
+<div class="col-md-3 col-xs-6 pt-20">
     <button class="btn btn-md th_yura_green" onclick="store_control_asistencia()">
         <i class="fa fa-floppy-o"></i>
-        Guardar asistencia
+        Guardar cambios
     </button>
 </div>
 </div>
@@ -128,6 +130,21 @@
         width: 55px;
         opacity: .8;
         border: none;
+    }
+    .pt-20 {
+        padding-top: 20px;
+    }
+
+    #tabla_control_personal tbody td, #tabla_control_personal tbody th { 
+        padding: 3px !important;
+    }
+    
+    .div-parent-buscador {
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        height: 34px;
+        min-height: 34px;
     }
 
 </style>
