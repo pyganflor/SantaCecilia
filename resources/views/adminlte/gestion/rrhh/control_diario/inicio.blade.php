@@ -75,9 +75,9 @@
                 </div>
             </div>
         </div>
+        @php
+        /*
         <div class="form-group input-group" style="padding: 0px">
-
-            <input type="text" class="form-control" placeholder="Búsqueda de personal" id="busqueda_personal" name="busqueda_personal">
             <span class="input-group-btn">
                 <button class="btn btn-yura_primary" onclick="add_control_personal()"
                         onmouseover="$('#title_btn_add').html('Añadir personal')"
@@ -86,7 +86,8 @@
                     <i class="fa fa-fw fa-plus" style="color: #0c0c0c"></i> <em id="title_btn_add"></em>
                 </button>
             </span>
-        </div>
+        </div> */
+        @endphp
         <div id="div_control_diario" style="margin-top:5px"></div>
     </section>
 @endsection

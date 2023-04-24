@@ -1,6 +1,5 @@
 <tr id="row_planta_4" style="">
-    <input type="hidden" class="id_personal_detalle" value="">
-    <input type="hidden" class="w-100 input-time_lunch" value="{{$time_lunch}}">
+    <input type="hidden" class="id_personal_detalle" value="{{isset($personalEncontrado) ? $personalEncontrado->id_personal_detalle : ''}}">
     @if (!$asignacionMasivaHoras)
         <td style="border-color: #9d9d9d" class="text-center">
             <input type="checkbox" class="check_select_personal" checked>
@@ -20,7 +19,9 @@
             @endforeach
         </select>
     </td>
-    <td style="border-color: #9d9d9d" class="text-center persona_detalle"></td>
+    <td style="border-color: #9d9d9d" class="text-center persona_detalle">
+        {{isset($personalEncontrado) ? $personalEncontrado->cedula_identidad : ''}}
+    </td>
     <td style="border-color: #9d9d9d" class="text-center">
         <input type="time" class="w-100 input-date-cd" value="{{$desde}}" >
     </td>

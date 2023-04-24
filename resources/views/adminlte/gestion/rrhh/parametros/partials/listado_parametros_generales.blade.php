@@ -9,7 +9,7 @@
         <tr class="{{$item->estado == 0 ? 'error' : ''}}">
             <td class="text-center" style="border-color: #9d9d9d">
                 <span id="span_nombre_{{$item->id_parametros_generales}}">{{$item->rrhh_minutos_almuerzo}}</span>
-                <input type="text" id="input_nombre_{{$item->id_parametros_generales}}" value="{{$item->rrhh_minutos_almuerzo}}" class="text-center hidden" style = "width: 100%">
+                <input type="number" max="600" id="input_nombre_{{$item->id_parametros_generales}}" value="{{$item->rrhh_minutos_almuerzo}}" class="text-center hidden" oninput="this.value = this.value.trim().replace(/^0+/, '').replace(/[^0-9]/g, '');" style = "width: 100%">
             </td>
             <td class="text-center" style="border-color: #9d9d9d">
                 <div class="btn-group">

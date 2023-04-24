@@ -110,13 +110,17 @@ function set_horario_personal(tipo, input){
     if(tipo == 'desde'){
 
         $.each(check_personal,(i,j)=>{
-            $(j).is(':checked') && $(j).parent().next().next().next().find('input.input-date-cd').val($(input).val())
+            if ($(j).parent().next().next().next().find('input.input-date-cd').val() === "") {
+                $(j).is(':checked') && $(j).parent().next().next().next().find('input.input-date-cd').val($(input).val())
+            }
         })
 
     }else{
 
         $.each(check_personal,(i,j)=>{
-            $(j).is(':checked') && $(j).parent().next().next().next().next().find('input.input-date-ch').val($(input).val())
+            if ($(j).parent().next().next().next().next().find('input.input-date-ch').val() === "") {
+                $(j).is(':checked') && $(j).parent().next().next().next().next().find('input.input-date-ch').val($(input).val())
+            }
         })
 
     }
@@ -129,11 +133,9 @@ function store_control_asistencia(){
 
     $.each($("input.input-date-cd"),function(i,j){
         console.log($(j).parent().parent().find('select.id_mano_obra'))
-        const time_lunch = $(j).parent().parent().find('input.input-time_lunch').val();
         datos.push({
             id_control_personal: $(j).parent().parent().find('input.input_control_personal').val(),
             id_personal_detalle: $(j).parent().parent().find('input.id_personal_detalle').val(),
-            time_lunch,
             desde: $(j).val(),
             hasta: $(j).parent().next().find('input.input-date-ch').val(),
             id_mano_obra: $(j).parent().parent().find('select.id_mano_obra').val()
@@ -152,6 +154,27 @@ function store_control_asistencia(){
 
 }
 
+function clone_asistencia(identificacion =null){
+
+let data= {
+    fecha: $("#fecha_search_control_diario").val(),
+    identificacion,
+    hora_desde: $("#desde_masivo").val(),
+    hora_hasta: $("#hasta_masivo").val(),
+}
+get_jquery('{{ url('control_diario/add_control_personal') }}', data, retorno => {
+    console.log('retorno', retorno)
+
+    if($("#tabla_control_personal tbody tr").length){
+        $("#tabla_control_personal tbody tr:first").before(retorno)
+    }else{
+        $("#tabla_control_personal tbody").append(retorno)
+    }
+    
+}, 'div_control_diario' )
+
+}
+
 function delete_asistencia(id_control_personal){
 
     let data= {
@@ -164,15 +187,12 @@ function delete_asistencia(id_control_personal){
 
 }
 
-$("#busqueda_personal").on("keyup", function() {
-
-    let value = $(this).val().toLowerCase()
-
-    $("table#tabla_control_personal tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    })
-
-})
+function buscarPersonal(event) {
+  const value = event.target.value.toLowerCase();
+  $("table#tabla_control_personal tbody tr").filter(function() {
+    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+  });
+}
 
 function modal_camara(){
 

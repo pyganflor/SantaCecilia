@@ -15,6 +15,7 @@ use yura\Modelos\Actividad;
 use yura\Modelos\ConfiguracionEmpresa;
 use yura\Modelos\ControlPersonal;
 use yura\Modelos\ManoObra;
+use yura\Modelos\ParametrosGenerales;
 use yura\Modelos\PersonalDetalle;
 use yura\Modelos\Submenu;
 use Illuminate\Support\Str;
@@ -120,6 +121,7 @@ class rrhhControlDiarioController extends Controller
             ])->get();
 
             return view('adminlte.gestion.rrhh.control_diario.partials.historico_control_diario',[
+                'ParametrosGenerales' => ParametrosGenerales::first(),
                 'personal' => $personal,
                 'ManoObras' => $manoObras,
                 'asignacionMasivaHoras' => Carbon::parse($request->fecha)->diffInDays(now())
@@ -153,8 +155,8 @@ class rrhhControlDiarioController extends Controller
         ->orderBy('p.nombre','asc')->orderBy('apellido','asc')->get();
 
         $personalEncontrado = Personal::join('personal_detalle as pd','personal.id_personal','pd.id_personal')
-        ->where('cedula_identidad',$request->identificacion)
-        ->select('personal.*','pd.id_mano_obra')->first();
+        ->where('cedula_identidad', $request->identificacion)
+        ->select('personal.*','pd.id_personal_detalle','pd.id_mano_obra')->first();
 
         return view('adminlte.gestion.rrhh.control_diario.partials.fila_tabla_control_personal',[
             'personal' => $personalDetalle,
@@ -213,7 +215,7 @@ class rrhhControlDiarioController extends Controller
             DB::beginTransaction();
 
             try{
-
+                $time_lunch = ParametrosGenerales::first()->rrhh_minutos_almuerzo;
                 foreach($request->datos as $asistencia){
 
                     if(isset($asistencia['desde']) && $asistencia['desde'] !== '' && $asistencia['id_personal_detalle'] !== '' && isset($asistencia['id_personal_detalle'])){
@@ -225,7 +227,7 @@ class rrhhControlDiarioController extends Controller
                         $objControlPersonal->id_personal_detalle = $asistencia['id_personal_detalle'];
                         $objControlPersonal->id_mano_obra = $asistencia['id_mano_obra'];
                         $objControlPersonal->fecha = now()->toDateString();
-                        $objControlPersonal->time_lunch = $asistencia['time_lunch'];
+                        $objControlPersonal->time_lunch = $time_lunch;
                         $objControlPersonal->desde = $asistencia['desde'];
                         $objControlPersonal->hasta = $asistencia['hasta'];
                         $objControlPersonal->save();
