@@ -101,7 +101,7 @@
             <div class="form-group">
             <label for="fecha_ingreso">Fecha Ingreso</label>
                 <input type="date" id="fecha_ingreso" name="fecha_ingreso" max="{{$fechaMaxima}}" class="form-control input-yura_default" required
-                    maxlength="250" autocomplete="off" value="{{ !empty($dataPersonal->fecha_ingreso) ? $dataPersonal->fecha_ingreso : $fechaActual }}">
+                    maxlength="250" autocomplete="off" value="{{ !empty($dataPersonal->fecha_ingreso) ? $dataPersonal->fecha_ingreso : '' }}">
             </div>
         </div>
         <div class="col-md-12">

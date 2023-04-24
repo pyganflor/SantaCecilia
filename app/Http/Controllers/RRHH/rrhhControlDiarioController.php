@@ -156,6 +156,7 @@ class rrhhControlDiarioController extends Controller
 
         $personalEncontrado = Personal::join('personal_detalle as pd','personal.id_personal','pd.id_personal')
         ->where('cedula_identidad', $request->identificacion)
+        ->where('pd.estado', '=', 1)
         ->select('personal.*','pd.id_personal_detalle','pd.id_mano_obra')->first();
 
         return view('adminlte.gestion.rrhh.control_diario.partials.fila_tabla_control_personal',[
