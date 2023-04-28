@@ -24,9 +24,9 @@
                 <span class="input-group-addon bg-yura_dark">Almuerzo</span>
                 <div class="btn-group" id="status" data-toggle="buttons">
                     <label class="btn btn-default btn-on">
-                    <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)">SI</label>
+                    <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)" checked="checked">SI</label>
                     <label class="btn btn-default btn-off active">
-                    <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)" checked="checked">NO</label>
+                    <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)">NO</label>
                 </div>
             </div>
         </div>
