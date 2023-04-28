@@ -156,7 +156,6 @@ class rrhhPersonalController extends Controller
             //'tipo_contrato' => $tipo_contrato,
             'sucursal' => $sucursal,
             'grupo_interno' => $grupo_interno,
-            'grupo' => $grupo,
             'area' => $area,
             //'plantilla' => $plantilla,
             //'tipo_cuenta' => $tipo_cuenta,
@@ -585,7 +584,7 @@ class rrhhPersonalController extends Controller
         ]);
         if (!$valida->fails()) {
 
-
+            DB::beginTransaction();
             try{
 
                 $success = true;
@@ -665,11 +664,12 @@ class rrhhPersonalController extends Controller
                 if($success)
                     $msg = '<div class="alert alert-success text-center">Se ha actualizado el personal satisfactoriamente</div>';
 
-
+                    DB::commit();
             }catch(\Exception $e){
-
+                DB::rollBack();
                 $success = false;
-                $msg = $e->getMessage();
+                $msg = "Ha ocurrido un error con los datos ingresados, por favor verifique y vuelva a intentar.";
+                // $msg = $e->getMessage();
             }
 
         }else {

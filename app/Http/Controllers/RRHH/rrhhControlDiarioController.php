@@ -112,6 +112,7 @@ class rrhhControlDiarioController extends Controller
                 'cp.id_personal_detalle',
                 'cp.id_mano_obra',
                 'personal_detalle.id_personal_detalle',
+                'personal_detalle.id_mano_obra AS id_mano_obra_first',
 
             )->get();
 
@@ -168,6 +169,7 @@ class rrhhControlDiarioController extends Controller
             'asignacionMasivaHoras' => Carbon::parse($request->fecha)->diffInDays(now()),
             'personalEncontrado' => $personalEncontrado,
             'time_lunch' => '',
+            'id_mano_obra' => $request->id_mano_obra,
             'desde' => $request->hora_desde,
             'hasta' => $request->hora_hasta,
         ]);
@@ -228,7 +230,7 @@ class rrhhControlDiarioController extends Controller
                         $objControlPersonal->id_personal_detalle = $asistencia['id_personal_detalle'];
                         $objControlPersonal->id_mano_obra = $asistencia['id_mano_obra'];
                         $objControlPersonal->fecha = now()->toDateString();
-                        $objControlPersonal->time_lunch = $time_lunch;
+                        $objControlPersonal->time_lunch = $asistencia['check_active_lunch']=="true" ? $time_lunch : '0';
                         $objControlPersonal->desde = $asistencia['desde'];
                         $objControlPersonal->hasta = $asistencia['hasta'];
                         $objControlPersonal->save();

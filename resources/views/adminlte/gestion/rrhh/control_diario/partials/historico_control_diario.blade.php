@@ -19,10 +19,18 @@
                         onchange="set_horario_personal('hasta',this)">
             </div>
         </div>
+        <div class="col-md-2 col-xs-6">
+            <div class="form-group input-group">
+                <span class="input-group-addon bg-yura_dark">Almuerzo</span>
+                <div class="btn-group" id="status" data-toggle="buttons">
+                    <label class="btn btn-default btn-on">
+                    <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)">SI</label>
+                    <label class="btn btn-default btn-off active">
+                    <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)" checked="checked">NO</label>
+                </div>
+            </div>
+        </div>
     @endif
-    <div class="col-md-2 col-xs-6">
-        
-    </div>
     <div class="col-md-3 col-xs-6">
         <div class="div-parent-buscador">
             Buscador de personal:
@@ -45,11 +53,15 @@
                 <th class="text-center th_yura_green">IDENTIFICACIÓN</th>
                 <th class="text-center th_yura_green">DESDE</th>
                 <th class="text-center th_yura_green">HASTA</th>
+                <th class="text-center th_yura_green">ALMUERZO</th>
                 <th class="text-center th_yura_green">LABOR</th>
                 <th class="text-center th_yura_green">OPCIONES</th>
             </tr>
         </thead>
         <tbody>
+            @php
+            $current_id = "";
+            @endphp
             @forelse ($personal as $p)
                 <tr id="row_planta_4" style="">
                     <input type="hidden" class="id_personal_detalle" value="{{ $p->id_personal_detalle }}">
@@ -62,26 +74,40 @@
                     <td style="border-color: #9d9d9d" class="text-center">{{$p->nombre}} {{$p->apellido}}</td>
                     <td style="border-color: #9d9d9d" class="text-center">{{$p->cedula_identidad}}</td>
                     <td style="border-color: #9d9d9d" class="text-center">
-                        <input type="time" class="w-100 input-date-cd"
+                        <input type="time" data-identification="{{$p->cedula_identidad}}" class="w-100 input-date-cd"
                                 id="cp-{{$p->id_personal_detalle}}" value="{{$p->desde}}">
                     </td>
                     <td style="border-color: #9d9d9d" class="text-center">
                         <input type="time" class="w-100 input-date-ch"
                                 id="cp-{{$p->id_personal_detalle}}" value="{{$p->hasta}}">
                     </td>
+                    <td style="border-color: #9d9d9d" class="text-center">
+                        @php
+                        if ($current_id != $p->cedula_identidad) {
+                            $current_id = $p->cedula_identidad;
+                            $first_time_id = true;
+                        } else {
+                            $first_time_id = false;
+                        }
+                        @endphp
+                        <input type="checkbox" class="check_active_lunch" {{ !isset($p->id_control_personal) ? 'checked' : ($p->time_lunch > 0 ? ( !$first_time_id ? '' : 'checked') : '') }} {{ !$first_time_id ? 'disabled' : ''}}>
+                    </td>
                     <td  style="border-color: #9d9d9d" class="text-center">
                         <select class="w-100 id_mano_obra" style="height: 22px;">
                             <option value="">Seleccione</option>
                             @foreach ($ManoObras as $mo)
+                                @php
+                                $id_mano_obra_actual = empty($p->id_mano_obra) ? $p->id_mano_obra_first : $p->id_mano_obra;
+                                @endphp
                                 <option value="{{$mo->id_mano_obra}}"
-                                    {{$mo->id_mano_obra === $p->id_mano_obra ? 'selected' : ''}}>{{$mo->nombre}}</option>
+                                    {{$mo->id_mano_obra === $id_mano_obra_actual ? 'selected' : ''}}>{{$mo->nombre}}</option>
                             @endforeach
                         </select>
                     </td>
                     <td  style="border-color: #9d9d9d" class="text-center">
                         @isset($p->id_control_personal)
                             <button class="btn btn-xs btn-info rounded-4" style="border-radius:18px"
-                                    title="Duplicar asistencia" onclick="clone_asistencia('{{$p->cedula_identidad}}')">
+                                    title="Duplicar asistencia" onclick="clone_asistencia('{{$p->cedula_identidad}}',$(this))">
                                 <i class="fa fa-clone"></i>
                             </button>
                             <button class="btn btn-xs btn-danger rounded-4" style="border-radius:18px"
@@ -146,5 +172,20 @@
         height: 34px;
         min-height: 34px;
     }
+    .btn-default.btn-on.active {
+        background-color: #5bc0de;
+        color: white;
+        border-radius: 0px;
+        outline: none;
+        outline-offset: 0;
+    }
+    .btn-default.btn-off.active{
+        background-color: #dd4b39;
+        color: white;
+        border-radius: 0px;
+        outline: none;
+        outline-offset: 0;
+    }
+
 
 </style>

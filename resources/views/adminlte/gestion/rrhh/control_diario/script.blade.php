@@ -127,43 +127,128 @@ function set_horario_personal(tipo, input){
 
 }
 
+function hasAttendanceOverlap(asistencias) {
+  // Objeto auxiliar para almacenar las fechas de las asistencias por personalId
+  const fechasPorPersonal = {};
+
+  // Agrupa las fechas de las asistencias por personalId
+  for (let i = 0; i < asistencias.length; i++) {
+    const asistencia = asistencias[i];
+    if (asistencia.desde && asistencia.hasta) {
+      const personalId = asistencia.personalId;
+      if (!fechasPorPersonal[personalId]) {
+        fechasPorPersonal[personalId] = [];
+      }
+      const desde = Date.parse(`01/01/2000 ${asistencia.desde}`);
+      const hasta = Date.parse(`01/01/2000 ${asistencia.hasta}`);
+      fechasPorPersonal[personalId].push({desde, hasta});
+    }
+  }
+  // Compara las fechas almacenadas en el objeto `fechasPorPersonal`
+  for (const personalId in fechasPorPersonal) {
+    const fechas = fechasPorPersonal[personalId];
+    for (let i = 0; i < fechas.length; i++) {
+      console.log(`comparando verticalmente ${personalId} `+i);
+      const {desde: desde1, hasta: hasta1} = fechas[i];
+      for (let j = i + 1; j < fechas.length; j++) {
+        console.log(`comparando horizontalmente ${personalId} `+j);
+        const {desde: desde2, hasta: hasta2} = fechas[j];
+        if (desde1 < hasta2 && hasta1 > desde2) {
+          return personalId;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+function set_time_lunch_masivo(tipo, lunch_masivo) {
+    // alert(lunch_masivo.value);
+    const check_personal = $("input.check_select_personal");
+    const desde_masivo = $('#desde_masivo').val();
+    const hasta_masivo = $('#hasta_masivo').val();
+
+    $.each(check_personal,(i,j)=>{
+        let desde_input = $(j).parent().next().next().next().find('input.input-date-cd').val();
+        if (desde_input !== "") {
+            desde_input = new Date("2000-01-01T" + desde_input); // crea un objeto Date con la hora y fecha
+            desde_input = desde_input.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}); // formatea la hora sin los segundos
+        }
+        let hasta_input = $(j).parent().next().next().next().next().find('input.input-date-ch').val();
+        if (hasta_input !== "") {
+            hasta_input = new Date("2000-01-01T" + hasta_input); // crea un objeto Date con la hora y fecha
+            hasta_input = hasta_input.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}); // formatea la hora sin los segundos
+        }
+        let check_lunch = $(j).parent().next().next().next().next().next().find('input.check_active_lunch');
+        if ($(j).is(':checked') && !$(check_lunch).is(':disabled') && desde_input === desde_masivo && hasta_input === hasta_masivo ) {
+            if (lunch_masivo.value === "1") {
+                check_lunch.prop('checked', true);
+            } else {
+                check_lunch.prop('checked', false);
+            }
+        }
+    });
+}
+
 function store_control_asistencia(){
-
+    let validate= true;
     let datos=[]
-
-    $.each($("input.input-date-cd"),function(i,j){
-        console.log($(j).parent().parent().find('select.id_mano_obra'))
+    let attendances = [];
+    $.each($("input.input-date-cd"), function(i, j) {
+        attendances.push({
+            personalId: $(j).attr("data-identification"),
+            desde: $(j).val(), 
+            hasta: $(j).parent().next().find('input.input-date-ch').val(),
+        });
+        if (!$(j).val()) {
+            validate= false;
+        }
         datos.push({
             id_control_personal: $(j).parent().parent().find('input.input_control_personal').val(),
             id_personal_detalle: $(j).parent().parent().find('input.id_personal_detalle').val(),
             desde: $(j).val(),
             hasta: $(j).parent().next().find('input.input-date-ch').val(),
+            check_active_lunch: $(j).parent().next().next().find('input.check_active_lunch').prop('checked'),
             id_mano_obra: $(j).parent().parent().find('select.id_mano_obra').val()
-        })
-
-    })
-
-    let data= {
-        _token: '{{csrf_token()}}',
-        fecha: $("#fecha_search_control_diario").val(),
-        datos
+        });
+    });
+    let overlapError = hasAttendanceOverlap(attendances);
+    // attendances.some((attendance, i) => {
+    //     console.log("escaneando");
+        
+    //     return overlapError;
+    // });
+    console.log("saliendo");
+    if (validate) {
+        if (!overlapError) {
+            let data= {
+            _token: '{{csrf_token()}}',
+            fecha: $("#fecha_search_control_diario").val(),
+            datos
+            }
+            post_jquery_m('{{url('control_diario/store_control_personal')}}', data, () => {
+                obtener_control_diario()
+            });
+        } else {
+            alerta_errores(`Ha ocurrido un error, por favor verifique que las horas no se solapen en el personal con cédula "${overlapError}".`);
+        }
+    } else {
+        alerta_errores("Ha ocurrido un error, por favor verifique que no existan campos vacíos");
     }
-    post_jquery_m('{{url('control_diario/store_control_personal')}}', data, () => {
-        obtener_control_diario()
-    })
-
 }
 
-function clone_asistencia(identificacion =null){
-
+function clone_asistencia(identificacion =null, obj = null){
+const id_mano_obra= $(obj).parent().prev().find("select.id_mano_obra").val();
 let data= {
     fecha: $("#fecha_search_control_diario").val(),
     identificacion,
     hora_desde: $("#desde_masivo").val(),
     hora_hasta: $("#hasta_masivo").val(),
+    id_mano_obra,
 }
 get_jquery('{{ url('control_diario/add_control_personal') }}', data, retorno => {
-    console.log('retorno', retorno)
+    // console.log('retorno', retorno)
 
     if($("#tabla_control_personal tbody tr").length){
         $("#tabla_control_personal tbody tr:first").before(retorno)

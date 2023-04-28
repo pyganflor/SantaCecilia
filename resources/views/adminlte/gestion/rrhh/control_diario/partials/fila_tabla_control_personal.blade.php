@@ -7,7 +7,6 @@
     @endif
     <td style="border-color: #9d9d9d" class="text-center">
         <select class="w-100 text-center" style="height: 22px;" onchange="seleccionar_personal(this)">
-            <option value="">Seleccione</option>
             @foreach ($personal as $p)
                 <option value="{{$p->id_personal}}"
                     data-identificacion="{{$p->cedula_identidad}}"
@@ -23,16 +22,22 @@
         {{isset($personalEncontrado) ? $personalEncontrado->cedula_identidad : ''}}
     </td>
     <td style="border-color: #9d9d9d" class="text-center">
-        <input type="time" class="w-100 input-date-cd" value="{{$desde}}" >
+        <input type="time" data-identification="{{$personalEncontrado->cedula_identidad}}" class="w-100 input-date-cd" value="{{$desde}}" >
     </td>
     <td style="border-color: #9d9d9d" class="text-center">
         <input type="time" class="w-100 input-date-ch" value="{{$hasta}}">
     </td>
     <td style="border-color: #9d9d9d" class="text-center">
+        <input type="checkbox" class="check_active_lunch" disabled>
+    </td>
+    <td style="border-color: #9d9d9d" class="text-center">
         <select class="w-100 id_mano_obra" style="height: 22px;">
             <option value="">Seleccione</option>
             @foreach ($manoObra as $mo)
-                <option value="{{$mo->id_mano_obra}}" {{isset($personalEncontrado) ? $personalEncontrado->id_mano_obra == $mo->id_mano_obra ? 'selected' : '' : ''}} >{{$mo->nombre}}</option>
+            @php
+            $id_mano_obra_actual = empty($id_mano_obra) ? $personalEncontrado->id_mano_obra : $id_mano_obra;
+            @endphp
+                <option value="{{$mo->id_mano_obra}}" {{ isset($personalEncontrado) ? $id_mano_obra_actual == $mo->id_mano_obra ? 'selected' : '' : ''}} >{{$mo->nombre}}</option>
             @endforeach
         </select>
     </td>

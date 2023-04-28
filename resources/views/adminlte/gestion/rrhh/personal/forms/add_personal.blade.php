@@ -80,17 +80,6 @@
                 </select>   
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="grupo">Agrupación</label>
-                <select name="grupo" id="id_grupo" class="form-control input-yura_default">
-                    <option>seleccione</option>
-                    @foreach($grupo as $p)
-                        <option value="{{$p->id_grupo}}">{{$p->nombre}}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
         @php
         // Obtenemos la fecha actual
         $fechaActual = date('Y-m-d');

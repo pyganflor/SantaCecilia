@@ -15,6 +15,7 @@ class ControlPersonal extends Model
         'nombre',
         'id_personal_detalle',
         'id_mano_obra',
+        'time_lunch',
         'desde',
         'hasta',
         'fecha',
