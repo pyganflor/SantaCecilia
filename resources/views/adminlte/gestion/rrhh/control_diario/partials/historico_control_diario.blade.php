@@ -23,9 +23,9 @@
             <div class="form-group input-group">
                 <span class="input-group-addon bg-yura_dark">Almuerzo</span>
                 <div class="btn-group" id="status" data-toggle="buttons">
-                    <label class="btn btn-default btn-on">
+                    <label class="btn btn-default btn-on active">
                     <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)" checked="checked">SI</label>
-                    <label class="btn btn-default btn-off active">
+                    <label class="btn btn-default btn-off">
                     <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)">NO</label>
                 </div>
             </div>
@@ -68,7 +68,7 @@
                     <input type="hidden" class="input_control_personal" value="{{ $p->id_control_personal }}">
                     @if(!$asignacionMasivaHoras)
                         <td style="border-color: #9d9d9d" class="text-center">
-                            <input type="checkbox" class="check_select_personal" checked>
+                            <input type="checkbox" class="check_select_personal" {{ isset($p->id_control_personal) ? 'checked' : '' }}>
                         </td>
                     @endif
                     <td style="border-color: #9d9d9d" class="text-center">{{$p->nombre}} {{$p->apellido}}</td>

@@ -196,22 +196,24 @@ function store_control_asistencia(){
     let datos=[]
     let attendances = [];
     $.each($("input.input-date-cd"), function(i, j) {
-        attendances.push({
-            personalId: $(j).attr("data-identification"),
-            desde: $(j).val(), 
-            hasta: $(j).parent().next().find('input.input-date-ch').val(),
-        });
-        if (!$(j).val()) {
-            validate= false;
+        if ($(j).parent().parent().find('input.check_select_personal').is(':checked')) {
+            attendances.push({
+                personalId: $(j).attr("data-identification"),
+                desde: $(j).val(), 
+                hasta: $(j).parent().next().find('input.input-date-ch').val(),
+            });
+            if (!$(j).val()) {
+                validate= false;
+            }
+            datos.push({
+                id_control_personal: $(j).parent().parent().find('input.input_control_personal').val(),
+                id_personal_detalle: $(j).parent().parent().find('input.id_personal_detalle').val(),
+                desde: $(j).val(),
+                hasta: $(j).parent().next().find('input.input-date-ch').val(),
+                check_active_lunch: $(j).parent().next().next().find('input.check_active_lunch').prop('checked'),
+                id_mano_obra: $(j).parent().parent().find('select.id_mano_obra').val()
+            });
         }
-        datos.push({
-            id_control_personal: $(j).parent().parent().find('input.input_control_personal').val(),
-            id_personal_detalle: $(j).parent().parent().find('input.id_personal_detalle').val(),
-            desde: $(j).val(),
-            hasta: $(j).parent().next().find('input.input-date-ch').val(),
-            check_active_lunch: $(j).parent().next().next().find('input.check_active_lunch').prop('checked'),
-            id_mano_obra: $(j).parent().parent().find('select.id_mano_obra').val()
-        });
     });
     let overlapError = hasAttendanceOverlap(attendances);
     // attendances.some((attendance, i) => {
@@ -219,7 +221,6 @@ function store_control_asistencia(){
         
     //     return overlapError;
     // });
-    console.log("saliendo");
     if (validate) {
         if (!overlapError) {
             let data= {
