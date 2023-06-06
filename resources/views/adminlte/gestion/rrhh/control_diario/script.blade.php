@@ -107,24 +107,15 @@ function set_horario_personal(tipo, input){
 
     let check_personal = $("input.check_select_personal")
 
-    if(tipo == 'desde'){
-
-        $.each(check_personal,(i,j)=>{
-            if ($(j).parent().next().next().next().find('input.input-date-cd').val() === "") {
-                $(j).is(':checked') && $(j).parent().next().next().next().find('input.input-date-cd').val($(input).val())
-            }
+    if (tipo == 'desde') {
+        $.each(check_personal,(i,j) => {
+            $(j).is(':checked') && $(j).parent().next().next().next().find('input.input-date-cd').val($(input).val())
         })
-
-    }else{
-
-        $.each(check_personal,(i,j)=>{
-            if ($(j).parent().next().next().next().next().find('input.input-date-ch').val() === "") {
-                $(j).is(':checked') && $(j).parent().next().next().next().next().find('input.input-date-ch').val($(input).val())
-            }
+    } else {
+        $.each(check_personal,(i,j) => {
+            $(j).is(':checked') && $(j).parent().next().next().next().next().find('input.input-date-ch').val($(input).val())
         })
-
     }
-
 }
 
 function hasAttendanceOverlap(asistencias) {

@@ -19,10 +19,10 @@
                         onchange="set_horario_personal('hasta',this)">
             </div>
         </div>
-        <div class="col-md-2 col-xs-6">
+        <div class="col-md-3 col-xs-6">
             <div class="form-group input-group">
                 <span class="input-group-addon bg-yura_dark">Almuerzo</span>
-                <div class="btn-group" id="status" data-toggle="buttons">
+                <div class="btn-group" id="status" data-toggle="buttons" style="display: flex;">
                     <label class="btn btn-default btn-on active">
                     <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)" checked="checked">SI</label>
                     <label class="btn btn-default btn-off">
@@ -31,7 +31,7 @@
             </div>
         </div>
     @endif
-    <div class="col-md-3 col-xs-6">
+    <div class="col-md-2 col-xs-6">
         <div class="div-parent-buscador">
             Buscador de personal:
         </div>
