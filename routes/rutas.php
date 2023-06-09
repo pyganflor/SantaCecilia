@@ -152,6 +152,7 @@ Route::group(['middleware' => 'autenticacion'], function () {
             include 'proyecciones/fenograma_no_perennes.php';
             include 'proyecciones/dashboard_temperaturas.php';
             include 'proyecciones/ejecucion_no_perennes.php';
+            include 'proyecciones/mapeo_cultivo.php';
 
             /* ================== COSTOS =================== */
             include 'costos/insumo.php';
