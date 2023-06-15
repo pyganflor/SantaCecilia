@@ -69,6 +69,7 @@ use yura\Modelos\DetalleEspecificacionEmpaqueRamosCaja;
 use yura\Modelos\Cama;
 use yura\Modelos\Job;
 use yura\Modelos\AplicacionCampo;
+use yura\Modelos\CicloCama;
 
 /*
  * -------- BITÁCORA DE LAS ACCIONES ECHAS POR EL USUARIO ------
@@ -3192,4 +3193,13 @@ function getDelta10Dias()
         ->get()[0]->cantidad;
     $delta_acum_10_dias = round($delta_acum_10_dias);
     return $delta_acum_10_dias;
+}
+
+function getCicloActivoByCamaCuadro($cama, $cuadro)
+{
+    return CicloCama::All()
+        ->where('id_cama', $cama)
+        ->where('cuadro', $cuadro)
+        ->where('activo', 1)
+        ->first();
 }
