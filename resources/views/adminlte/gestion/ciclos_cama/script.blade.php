@@ -8,9 +8,12 @@
         if (datos['modulo'] != '')
             get_jquery('{{ url('ciclos/seleccionar_modulo') }}', datos, function(retorno) {
                 $('#div_listado').html(retorno);
+                $('#div_btn_grabar').removeClass('hidden');
             });
-        else
+        else {
             $('#div_listado').html('');
+            $('#div_btn_grabar').addClass('hidden');
+        }
     }
 
     function seleccionar_sector() {

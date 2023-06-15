@@ -72,7 +72,7 @@
             </tbody>
         </table>
         <div id="div_listado" style="margin-top: 5px; overflow-y: scroll; max-height: 600px; overflow-x: scroll"></div>
-        <div class="text-center" style="margin-top: 5px">
+        <div class="text-center hidden" style="margin-top: 5px" id="div_btn_grabar">
             <button type="button" class="btn btn-yura_primary" onclick="store_ciclos()">
                 <i class="fa fa-fw fa-save"></i> GRABAR CICLOS
             </button>
