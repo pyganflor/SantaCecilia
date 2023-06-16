@@ -76,6 +76,7 @@ class CiclosCamaController extends Controller
                     //$model->semana_cosecha = $d->semana_cosecha;
                     $model->save();
                 } else {
+                    DB::rollBack();
                     $success = false;
                     $msg = '<div class="alert alert-danger text-center" style="font-size: 16px">El cuadro <b>' . $d->cuadro . '</b> de la cama <b>' . getCamaById($d->id_cama)->nombre . '</b> ya tiene un ciclo <b>ACTIVO</b></div>';
 
