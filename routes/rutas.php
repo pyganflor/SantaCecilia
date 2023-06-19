@@ -176,6 +176,10 @@ Route::group(['middleware' => 'autenticacion'], function () {
             include 'propagacion/inventario_enraizamiento.php';
             include 'propagacion/reporte_enraizamiento.php';
 
+            /* ================== BODEGA =============== */
+            include 'bodega/productos.php';
+            include 'bodega/movimientos_bodega.php';
+
             /* ================== COSECHA_DIARIA =============== */
             include 'crm/cosecha_diaria.php';
 
