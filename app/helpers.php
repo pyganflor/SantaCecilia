@@ -3203,3 +3203,13 @@ function getCicloActivoByCamaCuadro($cama, $cuadro)
         ->where('activo', 1)
         ->first();
 }
+
+function getDiaLaboral($fecha) {
+    $diaSemana = date('N', strtotime($fecha));
+    
+    if ($diaSemana == 6 || $diaSemana == 7) {
+        return false;
+    } else {
+        return true;
+    }
+}
