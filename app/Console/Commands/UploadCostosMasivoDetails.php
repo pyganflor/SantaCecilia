@@ -279,10 +279,10 @@ class UploadCostosMasivoDetails extends Command
                                         $act_mo->save();
                                         $act_mo = ActividadManoObra::All()->last();
                                     }
-                                    $costo_mo = CostosDiarioManoObra::All()
+                                    $costo_diario_mo = CostosDiarioManoObra::All()
                                     ->where('id_control_personal', $control->id_control_personal)
                                     ->first();
-                                    if ($costo_mo == '') {
+                                    if ($costo_diario_mo == '') {
                                         // Setear los valores   
                                         $costoDiario->id_actividad_mano_obra = $act_mo->id_actividad_mano_obra;
                                         $costoDiario->id_control_personal = $control->id_control_personal;
@@ -290,6 +290,9 @@ class UploadCostosMasivoDetails extends Command
                                         $costoDiario->codigo_semana = $semana->codigo;
                                         $costoDiario->valor = $total;
                                         $costoDiario->cantidad = 1;
+                                        $costoDiario->cantidad_horas = (getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0) * $cost_hr_ord;
+                                        $costoDiario->cantidad_horas_50 = (getDiaLaboral($control->fecha)? $cantidad_horas_extra : 0) * (1.5 * $cost_hr_supl);
+                                        $costoDiario->cantidad_horas_100 = (!getDiaLaboral($control->fecha)? $cantidad_horas_laboradas_full : 0) * (2 * $cost_hr_supl);
                                         $costoDiario->id_personal = $control->id_personal;
                                         $costoDiario->id_empresa = $finca->id_configuracion_empresa;
                                         $costoDiario->valor_50 = $cost_dia_50_pers;
@@ -297,6 +300,23 @@ class UploadCostosMasivoDetails extends Command
 
                                         // Guardar en la tabla
                                         $costoDiario->save();
+                                    } else {
+                                        // Actualizar los valores
+                                        $costo_diario_mo->id_actividad_mano_obra = $act_mo->id_actividad_mano_obra;
+                                        $costo_diario_mo->fecha = $control->fecha;
+                                        $costo_diario_mo->codigo_semana = $semana->codigo;
+                                        $costo_diario_mo->valor = $total;
+                                        $costo_diario_mo->cantidad = 1;
+                                        $costo_diario_mo->cantidad_horas = getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0;
+                                        $costo_diario_mo->cantidad_horas_50 = getDiaLaboral($control->fecha) ? $cantidad_horas_extra : 0;
+                                        $costo_diario_mo->cantidad_horas_100 = !getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas_full : 0;
+                                        $costo_diario_mo->id_personal = $control->id_personal;
+                                        $costo_diario_mo->id_empresa = $finca->id_configuracion_empresa;
+                                        $costo_diario_mo->valor_50 = $cost_dia_50_pers;
+                                        $costo_diario_mo->valor_100 = $cost_dia_100_pers;
+                                    
+                                        // Guardar los cambios en la tabla
+                                        $costo_diario_mo->update();
                                     }
                                    
 
