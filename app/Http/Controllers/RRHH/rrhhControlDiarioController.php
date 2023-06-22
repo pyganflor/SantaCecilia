@@ -229,7 +229,7 @@ class rrhhControlDiarioController extends Controller
 
                         $objControlPersonal->id_personal_detalle = $asistencia['id_personal_detalle'];
                         $objControlPersonal->id_mano_obra = $asistencia['id_mano_obra'];
-                        $objControlPersonal->fecha = now()->toDateString();
+                        $objControlPersonal->fecha = $request->fecha;
                         $objControlPersonal->time_lunch = $asistencia['check_active_lunch']=="true" ? $time_lunch : '0';
                         $objControlPersonal->desde = $asistencia['desde'];
                         $objControlPersonal->hasta = $asistencia['hasta'];

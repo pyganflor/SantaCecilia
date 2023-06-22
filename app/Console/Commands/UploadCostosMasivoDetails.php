@@ -211,6 +211,7 @@ class UploadCostosMasivoDetails extends Command
             {
                 $controles_personal = ControlPersonal::join('personal_detalle', 'control_personal.id_personal_detalle', '=', 'personal_detalle.id_personal_detalle')
                 ->select('control_personal.*', 'personal_detalle.*')
+                ->orderBy('personal_detalle.id_personal')
                 ->get();
 
                 foreach($controles_personal as $pos_cp => $control)
@@ -250,6 +251,9 @@ class UploadCostosMasivoDetails extends Command
                                 $hor_efect_mes = $dias_lab_mes * 8; // CantDiasLaborables/Mes *8(hrs/dia)
                                 $cost_hr_ord = 450 / $hor_efect_mes;  // Sueldo / HorasEfectivasMes // OJO
                                 $cost_hr_supl = 450 / 240;    // Sueldo / 240(30dias * 8) // OJO
+                                $cantidad_horas = getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0;
+                                $cantidad_horas_50 = getDiaLaboral($control->fecha)? $cantidad_horas_extra : 0;
+                                $cantidad_horas_100 = !getDiaLaboral($control->fecha)? $cantidad_horas_laboradas_full : 0;
                                 $cost_dia_pers = (getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0) * $cost_hr_ord;   // HoraNormal * CostHrsOrdinaria
                                 $cost_dia_50_pers = (getDiaLaboral($control->fecha)? $cantidad_horas_extra : 0) * (1.5 * $cost_hr_supl); // Hrs50  * (50% de CostHrOrdinaria)
                                 $cost_dia_100_pers = (!getDiaLaboral($control->fecha)? $cantidad_horas_laboradas_full : 0) * (2 * $cost_hr_supl); // Hrs100  * (100% de CostHrOrdinaria)
@@ -290,9 +294,9 @@ class UploadCostosMasivoDetails extends Command
                                         $costoDiario->codigo_semana = $semana->codigo;
                                         $costoDiario->valor = $total;
                                         $costoDiario->cantidad = 1;
-                                        $costoDiario->cantidad_horas = (getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0) * $cost_hr_ord;
-                                        $costoDiario->cantidad_horas_50 = (getDiaLaboral($control->fecha)? $cantidad_horas_extra : 0) * (1.5 * $cost_hr_supl);
-                                        $costoDiario->cantidad_horas_100 = (!getDiaLaboral($control->fecha)? $cantidad_horas_laboradas_full : 0) * (2 * $cost_hr_supl);
+                                        $costoDiario->cantidad_horas = $cantidad_horas;
+                                        $costoDiario->cantidad_horas_50 = $cantidad_horas_50;
+                                        $costoDiario->cantidad_horas_100 = $cantidad_horas_100;
                                         $costoDiario->id_personal = $control->id_personal;
                                         $costoDiario->id_empresa = $finca->id_configuracion_empresa;
                                         $costoDiario->valor_50 = $cost_dia_50_pers;
@@ -307,9 +311,9 @@ class UploadCostosMasivoDetails extends Command
                                         $costo_diario_mo->codigo_semana = $semana->codigo;
                                         $costo_diario_mo->valor = $total;
                                         $costo_diario_mo->cantidad = 1;
-                                        $costo_diario_mo->cantidad_horas = getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas : 0;
-                                        $costo_diario_mo->cantidad_horas_50 = getDiaLaboral($control->fecha) ? $cantidad_horas_extra : 0;
-                                        $costo_diario_mo->cantidad_horas_100 = !getDiaLaboral($control->fecha) ? $cantidad_horas_laboradas_full : 0;
+                                        $costo_diario_mo->cantidad_horas = $cantidad_horas;
+                                        $costo_diario_mo->cantidad_horas_50 = $cantidad_horas_50;
+                                        $costo_diario_mo->cantidad_horas_100 = $cantidad_horas_100;
                                         $costo_diario_mo->id_personal = $control->id_personal;
                                         $costo_diario_mo->id_empresa = $finca->id_configuracion_empresa;
                                         $costo_diario_mo->valor_50 = $cost_dia_50_pers;
@@ -337,12 +341,20 @@ class UploadCostosMasivoDetails extends Command
                                     // dump('pos: ' . $p . '/' . count($activeSheetData) . '-' . porcentaje($p, count($activeSheetData), 1) . '% - fecha: ' . $fecha . ' - sem: ' . $semana->codigo . ' - act: ' . $actividad->nombre . ' - mo: ' . $mo->nombre . ' - TOTAL: ' . $total);
                                     //dump('$total: '. $total, '$cost_total_dia_pers: '.$cost_total_dia_pers, '$prov_13th: '.$prov_13th, '$prov_14th: '.$prov_14th, '$fondos_reserva: '.$fondos_reserva, '$aporte_patronal: '.$aporte_patronal);
                                     $existe = false;
+                                    $aux_id_personal = 0;
                                     for ($i = 0; $i < count($lista); $i++) {
                                         if ($lista[$i]['semana'] == $semana->codigo && $lista[$i]['actividad']->id_actividad == $actividad->id_actividad && $lista[$i]['mano_obra']->id_mano_obra == $mo->id_mano_obra && $lista[$i]['finca'] == $finca->id_configuracion_empresa) {
                                             $lista[$i]['valor'] += $total;
                                             $lista[$i]['valor_50'] += $cost_dia_50_pers;
                                             $lista[$i]['valor_100'] += $cost_dia_100_pers;
+                                            $lista[$i]['cantidad_horas'] += $cantidad_horas;
+                                            $lista[$i]['cantidad_horas_50'] += $cantidad_horas_50;
+                                            $lista[$i]['cantidad_horas_100'] += $cantidad_horas_100;
                                             $lista[$i]['cantidad'] += 1;
+                                            if($control->id_personal != $aux_id_personal) {
+                                               $aux_id_personal = $control->id_personal;
+                                               $lista[$i]['cantidad_personal']++;
+                                            }
                                             $existe = true;
                                         }
                                     }
@@ -355,7 +367,11 @@ class UploadCostosMasivoDetails extends Command
                                             'valor' => $total,
                                             'valor_50' => $cost_dia_50_pers,
                                             'valor_100' => $cost_dia_100_pers,
+                                            'cantidad_horas' => $cantidad_horas,
+                                            'cantidad_horas_50' => $cantidad_horas_50,
+                                            'cantidad_horas_100' => $cantidad_horas_100,
                                             'cantidad' => 1,
+                                            'cantidad_personal' => 1
                                         ]);
                                     }
                                 } else {
@@ -421,11 +437,19 @@ class UploadCostosMasivoDetails extends Command
                 $costo_semana->valor = $item['valor'];
                 $costo_semana->valor_50 = $item['valor_50'];
                 $costo_semana->valor_100 = $item['valor_100'];
+                $costo_semana->cantidad_horas = $item['cantidad_horas'];
+                $costo_semana->cantidad_horas_50 = $item['cantidad_horas_50'];
+                $costo_semana->cantidad_horas_100 = $item['cantidad_horas_100'];
+                $costo_semana->cantidad_personal = $item['cantidad_personal'];
             } else {
                 $costo_semana->cantidad += $item['cantidad'];
                 $costo_semana->valor += $item['valor'];
                 $costo_semana->valor_50 += $item['valor_50'];
                 $costo_semana->valor_100 += $item['valor_100'];
+                $costo_semana->cantidad_horas = $item['cantidad_horas'];
+                $costo_semana->cantidad_horas_50 = $item['cantidad_horas_50'];
+                $costo_semana->cantidad_horas_100 = $item['cantidad_horas_100'];
+                $costo_semana->cantidad_personal = $item['cantidad_personal'];
             }
             dump(($pos_item + 1) . '/' . count($lista) . '-' . porcentaje($pos_item, count($lista), 1) . '% - act_mo: ' . $act_mo->id_actividad_mano_obra . ' - act: ' . $item['actividad']->nombre . ' - prod: ' . $item['mano_obra']->nombre . ' -sem: ' . $item['semana'] . ' - valor: ' . $item['valor']);
             $costo_semana->save();

@@ -6,7 +6,6 @@
 
 @section('script_inicio')
     {{--<script src="{{url('js/portada/login.js')}}"></script>--}}
-
     <script language="JavaScript" type="text/javascript" src="{{url('js/rsa/jsbn.js')}}"></script>
     <script language="JavaScript" type="text/javascript" src="{{url('js/rsa/jsbn2.js')}}"></script>
     <script language="JavaScript" type="text/javascript" src="{{url('js/rsa/prng4.js')}}"></script>
