@@ -351,10 +351,8 @@ class UploadCostosMasivoDetails extends Command
                                             $lista[$i]['cantidad_horas_50'] += $cantidad_horas_50;
                                             $lista[$i]['cantidad_horas_100'] += $cantidad_horas_100;
                                             $lista[$i]['cantidad'] += 1;
-                                            if($control->id_personal != $aux_id_personal) {
-                                               $aux_id_personal = $control->id_personal;
-                                               $lista[$i]['cantidad_personal']++;
-                                            }
+                                            $aux_id_personal = $control->id_personal;
+                                            array_push($lista[$i]['cantidad_personal'], $aux_id_personal);
                                             $existe = true;
                                         }
                                     }
@@ -371,7 +369,7 @@ class UploadCostosMasivoDetails extends Command
                                             'cantidad_horas_50' => $cantidad_horas_50,
                                             'cantidad_horas_100' => $cantidad_horas_100,
                                             'cantidad' => 1,
-                                            'cantidad_personal' => 1
+                                            'cantidad_personal' => [$control->id_personal]
                                         ]);
                                     }
                                 } else {
@@ -432,6 +430,7 @@ class UploadCostosMasivoDetails extends Command
                 $costo_semana->cantidad = $item['cantidad'];
                 $costo_semana->id_empresa = $item['finca'];
             }
+            $item['cantidad_personal'] = array_unique($item['cantidad_personal']);
             if ($sobreescribir == 'S') {
                 $costo_semana->cantidad = $item['cantidad'];
                 $costo_semana->valor = $item['valor'];
@@ -440,7 +439,7 @@ class UploadCostosMasivoDetails extends Command
                 $costo_semana->cantidad_horas = $item['cantidad_horas'];
                 $costo_semana->cantidad_horas_50 = $item['cantidad_horas_50'];
                 $costo_semana->cantidad_horas_100 = $item['cantidad_horas_100'];
-                $costo_semana->cantidad_personal = $item['cantidad_personal'];
+                $costo_semana->cantidad_personal = count($item['cantidad_personal']);
             } else {
                 $costo_semana->cantidad += $item['cantidad'];
                 $costo_semana->valor += $item['valor'];
@@ -449,7 +448,7 @@ class UploadCostosMasivoDetails extends Command
                 $costo_semana->cantidad_horas = $item['cantidad_horas'];
                 $costo_semana->cantidad_horas_50 = $item['cantidad_horas_50'];
                 $costo_semana->cantidad_horas_100 = $item['cantidad_horas_100'];
-                $costo_semana->cantidad_personal = $item['cantidad_personal'];
+                $costo_semana->cantidad_personal = count($item['cantidad_personal']);
             }
             dump(($pos_item + 1) . '/' . count($lista) . '-' . porcentaje($pos_item, count($lista), 1) . '% - act_mo: ' . $act_mo->id_actividad_mano_obra . ' - act: ' . $item['actividad']->nombre . ' - prod: ' . $item['mano_obra']->nombre . ' -sem: ' . $item['semana'] . ' - valor: ' . $item['valor']);
             $costo_semana->save();
