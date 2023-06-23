@@ -81,7 +81,7 @@
                 Criterio
             </div>
             <select name="criterio" id="criterio" class="form-control">
-                <option value="V">Valores</option>
+                <option value="V">Costos</option>
                 <option value="C">Cant. de horas ordinarias</option>
                 <option value="E">Cant. de horas 50%</option>
                 <option value="F">Cant. de horas 100%</option>
