@@ -113,6 +113,9 @@ class ComandoDev extends Command
         if ($comando == 'importar_variedades') {
             $this->importar_variedades();
         }
+        if ($comando == 'importar_productos') {
+            $this->importar_productos();
+        }
         if ($comando == 'caca') {
             $this->caca();
         }
@@ -1094,6 +1097,41 @@ class ComandoDev extends Command
                     }
                 } else {
                     dd('Falló en la fila: ' . $pos_row . '; Planta errónea', $row, espacios(mb_strtoupper($row['B'])));
+                }
+            }
+            //unlink($url);
+        } catch (\Exception $e) {
+            dump('************************* ERROR ****************************');
+            dump($e->getMessage());
+        }
+    }
+
+    function importar_productos()
+    {
+        dump('<<<<< ! >>>>> Ejecutando comando:dev "caca" <<<<< ! >>>>>');
+        try {
+            $url = public_path('storage/pdf_loads/productos.xlsx');
+            $document = IOFactory::load($url);
+            $activeSheetData = $document->getActiveSheet()->toArray(null, true, true, true);
+
+            foreach ($activeSheetData as $pos_row => $row) {
+                if ($pos_row > 3) {
+                    $producto = Producto::All()
+                        ->where('nombre', espacios(mb_strtoupper($row['B'])))
+                        ->where('codigo', espacios(mb_strtoupper($row['A'])))
+                        ->first();
+                    if ($producto == '') {
+                        dump($pos_row . '/' . (count($activeSheetData) - 1));
+                        $producto = new Producto();
+                        $producto->codigo = espacios(mb_strtoupper($row['A']));
+                        $producto->nombre = espacios(mb_strtoupper($row['B']));
+                        $producto->unidad_medida = espacios(mb_strtoupper($row['C']));
+                        $producto->stock_minimo = $row['D'];
+                        $producto->disponibles = $row['D'];
+                        $producto->conversion = 1;
+                        $producto->id_empresa = 1;
+                        $producto->save();
+                    }
                 }
             }
             //unlink($url);
