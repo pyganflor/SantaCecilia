@@ -1,10 +1,8 @@
 <tr id="row_planta_4" style="">
     <input type="hidden" class="id_personal_detalle" value="{{isset($personalEncontrado) ? $personalEncontrado->id_personal_detalle : ''}}">
-    @if (!$asignacionMasivaHoras)
-        <td style="border-color: #9d9d9d" class="text-center">
-            <input type="checkbox" class="check_select_personal" checked>
-        </td>
-    @endif
+    <td style="border-color: #9d9d9d" class="text-center">
+        <input type="checkbox" class="check_select_personal" checked>
+    </td>
     <td style="border-color: #9d9d9d" class="text-center">
         <select class="w-100 text-center" style="height: 22px;" onchange="seleccionar_personal(this)">
             @foreach ($personal as $p)

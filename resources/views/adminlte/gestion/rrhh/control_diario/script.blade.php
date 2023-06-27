@@ -188,12 +188,14 @@ function store_control_asistencia(){
     let attendances = [];
     $.each($("input.input-date-cd"), function(i, j) {
         if ($(j).parent().parent().find('input.check_select_personal').is(':checked')) {
+            $(j).attr("style","");
             attendances.push({
                 personalId: $(j).attr("data-identification"),
                 desde: $(j).val(), 
                 hasta: $(j).parent().next().find('input.input-date-ch').val(),
             });
             if (!$(j).val()) {
+                $(j).attr("style","border: 2px solid #D6006E;");
                 validate= false;
             }
             datos.push({

@@ -30,17 +30,54 @@
             </th>
             @php
                 $total = 0;
+                $total_cantidad_horas_ordinarias = 0;
+                $total_cantidad_horas_50 = 0;
+                $total_cantidad_horas_100 = 0;
+                $total_cantidad_personal = 0;
             @endphp
             @foreach($totales as $item)
                 <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
-                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->cant, 2)}}</span>
+                    @if ($criterio == 'V')
+                        <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->cant, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'C')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->total_cantidad_horas_ordinarias, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'E')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->total_cantidad_horas_50, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'F')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->total_cantidad_horas_100, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'P')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($item->total_cantidad_personal, 2)}}</span>
+                    @endif
+                    
                 </th>
                 @php
+                    $total_cantidad_horas_ordinarias += round($item->total_cantidad_horas_ordinarias, 2);
+                    $total_cantidad_horas_50 += round($item->total_cantidad_horas_50, 2);
+                    $total_cantidad_horas_100 += round($item->total_cantidad_horas_100, 2);
+                    $total_cantidad_personal += round($item->total_cantidad_personal, 2);
                     $total += round($item->cant, 2);
                 @endphp
             @endforeach
             <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
-                <span style="margin-left: 5px; margin-right: 5px">{{number_format($total, 2)}}</span>
+                @if ($criterio == 'V')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($total, 2)}}</span>
+                @endif
+                @if ($criterio == 'C')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($total_cantidad_horas_ordinarias, 2)}}</span>
+                @endif
+                @if ($criterio == 'E')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($total_cantidad_horas_50, 2)}}</span>
+                @endif
+                @if ($criterio == 'F')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($total_cantidad_horas_100, 2)}}</span>
+                @endif
+                @if ($criterio == 'P')
+                    <span style="margin-left: 5px; margin-right: 5px">{{number_format($total_cantidad_personal, 2)}}</span>
+                @endif
             </th>
             <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef;">
                 <span style="margin-left: 5px; margin-right: 5px">100%</span>
@@ -60,6 +97,10 @@
                 id="tr_act_mo_{{$pos_act}}">
                 @php
                     $total_prod = 0;
+                    $total_horas_ordinarias_x_mo = 0;
+                    $total_horas_50_x_mo = 0;
+                    $total_horas_100_x_mo = 0;
+                    $total_personal_x_mo = 0;
                 @endphp
                 @foreach($act as $pos_item => $item)
                     @if($pos_item == 0)
@@ -76,21 +117,106 @@
                         </td>
                     @endif
                     <td class="text-center" style="border-color: #9d9d9d">
-                        <span>{{number_format($item->valor, 2)}}</span>
+                        @if ($criterio == 'V')
+                            <span>{{number_format($item->valor, 2)}}</span>
+                        @endif
+                        @if ($criterio == 'C')
+                            <span>{{number_format($item->cantidad_horas, 2)}}</span>
+                        @endif
+                        @if ($criterio == 'E')
+                            <span>{{number_format($item->cantidad_horas_50, 2)}}</span>
+                        @endif
+                        @if ($criterio == 'F')
+                            <span>{{number_format($item->cantidad_horas_100, 2)}}</span>
+                        @endif
+                        @if ($criterio == 'P')
+                            <span>{{number_format($item->cantidad_personal, 2)}}</span>
+                        @endif
                     </td>
                     @php
                         $total_prod += round($item->valor, 2);
+                        $total_horas_ordinarias_x_mo += round($item->cantidad_horas, 2);
+                        $total_horas_50_x_mo += round($item->cantidad_horas_50, 2);
+                        $total_horas_100_x_mo += round($item->cantidad_horas_100, 2);
+                        $total_personal_x_mo += round($item->cantidad_personal, 2);
                     @endphp
                 @endforeach
                 <td class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
-                    <span>{{number_format($total_prod, 2)}}</span>
+                    @if ($criterio == 'V')
+                        <span>{{number_format($total_prod, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'C')
+                        <span>{{number_format($total_horas_ordinarias_x_mo, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'E')
+                        <span>{{number_format($total_horas_50_x_mo, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'F')
+                        <span>{{number_format($total_horas_100_x_mo, 2)}}</span>
+                    @endif
+                    @if ($criterio == 'P')
+                        <span>{{number_format($total_personal_x_mo, 2)}}</span>
+                    @endif
                 </td>
                 <td class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
-                    <span>{{round(($total_prod / $total) * 100, 2)}}</span>
-                    <input type="hidden" value="{{round(($total_prod / $total) * 100, 2)}}" class="porcentaje_parcial">
+                    @if ($criterio == 'V')
+                        <span>
+                            {{ $total != 0 ? round(($total_prod / $total) * 100, 2) : 0 }}
+                        </span>
+                        <input type="hidden" value="{{ $total != 0 ? round(($total_prod / $total) * 100, 2) : 0 }}" class="porcentaje_parcial">
+                    @endif
+                    @if ($criterio == 'C')
+                        <span>
+                            {{ $total_cantidad_horas_ordinarias != 0 ? round(($total_horas_ordinarias_x_mo / $total_cantidad_horas_ordinarias) * 100, 2) : 0 }}
+                        </span>
+                        <input type="hidden" value="{{ $total_cantidad_horas_ordinarias != 0 ? round(($total_horas_ordinarias_x_mo / $total_cantidad_horas_ordinarias) * 100, 2) : 0 }}" class="porcentaje_parcial">
+                    @endif
+                    @if ($criterio == 'E')
+                        <span>
+                            {{ $total_cantidad_horas_50 != 0 ? round(($total_horas_50_x_mo / $total_cantidad_horas_50) * 100, 2) : 0 }}
+                        </span>
+                        <input type="hidden" value="{{ $total_cantidad_horas_50 != 0 ? round(($total_horas_50_x_mo / $total_cantidad_horas_50) * 100, 2) : 0 }}" class="porcentaje_parcial">
+                    @endif
+                    @if ($criterio == 'F')
+                        <span>
+                            {{ $total_cantidad_horas_100 != 0 ? round(($total_horas_100_x_mo / $total_cantidad_horas_100) * 100, 2) : 0 }}
+                        </span>
+                        <input type="hidden" value="{{ $total_cantidad_horas_100 != 0 ? round(($total_horas_100_x_mo / $total_cantidad_horas_100) * 100, 2) : 0 }}" class="porcentaje_parcial">
+                    @endif
+                    @if ($criterio == 'P')
+                        <span>
+                            {{ $total_cantidad_personal != 0 ? round(($total_personal_x_mo / $total_cantidad_personal) * 100, 2) : 0 }}
+                        </span>
+                        <input type="hidden" value="{{ $total_cantidad_personal != 0 ? round(($total_personal_x_mo / $total_cantidad_personal) * 100, 2) : 0 }}" class="porcentaje_parcial">
+                    @endif
                 </td>
                 @php
-                    $acumulado += ($total_prod / $total) * 100;
+                if ($criterio == 'V') {
+                    if ($total != 0) {
+                        $acumulado += ($total_prod / $total) * 100;
+                    }
+                }
+                if ($criterio == 'C') {
+                    if ($total_cantidad_horas_ordinarias != 0) {
+                        $acumulado += ($total_horas_ordinarias_x_mo / $total_cantidad_horas_ordinarias) * 100;
+                    }
+                }
+                if ($criterio == 'E') {
+                    if ($total_cantidad_horas_50 != 0) {
+                        $acumulado += ($total_horas_50_x_mo / $total_cantidad_horas_50) * 100;
+                    }
+                }
+
+                if ($criterio == 'F') {
+                    if ($total_cantidad_horas_100 != 0) {
+                        $acumulado += ($total_horas_100_x_mo / $total_cantidad_horas_100) * 100;
+                    }
+                }
+                if ($criterio == 'P') {
+                    if ($total_cantidad_personal != 0) {
+                        $acumulado += ($total_personal_x_mo / $total_cantidad_personal) * 100;
+                    }
+                }
                 @endphp
                 <td class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                     <span class="acumulado_parcial">{{round($acumulado, 2)}}</span>

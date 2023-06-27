@@ -1,36 +1,34 @@
 <div class="row">
-    @if(!$asignacionMasivaHoras)
-        <div class="col-md-12 col-xs-12">
-            <h4 title="Puedes prellenar las horas de asistencia en estos campos para ahorrar tiempo en el registro individual">Asistencia rápida <i class="fa fa-info-circle"></i></h4>
+    <div class="col-md-12 col-xs-12">
+        <h4 title="Puedes prellenar las horas de asistencia en estos campos para ahorrar tiempo en el registro individual">Asistencia rápida <i class="fa fa-info-circle"></i></h4>
+    </div>
+    <div class="col-md-2 col-xs-6">
+        <div class="form-group input-group">
+            <span class="input-group-addon bg-yura_dark">Desde</span>
+            <input type="time" class="form-control" id="desde_masivo"
+                    onkeyup="set_horario_personal('desde',this)"
+                    onchange="set_horario_personal('desde',this)">
         </div>
-        <div class="col-md-2 col-xs-6">
-            <div class="form-group input-group">
-                <span class="input-group-addon bg-yura_dark">Desde</span>
-                <input type="time" class="form-control" id="desde_masivo"
-                        onkeyup="set_horario_personal('desde',this)"
-                        onchange="set_horario_personal('desde',this)">
+    </div>
+    <div class="col-md-2 col-xs-6">
+        <div class="form-group input-group">
+            <span class="input-group-addon bg-yura_dark">Hasta</span>
+            <input type="time" class="form-control" id="hasta_masivo"
+                    onkeyup="set_horario_personal('hasta',this)"
+                    onchange="set_horario_personal('hasta',this)">
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <div class="form-group input-group">
+            <span class="input-group-addon bg-yura_dark">Almuerzo</span>
+            <div class="btn-group" id="status" data-toggle="buttons" style="display: flex;">
+                <label class="btn btn-default btn-on active">
+                <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)" checked="checked">SI</label>
+                <label class="btn btn-default btn-off">
+                <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)">NO</label>
             </div>
         </div>
-        <div class="col-md-2 col-xs-6">
-            <div class="form-group input-group">
-                <span class="input-group-addon bg-yura_dark">Hasta</span>
-                <input type="time" class="form-control" id="hasta_masivo"
-                        onkeyup="set_horario_personal('hasta',this)"
-                        onchange="set_horario_personal('hasta',this)">
-            </div>
-        </div>
-        <div class="col-md-3 col-xs-6">
-            <div class="form-group input-group">
-                <span class="input-group-addon bg-yura_dark">Almuerzo</span>
-                <div class="btn-group" id="status" data-toggle="buttons" style="display: flex;">
-                    <label class="btn btn-default btn-on active">
-                    <input type="radio" value="1" name="time_lunch_masivo" onchange="set_time_lunch_masivo('si',this)" checked="checked">SI</label>
-                    <label class="btn btn-default btn-off">
-                    <input type="radio" value="0" name="time_lunch_masivo" onchange="set_time_lunch_masivo('no',this)">NO</label>
-                </div>
-            </div>
-        </div>
-    @endif
+    </div>
     <div class="col-md-2 col-xs-6">
         <div class="div-parent-buscador">
             Buscador de personal:
@@ -44,11 +42,9 @@
     <table width="100%" class="table-responsive table-bordered" id="tabla_control_personal" style="font-size: 0.8em; border-color: #9d9d9d">
         <thead>
             <tr id="th_fija_top_0">
-                @if(!$asignacionMasivaHoras)
-                    <th class="text-center th_yura_green">
-                        <input type="checkbox" name="seleccionar_todo_personal" onchange="seleccionar_todo_personal(this)" checked>
-                    </th>
-                @endif
+                <th class="text-center th_yura_green">
+                    <input type="checkbox" name="seleccionar_todo_personal" onchange="seleccionar_todo_personal(this)" checked>
+                </th>
                 <th class="text-center th_yura_green">PERSONAL</th>
                 <th class="text-center th_yura_green">IDENTIFICACIÓN</th>
                 <th class="text-center th_yura_green">DESDE</th>
@@ -66,11 +62,9 @@
                 <tr id="row_planta_4" style="">
                     <input type="hidden" class="id_personal_detalle" value="{{ $p->id_personal_detalle }}">
                     <input type="hidden" class="input_control_personal" value="{{ $p->id_control_personal }}">
-                    @if(!$asignacionMasivaHoras)
-                        <td style="border-color: #9d9d9d" class="text-center">
-                            <input type="checkbox" class="check_select_personal" {{ isset($p->id_control_personal) ? 'checked' : '' }}>
-                        </td>
-                    @endif
+                    <td style="border-color: #9d9d9d" class="text-center">
+                        <input type="checkbox" class="check_select_personal" {{ isset($p->id_control_personal) ? 'checked' : '' }}>
+                    </td>
                     <td style="border-color: #9d9d9d" class="text-center">{{$p->nombre}} {{$p->apellido}}</td>
                     <td style="border-color: #9d9d9d" class="text-center">{{$p->cedula_identidad}}</td>
                     <td style="border-color: #9d9d9d" class="text-center">

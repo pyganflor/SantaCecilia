@@ -2134,7 +2134,7 @@ class CostosController extends Controller
         }
 
         $totales = DB::table('costos_semana_mano_obra')
-            ->select(DB::raw('sum(valor) as cant'), 'codigo_semana as semana')
+            ->select(DB::raw('sum(valor) as cant'),DB::raw('sum(cantidad_horas) as total_cantidad_horas_ordinarias'),DB::raw('sum(cantidad_horas_50) as total_cantidad_horas_50'),DB::raw('sum(cantidad_horas_100) as total_cantidad_horas_100'),DB::raw('sum(cantidad_personal) as total_cantidad_personal'), 'codigo_semana as semana')
             ->where('codigo_semana', '>=', $request->desde)
             ->where('codigo_semana', '<=', $request->hasta)
             ->whereIn('id_actividad_mano_obra', $list_ids)
