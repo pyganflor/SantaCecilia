@@ -21,9 +21,10 @@ class MovimientosBodegaController extends Controller
     public function listar_reporte(Request $request)
     {
         $finca = getFincaActiva();
-        $listado = Producto::where('nombre', 'like', '%' . mb_strtoupper($request->busqueda) . '%')
-            ->orwhere('codigo', 'like', '%' . mb_strtoupper($request->busqueda) . '%')
-            ->where('id_empresa', $finca)
+        $listado = Producto::Where(function ($q) use ($request) {
+            $q->Where('nombre', 'like', '%' . mb_strtoupper($request->busqueda) . '%')
+                ->orWhere('codigo', 'like', '%' . mb_strtoupper($request->busqueda) . '%');
+        })->where('id_empresa', $finca)
             ->orderBy('nombre')
             ->get();
 
