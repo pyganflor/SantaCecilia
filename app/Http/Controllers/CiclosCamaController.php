@@ -73,17 +73,13 @@ class CiclosCamaController extends Controller
                     $model->plantas_iniciales = $d->plantas_iniciales;
                     $model->conteo = $d->conteo;
                     $model->id_variedad = $d->id_variedad;
-                    //$model->semana_cosecha = $d->semana_cosecha;
                     $model->save();
                 } else {
-                    DB::rollBack();
-                    $success = false;
-                    $msg = '<div class="alert alert-danger text-center" style="font-size: 16px">El cuadro <b>' . $d->cuadro . '</b> de la cama <b>' . getCamaById($d->id_cama)->nombre . '</b> ya tiene un ciclo <b>ACTIVO</b></div>';
-
-                    return [
-                        'success' => $success,
-                        'mensaje' => $msg,
-                    ];
+                    $existe->fecha_inicio = $d->fecha_inicio;
+                    $existe->plantas_iniciales = $d->plantas_iniciales;
+                    $existe->conteo = $d->conteo;
+                    $existe->id_variedad = $d->id_variedad;
+                    $existe->save();
                 }
             }
 

@@ -64,10 +64,8 @@
                     </td>
                 @endif
                 <td class="text-center" style="border-color: #9d9d9d">
-                    @if ($ciclo == '')
-                        <input type="checkbox" class="check_cuadros_{{ $c->id_cama }} check_cuadros mouse-hand"
-                            value="{{ $i }}" id="check_cuadro_{{ $i }}_{{ $c->id_cama }}">
-                    @endif
+                    <input type="checkbox" class="check_cuadros_{{ $c->id_cama }} check_cuadros mouse-hand"
+                        value="{{ $i }}" id="check_cuadro_{{ $i }}_{{ $c->id_cama }}">
                     <label for="check_cuadro_{{ $i }}_{{ $c->id_cama }}" class="mouse-hand">
                         {{ $i }}
                     </label>
