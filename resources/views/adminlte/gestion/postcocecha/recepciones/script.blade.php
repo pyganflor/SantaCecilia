@@ -1,6 +1,6 @@
 <script>
     $('#vista_actual').val('recepcion');
-    buscar_listado_recepcion();
+    //buscar_listado_recepcion();
 
     function add_recepcion() {
         datos = {}

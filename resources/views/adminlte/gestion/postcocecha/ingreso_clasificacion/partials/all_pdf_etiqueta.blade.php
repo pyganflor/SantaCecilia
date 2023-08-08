@@ -19,7 +19,7 @@
             </tr>
             <tr style="padding: 0">
                 <td style="text-align: left; font-size: 10px; padding: 0">
-                    {{ getDias(TP_LETRA)[transformDiaPhp(date('w', strtotime($d['fecha'])))] }}{{ intVal(substr($d['fecha'], 5, 2)) }}.{{ substr($d['fecha'], 8, 2) }}F<small>in</small>{{ mb_strtoupper(substr($d['finca']->nombre, 0, 2)) }}
+                    {{ getDias(TP_LETRA)[transformDiaPhp(date('w', strtotime($d['fecha'])))] }}{{ intVal(substr($d['fecha'], 5, 2)) }}.{{ substr($d['fecha'], 8, 2) }}
                 </td>
                 <td style="text-align: center; font-size: 10px; padding: 0" colspan="2">
                     PRODUCT of ECUADOR

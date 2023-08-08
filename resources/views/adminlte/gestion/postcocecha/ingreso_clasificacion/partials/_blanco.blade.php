@@ -17,6 +17,7 @@
                     {{ $item['planta']->nombre }}
                     <input type="hidden" id="count_form_{{ $item['planta']->id_planta }}" value="0">
                     <select id="select_variedades_{{ $item['planta']->id_planta }}" class="hidden">
+                        <option value="">Seleccione</option>
                         @foreach ($item['variedades'] as $v)
                             <option value="{{ $v->id_variedad }}">{{ $v->nombre }}</option>
                         @endforeach
@@ -70,13 +71,7 @@
 <select id="select_clasificacion_ramos" class="hidden">
     <option value="">Longitud del ramo</option>
     @foreach ($clasificaciones_ramos as $r)
-        <option value="{{ $r->id_clasificacion_ramo }}">{{ $r->nombre . $r->unidad_medida->siglas }}</option>
-    @endforeach
-</select>
-<select id="select_fincas" class="hidden">
-    <option value="">Finca destino</option>
-    @foreach ($fincas as $f)
-        <option value="{{ $f->id_configuracion_empresa }}">{{ $f->nombre }}</option>
+        <option value="{{ $r->id_clasificacion_ramo }}">{{ $r->nombre }}</option>
     @endforeach
 </select>
 
@@ -94,29 +89,15 @@
         count_form = $('#count_form_' + pta).val();
         count_form++;
         select_clasificacion_ramos = $('#select_clasificacion_ramos');
-        select_fincas = $('#select_fincas');
-        parametros_select_plantaByFinca = [
-            "'new_variedad_" + pta + "_" + count_form + "'",
-            "'new_variedad_" + pta + "_" + count_form + "'",
-            "'<option value=>Seleccione</option>'"
-        ];
+        select_variedades = $('#select_variedades_' + pta).html();
         $('#table_inventario_planta_' + pta).addClass('hidden');
         $('#table_desglose_planta_' + pta).removeClass('hidden');
         $('#table_desglose_planta_' + pta).append('<tr id="tr_desglose_planta_' + pta + '_' + count_form + '">' +
             '<td style="border-color: #9d9d9d">' +
-            '<select id="new_finca_destino_' + pta + '_' + count_form + '" style="width: 100%" ' +
-            'onchange="buscar_inventario(' + pta + ',' + count_form + '); ' +
-            'select_plantaByFinca($(this).val(),' + pta + ',' + parametros_select_plantaByFinca[0] +
-            ',' + parametros_select_plantaByFinca[1] +
-            ',' + parametros_select_plantaByFinca[2] + ')">' +
-            select_fincas.html() +
-            '</select>' +
-            '</td>' +
-            '<td style="border-color: #9d9d9d">' +
             '<select id="new_variedad_' + pta + '_' + count_form + '" style="width: 100%" ' +
             'onchange="buscar_inventario(' + pta + '); ' +
             'buscar_modulos(' + pta + ',' + count_form + ')">' +
-            '<option value=>Variedad</option>' +
+            select_variedades +
             '</select>' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
@@ -202,7 +183,6 @@
                 modulo: $('#new_modulo_' + pta + '_' + i).val(),
                 clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + i).val(),
                 tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + i).val(),
-                finca_destino: $('#new_finca_destino_' + pta + '_' + i).val(),
                 cantidad: $('#new_cantidad_' + pta + '_' + i).val(),
             });
         }
@@ -232,11 +212,10 @@
             modulo: $('#new_modulo_' + pta + '_' + count_form).val(),
             clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + count_form).val(),
             tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + count_form).val(),
-            finca_destino: $('#new_finca_destino_' + pta + '_' + count_form).val(),
             cantidad: $('#new_cantidad_' + pta + '_' + count_form).val(),
         };
-        if (datos['clasificacion_ramo'] != '' && datos['tallos_x_ramo'] > 0 && datos[
-                'finca_destino'] != '' && datos['cantidad'] > 0 && datos['modulo'] != '')
+        if (datos['clasificacion_ramo'] != '' && datos['tallos_x_ramo'] > 0 && datos['cantidad'] > 0 && datos[
+            'modulo'] != '')
             post_jquery_m('{{ url('ingreso_clasificacion/store_blanco') }}', datos, function() {
                 buscar_inventario(pta, count_form);
                 $('#new_cantidad_' + pta + '_' + count_form).val('');

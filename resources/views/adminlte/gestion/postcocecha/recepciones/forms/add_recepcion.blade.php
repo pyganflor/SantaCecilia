@@ -1,19 +1,22 @@
 <table class="table-bordered" style="width: 100%; border: 1px solid #9d9d9d" id="table_add_recepcion">
     <tr>
         <th class="text-center th_yura_green">
-            Variedad
+            PLANTA
         </th>
         <th class="text-center th_yura_green">
-            Tipo
+            VARIEDAD
         </th>
         <th class="text-center th_yura_green">
-            Módulo
+            BLOQUE
         </th>
         <th class="text-center th_yura_green">
-            Mallas
+            MALLAS
         </th>
         <th class="text-center th_yura_green">
             Tallos x Malla
+        </th>
+        <th class="text-center th_yura_green">
+            COSECHADOR
         </th>
         <th class="text-center th_yura_green">
             <div class="btn-group">
@@ -25,7 +28,7 @@
     </tr>
     <tr>
         <td style="border-color: #9d9d9d">
-            <select id="new_planta_1" style="width: 100%"
+            <select id="new_planta_1" style="width: 100%; height: 26px;"
                 onchange="select_planta($(this).val(), 'new_variedad_1', 'new_variedad_1', '<option value= selected>Seleccione</option>')">
                 @if (count($plantas) > 1)
                     <option value="">Seleccione</option>
@@ -42,12 +45,12 @@
             @endif
         </td>
         <td style="border-color: #9d9d9d">
-            <select id="new_variedad_1" style="width: 100%" onchange="select_variedad_recepcion(1)">
+            <select id="new_variedad_1" style="width: 100%; height: 26px;" onchange="select_variedad_recepcion(1)">
                 <option value="">Seleccione</option>
             </select>
         </td>
         <td style="border-color: #9d9d9d">
-            <select id="new_modulo_1" style="width: 100%">
+            <select id="new_modulo_1" style="width: 100%; height: 26px;">
                 <option value="-1">Default</option>
             </select>
         </td>
@@ -58,6 +61,16 @@
         <td style="border-color: #9d9d9d">
             <input type="number" id="new_tallos_x_malla_1" class="text-center" min="0" value="0" required
                 style="width: 100%">
+        </td>
+        <td style="border-color: #9d9d9d">
+            <select id="new_cosechador_1" style="width: 100%; height: 26px;">
+                @if (count($cosechadores) > 1)
+                    <option value="">Seleccione</option>
+                @endif
+                @foreach ($cosechadores as $item)
+                    <option value="{{ $item->id_cosechador }}">{{ $item->nombre }}</option>
+                @endforeach
+            </select>
         </td>
     </tr>
 </table>
@@ -92,13 +105,14 @@
     function add_new_row() {
         cant_forms++;
         select_plantas = $('#new_planta_1').html();
+        select_cosechadores = $('#new_cosechador_1').html();
         parametros_select_planta = [
             "'new_variedad_" + cant_forms + "'",
             "'<option value = selected>Seleccione</option>'",
         ]
         $('#table_add_recepcion').append('<tr>' +
             '<td style="border-color: #9d9d9d">' +
-            '<select id="new_planta_' + cant_forms + '" style="width: 100%"' +
+            '<select id="new_planta_' + cant_forms + '" style="width: 100%; height: 26px;"' +
             'onchange="select_planta($(this).val(), ' +
             parametros_select_planta[0] + ', ' +
             parametros_select_planta[0] + ', ' + parametros_select_planta[1] + ')">' +
@@ -107,12 +121,12 @@
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
             '<select id="new_variedad_' + cant_forms +
-            '" style="width: 100%" onchange="select_variedad_recepcion(' + cant_forms + ')">' +
+            '" style="width: 100%; height: 26px;" onchange="select_variedad_recepcion(' + cant_forms + ')">' +
             '<option value="">Seleccione</option>' +
             '</select>' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
-            '<select id="new_modulo_' + cant_forms + '" style="width: 100%">' +
+            '<select id="new_modulo_' + cant_forms + '" style="width: 100%; height: 26px;">' +
             '<option value="-1">Default</option>' +
             '</select>' +
             '</td>' +
@@ -125,6 +139,11 @@
             '<input type="number" id="new_tallos_x_malla_' + cant_forms +
             '" class="text-center" min="0" value="0" required' +
             ' style="width: 100%">' +
+            '</td>' +
+            '<td style="border-color: #9d9d9d">' +
+            '<select id="new_cosechador_' + cant_forms + '" style="width: 100%; height: 26px;">' +
+            select_cosechadores +
+            '</select>' +
             '</td>' +
             '</tr>');
         select_planta($('#new_planta_' + cant_forms).val(), 'new_variedad_' + cant_forms, 'new_variedad_' + cant_forms,

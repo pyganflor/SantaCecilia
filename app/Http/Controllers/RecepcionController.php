@@ -79,29 +79,35 @@ class RecepcionController extends Controller
     public function add_recepcion(Request $request)
     {
         $finca = getFincaActiva();
-        $plantas = DB::table('ciclo as c')
+        $plantas = DB::table('ciclo_cama as c')
             ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
             ->join('planta as p', 'p.id_planta', '=', 'v.id_planta')
             ->select('v.id_planta', 'p.nombre')->distinct()
-            ->where('c.estado', 1)
             ->where('v.estado', 1)
             ->where('p.estado', 1)
             ->where('c.activo', 1)
             ->where('c.id_empresa', $finca)
+            ->orderBy('p.nombre')
+            ->get();
+        $cosechadores = DB::table('cosechador')
+            ->where('estado', 1)
+            ->where('id_empresa', $finca)
             ->orderBy('nombre')
             ->get();
         return view('adminlte.gestion.postcocecha.recepciones.forms.add_recepcion', [
             'plantas' => $plantas,
+            'cosechadores' => $cosechadores,
         ]);
     }
 
     public function select_variedad_recepcion(Request $request)
     {
         $finca_actual = getFincaActiva();
-        $modulos = DB::table('ciclo as c')
-            ->join('modulo as m', 'm.id_modulo', '=', 'c.id_modulo')
+        $modulos = DB::table('ciclo_cama as c')
+            ->join('cama as ca', 'ca.id_cama', '=', 'c.id_cama')
+            ->join('modulo as m', 'm.id_modulo', '=', 'ca.id_modulo')
             ->join('sector as s', 's.id_sector', '=', 'm.id_sector')
-            ->select('c.id_modulo', 'm.nombre', 's.nombre as nombre_sector')->distinct()
+            ->select('ca.id_modulo', 'm.nombre', 's.nombre as nombre_sector')->distinct()
             ->where('c.activo', 1)
             ->where('c.id_variedad', $request->variedad)
             ->where('c.id_empresa', $finca_actual)

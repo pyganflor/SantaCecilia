@@ -28,10 +28,9 @@ class BlancoController extends Controller
 
         $listado = [];
         foreach ($all_plantas as $p) {
-            $variedades = DB::table('ciclo as c')
+            $variedades = DB::table('ciclo_cama as c')
                 ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
                 ->select('c.id_variedad', 'v.nombre')->distinct()
-                ->where('c.estado', 1)
                 ->where('v.estado', 1)
                 ->where('v.id_planta', $p->id_planta)
                 ->where('c.activo', 1)
@@ -59,13 +58,10 @@ class BlancoController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        $fincas = ConfiguracionEmpresa::get();
-
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.partials._blanco', [
             'fecha' => $request->fecha,
             'listado' => $listado,
             'clasificaciones_ramos' => $clasificaciones_ramos,
-            'fincas' => $fincas,
         ]);
     }
 
@@ -77,7 +73,6 @@ class BlancoController extends Controller
             ->where('id_variedad', $request->variedad)
             ->where('id_modulo', $request->modulo)
             ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
-            ->where('finca_destino', $request->finca_destino)
             ->where('tallos_x_ramo', $request->tallos_x_ramo)
             ->where('basura', 0)
             ->where('disponibilidad', 1)
@@ -91,7 +86,6 @@ class BlancoController extends Controller
             $model->id_variedad = $request->variedad;
             $model->id_modulo = $request->modulo != '' ? $request->modulo : -1;
             $model->id_clasificacion_ramo = $request->clasificacion_ramo;
-            $model->finca_destino = $request->finca_destino;
             $model->tallos_x_ramo = $request->tallos_x_ramo;
             $model->disponibilidad = 1;
             $model->basura = 0;
@@ -121,7 +115,7 @@ class BlancoController extends Controller
             ->where('id_modulo', $request->modulo)
             ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
             //->where('id_empaque', $request->empaque)
-            ->where('finca_destino', $request->finca_destino)
+            //->where('finca_destino', $request->finca_destino)
             ->where('tallos_x_ramo', $request->tallos_x_ramo)
             ->where('id_empresa', $finca)
             ->get()[0]->cantidad;
@@ -201,11 +195,12 @@ class BlancoController extends Controller
 
     public function buscar_modulos(Request $request)
     {
-        $finca = $request->finca;
-        $modulos = DB::table('ciclo as c')
-            ->join('modulo as m', 'm.id_modulo', '=', 'c.id_modulo')
+        $finca = getFincaActiva();
+        $modulos = DB::table('ciclo_cama as c')
+            ->join('cama as ca', 'ca.id_cama', '=', 'c.id_cama')
+            ->join('modulo as m', 'm.id_modulo', '=', 'ca.id_modulo')
             ->join('sector as s', 's.id_sector', '=', 'm.id_sector')
-            ->select('c.id_modulo', 'm.nombre', 's.nombre as nombre_sector')->distinct()
+            ->select('ca.id_modulo', 'm.nombre', 's.nombre as nombre_sector')->distinct()
             ->where('c.activo', 1)
             ->where('c.id_variedad', $request->variedad)
             ->where('c.id_empresa', $finca)
@@ -215,7 +210,7 @@ class BlancoController extends Controller
 
         $options = '';
         foreach ($modulos as $mod)
-            $options .= '<option value="' . $mod->id_modulo . '">' . $mod->nombre_sector . '</option>';
+            $options .= '<option value="' . $mod->id_modulo . '">' . $mod->nombre_sector . ': ' . $mod->nombre . '</option>';
 
         return [
             'options' => $options,
@@ -231,7 +226,6 @@ class BlancoController extends Controller
         $finca = getFincaActiva();
         $variedad = Variedad::find($request->variedad);
         $longitud = ClasificacionRamo::find($request->clasificacion_ramo);
-        $finca_destino = ConfiguracionEmpresa::find($request->finca_destino);
         $tallos_x_ramo = $request->tallos_x_ramo;
         $cantidad = $request->cantidad;
         $fecha = $request->fecha;
@@ -241,7 +235,6 @@ class BlancoController extends Controller
             ->where('id_variedad', $request->variedad)
             ->where('id_modulo', $request->modulo)
             ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
-            ->where('finca_destino', $request->finca_destino)
             ->where('tallos_x_ramo', $request->tallos_x_ramo)
             ->where('basura', 0)
             ->where('disponibilidad', 1)
@@ -254,7 +247,6 @@ class BlancoController extends Controller
             'longitud' => $longitud,
             'tallos_x_ramo' => $tallos_x_ramo,
             'cantidad' => $cantidad,
-            'finca' => $finca_destino,
             'fecha' => $fecha,
         ];
 
@@ -272,7 +264,6 @@ class BlancoController extends Controller
                 ->where('id_variedad', $d->variedad)
                 ->where('id_modulo', $d->modulo)
                 ->where('id_clasificacion_ramo', $d->clasificacion_ramo)
-                ->where('finca_destino', $d->finca_destino)
                 ->where('tallos_x_ramo', $d->tallos_x_ramo)
                 ->where('basura', 0)
                 ->where('disponibilidad', 1)
@@ -286,7 +277,6 @@ class BlancoController extends Controller
                 $model->id_variedad = $d->variedad;
                 $model->id_modulo = $d->modulo != '' ? $d->modulo : -1;
                 $model->id_clasificacion_ramo = $d->clasificacion_ramo;
-                $model->finca_destino = $d->finca_destino;
                 $model->tallos_x_ramo = $d->tallos_x_ramo;
                 $model->disponibilidad = 1;
                 $model->basura = 0;
@@ -320,9 +310,7 @@ class BlancoController extends Controller
             $model = InventarioFrio::find($id);
             $variedad = Variedad::find($model->id_variedad);
             $longitud = ClasificacionRamo::find($model->id_clasificacion_ramo);
-            $finca = ConfiguracionEmpresa::find($model->finca_destino);
             $tallos_x_ramo = $model->tallos_x_ramo;
-            $cantidad = $cantidad;
             $fecha = $model->fecha;
             $datos[] = [
                 'variedad' => $variedad,
@@ -330,7 +318,6 @@ class BlancoController extends Controller
                 'longitud' => $longitud,
                 'tallos_x_ramo' => $tallos_x_ramo,
                 'cantidad' => $cantidad,
-                'finca' => $finca,
                 'fecha' => $fecha,
             ];
         }
@@ -348,9 +335,7 @@ class BlancoController extends Controller
         $model = InventarioFrio::find($id);
         $variedad = Variedad::find($model->id_variedad);
         $longitud = ClasificacionRamo::find($model->id_clasificacion_ramo);
-        $finca = ConfiguracionEmpresa::find($model->finca_destino);
         $tallos_x_ramo = $model->tallos_x_ramo;
-        $cantidad = $cantidad;
         $fecha = $model->fecha;
         $datos = [
             'inventario_frio' => $model,
@@ -358,7 +343,6 @@ class BlancoController extends Controller
             'longitud' => $longitud,
             'tallos_x_ramo' => $tallos_x_ramo,
             'cantidad' => $cantidad,
-            'finca' => $finca,
             'fecha' => $fecha,
         ];
         return PDF::loadView('adminlte.gestion.postcocecha.ingreso_clasificacion.partials.pdf_etiqueta', compact('datos', 'barCode'))

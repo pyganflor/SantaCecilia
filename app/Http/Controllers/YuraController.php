@@ -691,15 +691,14 @@ class YuraController extends Controller
     public function select_planta(Request $request)
     {
         $finca = getFincaActiva();
-        $p_variedades = DB::table('ciclo as c')
+        $p_variedades = DB::table('ciclo_cama as c')
             ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
             ->select('v.id_variedad', 'v.nombre')->distinct()
-            ->where('c.estado', 1)
             ->where('v.estado', 1)
             ->where('v.id_planta', $request->planta)
             ->where('c.activo', 1)
             ->where('c.id_empresa', $finca)
-            ->orderBy('nombre')
+            ->orderBy('v.nombre')
             ->get();
         $r = '';
         foreach ($p_variedades as $v) {

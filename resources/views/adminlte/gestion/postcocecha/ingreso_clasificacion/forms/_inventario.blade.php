@@ -3,9 +3,6 @@
         Fecha
     </th>
     <th class="text-center th_yura_green" style="border-color: white">
-        Finca destino
-    </th>
-    <th class="text-center th_yura_green" style="border-color: white">
         Variedad
     </th>
     <th class="text-center th_yura_green" style="border-color: white">
@@ -34,10 +31,6 @@
         <td class="text-center" style="border-color: #9d9d9d">
             <input type="text" readonly style="width: 100%; background-color: #e9ecef" class="text-center"
                 value="{{ $item->fecha }}">
-        </td>
-        <td class="text-center" style="border-color: #9d9d9d">
-            <input type="text" readonly style="width: 100%; background-color: #e9ecef" class="text-center"
-                value="{{ $item->get_finca_destino->nombre }}">
         </td>
         <td class="text-center" style="border-color: #9d9d9d">
             <input type="text" readonly style="width: 100%; background-color: #e9ecef" class="text-center"
