@@ -42,4 +42,9 @@ class DesgloseRecepcion extends Model
     {
         return $this->belongsTo('\yura\Modelos\Modulo', 'id_modulo');
     }
+
+    public function cosechador()
+    {
+        return $this->belongsTo('\yura\Modelos\Cosechador', 'id_cosechador');
+    }
 }

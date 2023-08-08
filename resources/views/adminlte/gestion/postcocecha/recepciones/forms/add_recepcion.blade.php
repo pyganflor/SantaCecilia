@@ -159,12 +159,14 @@
                 planta = $('#new_planta_' + i).val();
                 variedad = $('#new_variedad_' + i).val();
                 modulo = $('#new_modulo_' + i).val();
+                cosechador = $('#new_cosechador_' + i).val();
                 data.push({
                     planta: planta,
                     variedad: variedad,
                     modulo: modulo,
                     mallas: mallas,
                     tallos_x_malla: tallos_x_malla,
+                    cosechador: cosechador,
                 });
             }
         }
@@ -172,7 +174,7 @@
             datos = {
                 _token: '{{ csrf_token() }}',
                 fecha: $('#filtro_fecha').val(),
-                data: data,
+                data: JSON.stringify(data),
             }
             post_jquery_m('{{ url('recepcion/store_recepcion') }}', datos, function() {
                 cerrar_modals();

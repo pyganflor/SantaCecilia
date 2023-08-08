@@ -59,16 +59,15 @@ class RecepcionController extends Controller
             ->where('r.fecha_ingreso', $request->fecha)
             ->where('desglose_recepcion.id_empresa', $finca)
             ->get();
-        $plantas = DB::table('ciclo as c')
+        $plantas = DB::table('ciclo_cama as c')
             ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
             ->join('planta as p', 'p.id_planta', '=', 'v.id_planta')
             ->select('v.id_planta', 'p.nombre')->distinct()
-            ->where('c.estado', 1)
             ->where('v.estado', 1)
             ->where('p.estado', 1)
             ->where('c.activo', 1)
             ->where('c.id_empresa', $finca)
-            ->orderBy('nombre')
+            ->orderBy('p.nombre')
             ->get();
         return view('adminlte.gestion.postcocecha.recepciones.partials.listado', [
             'listado' => $listado,
@@ -147,20 +146,20 @@ class RecepcionController extends Controller
         $recepcion->fecha_registro = date('Y-m-d H:i:s');
         $recepcion->save();
         $recepcion = Recepcion::All()->last();
-        foreach ($request->data as $d) {
+        foreach (json_decode($request->data) as $d) {
             $desglose = new DesgloseRecepcion();
-            $desglose->id_variedad = $d['variedad'];
-            $desglose->id_modulo = $d['modulo'];
-            $desglose->tallos_x_malla = $d['tallos_x_malla'];
-            $desglose->cantidad_mallas = $d['mallas'];
-            $desglose->id_cosechador = -1;
+            $desglose->id_variedad = $d->variedad;
+            $desglose->id_modulo = $d->modulo;
+            $desglose->tallos_x_malla = $d->tallos_x_malla;
+            $desglose->id_cosechador = $d->cosechador;
+            $desglose->cantidad_mallas = $d->mallas;
             $desglose->id_recepcion = $recepcion->id_recepcion;
             $desglose->fecha_registro = date('Y-m-d H:i:s');
             $desglose->id_empresa = $finca;
             $desglose->save();
 
             /* ======= ACTUALIZAR LA TABLA COSECHA_DIARIA ========== */
-            jobActualizarCosecha::dispatch($d['variedad'], substr($recepcion->fecha_ingreso, 0, 10), $finca, $d['modulo'])
+            jobActualizarCosecha::dispatch($d->variedad, substr($recepcion->fecha_ingreso, 0, 10), $finca, $d->modulo)
                 ->onQueue('proy_cosecha');
         }
 
