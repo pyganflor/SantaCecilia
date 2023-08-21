@@ -12,9 +12,13 @@
                 </legend>
             </td>
             <td class="text-center">
-                <legend style="font-size: 1em; margin-bottom: 2px">
-                    Productos Seleccionados
-                </legend>
+                <div class="input-group" style="font-size: 1em; margin-bottom: 2px">
+                    <span class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
+                        Productos a Sacar
+                    </span>
+                    <input type="date" id="fecha_salida" style="width: 100%; height: 28px;" class="text-center"
+                        value="{{ hoy() }}" max="{{ hoy() }}">
+                </div>
             </td>
         </tr>
         <tr>
@@ -84,11 +88,17 @@
                         <th class="text-center bg-yura_dark">
                             CODIGO
                         </th>
-                        <th class="text-center bg-yura_dark" style="width: 80% !important">
+                        <th class="text-center bg-yura_dark">
                             NOMBRE
                         </th>
-                        <th class="text-center bg-yura_dark">
+                        <th class="text-center bg-yura_dark" style="width: 60px">
                             UNIDADES
+                        </th>
+                        <th class="text-center bg-yura_dark">
+                            SECTOR
+                        </th>
+                        <th class="text-center bg-yura_dark">
+                            BLOQUE
                         </th>
                         <th class="text-center bg-yura_dark">
                         </th>
@@ -98,11 +108,20 @@
         </tr>
     </table>
 </div>
+<select class="hidden" id="select_sectores">
+    <option value="">Seleccione</option>
+    @foreach ($sectores as $item)
+        <option value="{{ $item->id_sector }}">
+            {{ $item->nombre }}
+        </option>
+    @endforeach
+</select>
 
 <script>
     estructura_tabla('table_listado_add_salidas');
 
     function agregar_productos() {
+        select_sectores = $('#select_sectores').html();
         tr_productos = $('.tr_productos');
         for (i = 0; i < tr_productos.length; i++) {
             id_prod = tr_productos[i].value;
@@ -122,6 +141,18 @@
                         '<td class="text-center" style="border-color: #9d9d9d">' +
                         '<input type="number" style="width: 100%" class="text-center"' +
                         'id="unidades_seleccionado_' + id_prod + '" min="0" value="' + unidades + '">' +
+                        '</td>' +
+                        '<td class="text-center" style="border-color: #9d9d9d">' +
+                        '<select style="width: 100%; height: 26px" onchange="seleccionar_sector(' + id_prod + ')"' +
+                        'id="sector_seleccionado_' + id_prod + '" min="0">' +
+                        select_sectores +
+                        '</select>' +
+                        '</td>' +
+                        '<td class="text-center" style="border-color: #9d9d9d">' +
+                        '<select style="width: 100%; height: 26px" ' +
+                        'id="modulo_seleccionado_' + id_prod + '" min="0">' +
+                        '<option value="">Seleccione</option' +
+                        '</select>' +
                         '</td>' +
                         '<td class="text-center" style="border-color: #9d9d9d">' +
                         '<button type="button" class="btn btn-xs btn-yura_danger" onclick="quitar_fila(' + id_prod +
@@ -145,10 +176,12 @@
         for (i = 0; i < id_producto_seleccionado.length; i++) {
             id_prod = id_producto_seleccionado[i].value;
             unidades = $('#unidades_seleccionado_' + id_prod).val();
-            if (unidades > 0) {
+            modulo = $('#modulo_seleccionado_' + id_prod).val();
+            if (unidades > 0 && modulo != '') {
                 data.push({
                     id_prod: id_prod,
                     unidades: unidades,
+                    modulo: modulo,
                 })
             }
         }
@@ -163,6 +196,7 @@
                 function() {
                     datos = {
                         _token: '{{ csrf_token() }}',
+                        fecha: $('#fecha_salida').val(),
                         data: JSON.stringify(data),
                     };
                     post_jquery_m('{{ url('movimientos_bodega/store_salidas') }}', datos, function() {
@@ -179,5 +213,21 @@
         $('#unidades_' + id_prod).removeClass('error');
         if (unidades > disponibles)
             $('#unidades_' + id_prod).addClass('error');
+    }
+
+    function seleccionar_sector(id_prod) {
+        datos = {
+            _token: '{{ csrf_token() }}',
+            sector: $('#sector_seleccionado_' + id_prod).val(),
+        }
+        $('#tr_add_ingreso_' + id_prod).LoadingOverlay('show');
+        $.post('{{ url('movimientos_bodega/seleccionar_sector') }}', datos, function(retorno) {
+            $('#modulo_seleccionado_' + id_prod).html(retorno.modulos);
+        }, 'json').fail(function(retorno) {
+            console.log(retorno);
+            alerta_errores(retorno.responseText);
+        }).always(function() {
+            $('#tr_add_ingreso_' + id_prod).LoadingOverlay('hide');
+        })
     }
 </script>

@@ -18,6 +18,9 @@
                 CONVERSION
             </th>
             <th class="text-center th_yura_green" style="width: 60px">
+                PRECIO
+            </th>
+            <th class="text-center th_yura_green" style="width: 60px">
                 <button type="button" class="btn btn-xs btn-yura_default"
                     onclick="$('#tr_new_producto').removeClass('hidden'); $('#codigo_new').focus()">
                     <i class="fa fa-fw fa-plus"></i>
@@ -44,6 +47,10 @@
             <th class="text-center" style="border-color: #9d9d9d">
                 <input type="number" style="width: 100%" class="text-center bg-yura_dark" required min="0"
                     id="conversion_new" placeholder="0">
+            </th>
+            <th class="text-center" style="border-color: #9d9d9d">
+                <input type="number" style="width: 100%" class="text-center bg-yura_dark" required min="0"
+                    id="precio_compra_new" placeholder="0">
             </th>
             <th class="text-center" style="border-color: #9d9d9d">
                 <button type="button" class="btn btn-xs btn-yura_primary" onclick="store_producto()">
@@ -74,6 +81,10 @@
                         id="conversion_{{ $item->id_producto }}" value="{{ $item->conversion }}">
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
+                    <input type="number" style="width: 100%" class="text-center" required min="0"
+                        id="precio_compra_{{ $item->id_producto }}" value="{{ $item->precio_compra }}">
+                </th>
+                <th class="text-center" style="border-color: #9d9d9d">
                     <div class="btn-group">
                         <button type="button" class="btn btn-xs btn-yura_warning"
                             onclick="update_producto('{{ $item->id_producto }}')">
@@ -100,6 +111,7 @@
             stock_minimo: $('#stock_minimo_new').val(),
             disponibles: 0,
             conversion: $('#conversion_new').val(),
+            precio_compra: $('#precio_compra_new').val(),
         }
         post_jquery_m('{{ url('bodega_productos/store_producto') }}', datos, function() {
             listar_reporte();
@@ -114,6 +126,7 @@
             unidad_medida: $('#unidad_medida_' + id).val(),
             stock_minimo: $('#stock_minimo_' + id).val(),
             conversion: $('#conversion_' + id).val(),
+            precio_compra: $('#precio_compra_' + id).val(),
             id: id,
         }
         post_jquery_m('{{ url('bodega_productos/update_producto') }}', datos, function() {

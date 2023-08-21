@@ -6,3 +6,4 @@ Route::get('movimientos_bodega/add_ingresos', 'Bodega\MovimientosBodegaControlle
 Route::post('movimientos_bodega/store_ingresos', 'Bodega\MovimientosBodegaController@store_ingresos');
 Route::get('movimientos_bodega/add_salidas', 'Bodega\MovimientosBodegaController@add_salidas');
 Route::post('movimientos_bodega/store_salidas', 'Bodega\MovimientosBodegaController@store_salidas');
+Route::post('movimientos_bodega/seleccionar_sector', 'Bodega\MovimientosBodegaController@seleccionar_sector');

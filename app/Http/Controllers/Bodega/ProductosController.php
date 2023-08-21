@@ -62,6 +62,7 @@ class ProductosController extends Controller
             $model->stock_minimo = $request->stock_minimo;
             $model->disponibles = 0;
             $model->conversion = $request->conversion;
+            $model->precio_compra = $request->precio_compra;
             $model->save();
             $model = Producto::All()->last();
             bitacora('producto', $model->id_producto, 'I', 'Creacion del producto');
@@ -134,6 +135,7 @@ class ProductosController extends Controller
                     $model->stock_minimo = $request->stock_minimo;
                     $model->unidad_medida = $request->unidad_medida;
                     $model->conversion = $request->conversion;
+                    $model->precio_compra = $request->precio_compra;
                     $model->save();
 
                     if ($model->save()) {

@@ -12,9 +12,13 @@
                 </legend>
             </td>
             <td class="text-center">
-                <legend style="font-size: 1em; margin-bottom: 2px">
-                    Productos Seleccionados
-                </legend>
+                <div class="input-group" style="font-size: 1em; margin-bottom: 2px">
+                    <span class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
+                        Productos a Ingresar
+                    </span>
+                    <input type="date" id="fecha_ingreso" style="width: 100%; height: 28px;" class="text-center"
+                        value="{{ hoy() }}" max="{{ hoy() }}">
+                </div>
             </td>
         </tr>
         <tr>
@@ -27,11 +31,14 @@
                                 <th class="text-center th_yura_green">
                                     CODIGO
                                 </th>
-                                <th class="text-center th_yura_green" style="width: 80% !important">
+                                <th class="text-center th_yura_green">
                                     NOMBRE
                                 </th>
-                                <th class="text-center th_yura_green">
+                                <th class="text-center th_yura_green" style="width: 60px">
                                     UNIDADES
+                                </th>
+                                <th class="text-center th_yura_green" style="width: 60px">
+                                    PRECIO
                                 </th>
                             </tr>
                         </thead>
@@ -53,6 +60,11 @@
                                         <input type="number" style="width: 100%" class="text-center"
                                             id="unidades_{{ $item->id_producto }}" min="0">
                                     </th>
+                                    <th class="text-center" style="border-color: #9d9d9d">
+                                        <input type="number" style="width: 100%" class="text-center"
+                                            id="precio_compra_{{ $item->id_producto }}" min="0"
+                                            value="{{ $item->precio_compra }}">
+                                    </th>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -73,11 +85,14 @@
                         <th class="text-center bg-yura_dark">
                             CODIGO
                         </th>
-                        <th class="text-center bg-yura_dark" style="width: 80% !important">
+                        <th class="text-center bg-yura_dark">
                             NOMBRE
                         </th>
-                        <th class="text-center bg-yura_dark">
+                        <th class="text-center bg-yura_dark" style="width: 60px">
                             UNIDADES
+                        </th>
+                        <th class="text-center bg-yura_dark" style="width: 60px">
+                            PRECIO
                         </th>
                         <th class="text-center bg-yura_dark">
                         </th>
@@ -99,6 +114,7 @@
             if (unidades != '' && unidades > 0) {
                 codigo = $('#codigo_' + id_prod).val();
                 nombre = $('#nombre_' + id_prod).val();
+                precio_compra = $('#precio_compra_' + id_prod).val();
                 if ($('#unidades_seleccionado_' + id_prod).length == 0)
                     $('#table_add_ingresos').append('<tr id="tr_add_ingreso_' + id_prod + '">' +
                         '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
@@ -111,6 +127,10 @@
                         '<td class="text-center" style="border-color: #9d9d9d">' +
                         '<input type="number" style="width: 100%" class="text-center"' +
                         'id="unidades_seleccionado_' + id_prod + '" min="0" value="' + unidades + '">' +
+                        '</td>' +
+                        '<td class="text-center" style="border-color: #9d9d9d">' +
+                        '<input type="number" style="width: 100%" class="text-center"' +
+                        'id="precio_compra_seleccionado_' + id_prod + '" min="0" value="' + precio_compra + '">' +
                         '</td>' +
                         '<td class="text-center" style="border-color: #9d9d9d">' +
                         '<button type="button" class="btn btn-xs btn-yura_danger" onclick="quitar_fila(' + id_prod +
@@ -134,10 +154,12 @@
         for (i = 0; i < id_producto_seleccionado.length; i++) {
             id_prod = id_producto_seleccionado[i].value;
             unidades = $('#unidades_seleccionado_' + id_prod).val();
+            precio_compra = $('#precio_compra_seleccionado_' + id_prod).val();
             if (unidades > 0) {
                 data.push({
                     id_prod: id_prod,
                     unidades: unidades,
+                    precio_compra: precio_compra,
                 })
             }
         }
@@ -152,6 +174,7 @@
                 function() {
                     datos = {
                         _token: '{{ csrf_token() }}',
+                        fecha: $('#fecha_ingreso').val(),
                         data: JSON.stringify(data),
                     };
                     post_jquery_m('{{ url('movimientos_bodega/store_ingresos') }}', datos, function() {
