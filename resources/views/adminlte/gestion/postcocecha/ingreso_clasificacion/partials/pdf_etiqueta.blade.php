@@ -1,5 +1,5 @@
 @for ($i = 1; $i <= $datos['cantidad']; $i++)
-    <table style="position: relative; left: 0; font-family: Arial, Helvetica, sans-serif; max-width: 50%">
+    <table style="position: relative; font-family: Arial, Helvetica, sans-serif;">
         <tr style="padding: 0">
             <th style="text-align: center; padding: 0;">
                 {!! $barCode->getBarcode($datos['inventario_frio']->id_inventario_frio, $barCode::TYPE_CODE_128, 2) !!}
