@@ -14,7 +14,63 @@
                     {{ $item['cama']->nombre }}
                 </th>
                 @foreach ($item['ciclos'] as $ciclo)
-                    <td class="text-center" style="border: 2px solid black; position: relative; height: 60px;">
+                    @php
+                        $mis_plagas = [];
+                        foreach ($ciclo['plagas'] as $plaga) {
+                            $existe = false;
+                            foreach ($mis_plagas as $p) {
+                                if ($p->id_plaga == $plaga->id_plaga) {
+                                    $existe = true;
+                                }
+                            }
+                            if (!$existe) {
+                                $mis_plagas[] = $plaga;
+                            }
+                        }
+                    @endphp
+                    <td class="text-right"
+                        style="border: 2px solid black; position: relative; width: 100px; vertical-align: top; padding: 0">
+                        <table
+                            style="width: 100%; min-width: 160px; border: 1px solid #9d9d9d; border-collapse: collapse; border-spacing: 0;"
+                            class="table-bordered">
+                            @foreach ($mis_plagas as $p)
+                                @php
+                                    switch ($p->incidencia) {
+                                        case 'alta':
+                                            $bg_plaga = 'bg-yura_danger';
+                                            break;
+                                        case 'media':
+                                            $bg_plaga = 'bg-yura_warning';
+                                            break;
+                                        case 'baja':
+                                            $bg_plaga = 'bg-yura_primary';
+                                            break;
+                                    
+                                        default:
+                                            $bg_plaga = '';
+                                            break;
+                                    }
+                                @endphp
+                                <tr style="height: 30px; font-size: 0.8em">
+                                    <th class="text-right {{ $bg_plaga }}" style="padding-right: 2px">
+                                        {{ str_limit($p->plaga->nombre, 5) }}
+                                    </th>
+                                    <th class="text-center {{ $bg_plaga }}" style="width: 50px; padding-left: 2px">
+                                        {{ explode(' del ', convertDateToText($p->fecha))[0] }}
+                                    </th>
+                                    <th class="text-right" style="width: 30px; border-color: #9d9d9d">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-xs btn-yura_default"
+                                                title="Eliminar Incidencia"
+                                                onclick="delete_incidencia('{{ $p->id_ciclo_plaga }}')">
+                                                <i class="fa fa-fw fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                </tr>
+                            @endforeach
+                        </table>
+
                         <span class="span_nombre_cuadro sombra_pequeña mouse-hand">
                             <div class="dropdown">
                                 <span class="dropdown-toggle" id="menu_ciclo_{{ $ciclo['ciclo']->id_ciclo_cama }}"
@@ -86,5 +142,13 @@
             fecha: $('#filtro_fecha').val(),
         };
         post_jquery_m('{{ url('monitoreo_plagas/store_incidencia') }}', datos, function(retorno) {});
+    }
+
+    function delete_incidencia(id) {
+        datos = {
+            _token: '{{ csrf_token() }}',
+            id: id,
+        };
+        post_jquery_m('{{ url('monitoreo_plagas/delete_incidencia') }}', datos, function(retorno) {});
     }
 </script>

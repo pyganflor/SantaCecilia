@@ -37,9 +37,9 @@ class MonitoreoPlagasController extends Controller
             ->orderBy('c.nombre')
             ->get();
         $max_ciclos = 0;
-        foreach ($camas as $c) {
+        foreach ($camas as $cama) {
             $ciclos = CicloCama::where('activo', 1)
-                ->where('id_cama', $c->id_cama)
+                ->where('id_cama', $cama->id_cama)
                 ->orderBy('cuadro', 'asc')
                 ->get();
 
@@ -47,6 +47,7 @@ class MonitoreoPlagasController extends Controller
             foreach ($ciclos as $c) {
                 $plagas = CicloPlaga::where('id_ciclo_cama', $c->id_ciclo_cama)
                     ->where('fecha', '<=', $request->fecha)
+                    ->where('estado', 1)
                     ->orderBy('id_plaga')
                     ->orderBy('fecha', 'desc')
                     ->get();
@@ -57,7 +58,7 @@ class MonitoreoPlagasController extends Controller
             }
 
             $listado[] = [
-                'cama' => $c,
+                'cama' => $cama,
                 'ciclos' => $valores_ciclos
             ];
             if (count($ciclos) > $max_ciclos)
@@ -80,7 +81,6 @@ class MonitoreoPlagasController extends Controller
             $existe = CicloPlaga::All()
                 ->where('id_ciclo_cama', $request->ciclo)
                 ->where('fecha', $request->fecha)
-                ->where('incidencia', $request->incidencia)
                 ->where('id_plaga', $request->plaga)
                 ->first();
             if ($existe == '') {
@@ -102,6 +102,32 @@ class MonitoreoPlagasController extends Controller
                         'Ya existe una incidencia de esta plaga, en el cuadro seleccionado</div>',
                 ];
             }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function delete_incidencia(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $model = CicloPlaga::find($request->id);
+            $model->estado = 0;
+            $model->save();
+
+            DB::commit();
+            $success = true;
+            $msg = 'Se ha <strong>ELIMINADO</strong> la incidencia correctamente';
         } catch (\Exception $e) {
             DB::rollBack();
             $success = false;
