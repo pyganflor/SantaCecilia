@@ -178,30 +178,40 @@
         count_form = $('#count_form_' + pta).val();
         data = [];
         for (i = 1; i <= count_form; i++) {
-            data.push({
-                variedad: $('#new_variedad_' + pta + '_' + i).val(),
-                modulo: $('#new_modulo_' + pta + '_' + i).val(),
-                clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + i).val(),
-                tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + i).val(),
-                cantidad: $('#new_cantidad_' + pta + '_' + i).val(),
+            variedad = $('#new_variedad_' + pta + '_' + i).val();
+            modulo = $('#new_modulo_' + pta + '_' + i).val();
+            clasificacion_ramo = $('#new_clasificacion_ramo_' + pta + '_' + i).val();
+            tallos_x_ramo = $('#new_tallos_x_ramo_' + pta + '_' + i).val();
+            cantidad = $('#new_cantidad_' + pta + '_' + i).val();
+            if (variedad != '' && modulo != '' && clasificacion_ramo != '' && tallos_x_ramo > 0 && cantidad > 0)
+                data.push({
+                    variedad: variedad,
+                    modulo: modulo,
+                    clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + i).val(),
+                    tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + i).val(),
+                    cantidad: $('#new_cantidad_' + pta + '_' + i).val(),
+                });
+        }
+        if (data.length > 0) {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                fecha: $('#fecha_blanco_filtro').val(),
+                data: JSON.stringify(data),
+            }
+            $.LoadingOverlay('show');
+            $.post('{{ url('ingreso_clasificacion/store_all_blanco') }}', datos, function(retorno) {
+                window.open('{{ url('ingreso_clasificacion/ver_all_pdf_etiquetas') }}?data=' + retorno.data,
+                    '_blank');
+                listar_blanco();
+            }, 'json').fail(function(retorno) {
+                console.log(retorno);
+                alerta_errores(retorno.responseText);
+            }).always(function() {
+                $.LoadingOverlay('hide');
             });
+        } else {
+            alerta('<div class="alert alert-warning text-center">Faltan datos necesarios</div>');
         }
-        datos = {
-            _token: '{{ csrf_token() }}',
-            fecha: $('#fecha_blanco_filtro').val(),
-            data: JSON.stringify(data),
-        }
-        $.LoadingOverlay('show');
-        $.post('{{ url('ingreso_clasificacion/store_all_blanco') }}', datos, function(retorno) {
-            window.open('{{ url('ingreso_clasificacion/ver_all_pdf_etiquetas') }}?data=' + retorno.data,
-                '_blank');
-            listar_blanco();
-        }, 'json').fail(function(retorno) {
-            console.log(retorno);
-            alerta_errores(retorno.responseText);
-        }).always(function() {
-            $.LoadingOverlay('hide');
-        });
     }
 
     function store_blanco(pta, count_form) {
@@ -214,12 +224,15 @@
             tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + count_form).val(),
             cantidad: $('#new_cantidad_' + pta + '_' + count_form).val(),
         };
-        if (datos['clasificacion_ramo'] != '' && datos['tallos_x_ramo'] > 0 && datos['cantidad'] > 0 && datos[
-            'modulo'] != '')
+        if (datos['variedad'] != '' && datos['clasificacion_ramo'] != '' && datos['tallos_x_ramo'] > 0 &&
+            datos['cantidad'] > 0 && datos['modulo'] != '') {
             post_jquery_m('{{ url('ingreso_clasificacion/store_blanco') }}', datos, function() {
                 buscar_inventario(pta, count_form);
                 $('#new_cantidad_' + pta + '_' + count_form).val('');
             }, 'tr_desglose_planta_' + pta + '_' + count_form);
+        } else {
+            alerta('<div class="alert alert-warning text-center">Faltan datos necesarios</div>');
+        }
     }
 
     function buscar_inventario(pta, count_form) {

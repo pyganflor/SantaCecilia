@@ -16,4 +16,9 @@ class Plaga extends Model
         'estado',
         'fecha_registro',
     ];
+
+    public function rotaciones()
+    {
+        return $this->hasMany('\yura\Modelos\RotacionesPlaga', 'id_plaga')->orderBy('rotacion');
+    }
 }

@@ -213,6 +213,16 @@ table.dataTable thead .sorting_desc_disabled:after {
     background-color: #00B388 !important;
 }
 
+.bg-yura_danger {
+    color: white !important;
+    background-color: #d01c62 !important;
+}
+
+.bg-yura_warning {
+    color: white !important;
+    background-color: #ef6e11 !important;
+}
+
 .color_text-yura_danger {
     color: #d01c62 !important;
 }
@@ -406,13 +416,17 @@ table.dataTable thead .sorting_desc_disabled:after {
     color:white!important
 }
 
-
 .bg-success {
     background-color: #00B388 !important;
     color:white
 }
 
-
 th{
     vertical-align: middle;
+}
+
+.tr_fija_top_0{
+    position: sticky;
+    top: 0;
+    z-index: 9;
 }

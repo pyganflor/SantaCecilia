@@ -205,6 +205,7 @@ Route::group(['middleware' => 'autenticacion'], function () {
             include 'campo/ejecucion_luz.php';
             include 'campo/ejecucion_labores.php';
             include 'campo/plagas.php';
+            include 'campo/monitoreo_plagas.php';
 
             /* ================== TEST =================== */
             Route::get('proy_ganaderia', 'TestController@inicio');

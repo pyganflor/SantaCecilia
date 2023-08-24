@@ -145,7 +145,7 @@ class MovimientosBodegaController extends Controller
 
             DB::commit();
             $success = true;
-            $msg = 'Se han <strong>GRABADO</strong> los ingresos correctamente';
+            $msg = 'Se han <strong>GRABADO</strong> las salidas correctamente';
         } catch (\Exception $e) {
             DB::rollBack();
             $success = false;
