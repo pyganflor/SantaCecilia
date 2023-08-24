@@ -67,6 +67,18 @@ class MonitoreoPlagasController extends Controller
         $plagas = Plaga::where('estado', 1)
             ->orderBy('nombre')
             ->get();
+
+        $n = count($listado);
+        for ($y = 0; $y < $n - 1; $y++) {
+            for ($z = 0; $z < $n - $y - 1; $z++) {
+                if (intval($listado[$z]['cama']->nombre) > intval($listado[$z + 1]['cama']->nombre)) {
+                    $temp = $listado[$z];
+                    $listado[$z] = $listado[$z + 1];
+                    $listado[$z + 1] = $temp;
+                }
+            }
+        }
+
         return view('adminlte.gestion.campo.monitoreo_plagas.partials.listado', [
             'listado' => $listado,
             'max_ciclos' => $max_ciclos,
