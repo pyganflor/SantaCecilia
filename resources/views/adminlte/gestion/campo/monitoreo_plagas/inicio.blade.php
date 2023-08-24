@@ -40,7 +40,8 @@
                             <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                                 Fecha
                             </div>
-                            <input type="date" class="form-control text-center" id="filtro_fecha" value="{{ hoy() }}">
+                            <input type="date" class="form-control text-center" id="filtro_fecha"
+                                value="{{ hoy() }}">
                         </div>
                     </td>
                     <td>
@@ -48,8 +49,8 @@
                             <div class="input-group-addon bg-yura_dark">
                                 Sector
                             </div>
-                            <select id="filtro_sector" class="form-control"
-                                onchange="seleccionar_sector()" style="width: 100% !important;">
+                            <select id="filtro_sector" class="form-control" onchange="seleccionar_sector()"
+                                style="width: 100% !important;">
                                 @foreach ($sectores as $s)
                                     <option value="{{ $s->id_sector }}">{{ $s->nombre }}</option>
                                 @endforeach
@@ -61,8 +62,8 @@
                             <div class="input-group-addon bg-yura_dark">
                                 Bloque
                             </div>
-                            <select id="filtro_modulo" class="form-control"
-                                style="width: 100% !important;" onchange="listar_reporte()">
+                            <select id="filtro_modulo" class="form-control" style="width: 100% !important;"
+                                onchange="listar_reporte()">
                                 <option value="">Seleccione</option>
                             </select>
                             <div class="input-group-btn">
@@ -76,7 +77,7 @@
             </tbody>
         </table>
 
-        <div id="div_listado" style="margin-top: 5px">
+        <div id="div_listado" style="margin-top: 5px; overflow-y: scroll; overflow-x: scroll; max-height: 700px">
         </div>
     </section>
 
