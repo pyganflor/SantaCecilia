@@ -251,7 +251,7 @@ class BlancoController extends Controller
         ];
 
         return PDF::loadView('adminlte.gestion.postcocecha.ingreso_clasificacion.partials.pdf_etiqueta', compact('datos', 'barCode'))
-            ->setPaper(array(0, 0, 360, 360), 'landscape')->stream();
+            ->setPaper(array(0, 0, 140, 360), 'landscape')->stream();
     }
 
     public function store_all_blanco(Request $request)
@@ -322,7 +322,7 @@ class BlancoController extends Controller
             ];
         }
         return PDF::loadView('adminlte.gestion.postcocecha.ingreso_clasificacion.partials.all_pdf_etiqueta', compact('datos', 'barCode'))
-            ->setPaper(array(0, 0, 360, 360), 'landscape')->stream();
+            ->setPaper(array(0, 0, 140, 360), 'landscape')->stream();
     }
 
     public function view_pdf_inventario(Request $request)
