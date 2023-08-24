@@ -1,19 +1,16 @@
 @for ($i = 1; $i <= $datos['cantidad']; $i++)
-    <table
-        style="position: relative; top: -40px; left: 50px; font-family: Arial, Helvetica, sans-serif; max-width: 50%">
+    <table style="position: relative; left: 0; font-family: Arial, Helvetica, sans-serif; max-width: 50%">
         <tr style="padding: 0">
-            <th style="text-align: center; padding: 0; " colspan="3">
-                {{ $datos['variedad']->nombre }}
-            </th>
-        </tr>
-        <tr style="padding: 0">
-            <th style="text-align: center; padding: 0;" colspan="2">
+            <th style="text-align: center; padding: 0;">
                 {!! $barCode->getBarcode($datos['inventario_frio']->id_inventario_frio, $barCode::TYPE_CODE_128, 2) !!}
+            </th>
+            <th style="text-align: center; padding: 0;">
+                {{ $datos['variedad']->nombre }}
             </th>
             <td style="text-align: left;">
                 <b>{{ $datos['longitud']->nombre }}</b><small><sup>cm</sup></small>
                 <br>
-                {{ $datos['tallos_x_ramo'] }}<small><sup>tallos</sup></small>
+                {{ $datos['tallos_x_ramo'] }}<small><sup>stems</sup></small>
             </td>
         </tr>
         <tr style="padding: 0">

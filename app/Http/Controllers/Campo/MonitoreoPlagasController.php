@@ -43,9 +43,22 @@ class MonitoreoPlagasController extends Controller
                 ->orderBy('cuadro', 'asc')
                 ->get();
 
+            $valores_ciclos = [];
+            foreach ($ciclos as $c) {
+                $plagas = CicloPlaga::where('id_ciclo_cama', $c->id_ciclo_cama)
+                    ->where('fecha', '<=', $request->fecha)
+                    ->orderBy('id_plaga')
+                    ->orderBy('fecha', 'desc')
+                    ->get();
+                $valores_ciclos[] = [
+                    'ciclo' => $c,
+                    'plagas' => $plagas,
+                ];
+            }
+
             $listado[] = [
                 'cama' => $c,
-                'ciclos' => $ciclos
+                'ciclos' => $valores_ciclos
             ];
             if (count($ciclos) > $max_ciclos)
                 $max_ciclos = count($ciclos);

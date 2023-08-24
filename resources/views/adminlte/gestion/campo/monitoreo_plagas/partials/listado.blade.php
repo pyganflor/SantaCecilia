@@ -17,12 +17,13 @@
                     <td class="text-center" style="border: 2px solid black; position: relative; height: 60px;">
                         <span class="span_nombre_cuadro sombra_pequeña mouse-hand">
                             <div class="dropdown">
-                                <span class="dropdown-toggle" id="menu_ciclo_{{ $ciclo->id_ciclo_cama }}"
+                                <span class="dropdown-toggle" id="menu_ciclo_{{ $ciclo['ciclo']->id_ciclo_cama }}"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                     title="Asignar Incidencia de Plaga">
-                                    <sup>c</sup><b>{{ $ciclo->cuadro }}</b>
+                                    <sup>c</sup><b>{{ $ciclo['ciclo']->cuadro }}</b>
                                 </span>
-                                <ul class="dropdown-menu" aria-labelledby="menu_ciclo_{{ $ciclo->id_ciclo_cama }}"
+                                <ul class="dropdown-menu"
+                                    aria-labelledby="menu_ciclo_{{ $ciclo['ciclo']->id_ciclo_cama }}"
                                     style="overflow-y: scroll; max-height: 350px; width: 200px">
                                     @foreach ($plagas as $p)
                                         <li class="dropdown-header">
@@ -32,7 +33,7 @@
                                             <a href="javascript:void(0)" style="color: white"
                                                 onmouseover="$(this).css('color', 'black')"
                                                 onmouseleave="$(this).css('color', 'white')"
-                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'alta', '{{ $ciclo->id_ciclo_cama }}')">
+                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'alta', '{{ $ciclo['ciclo']->id_ciclo_cama }}')">
                                                 <i class="fa fa-fw fa-caret-right pull-left"></i>Alta
                                             </a>
                                         </li>
@@ -40,7 +41,7 @@
                                             <a href="javascript:void(0)" style="color: white"
                                                 onmouseover="$(this).css('color', 'black')"
                                                 onmouseleave="$(this).css('color', 'white')"
-                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'media', '{{ $ciclo->id_ciclo_cama }}')">
+                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'media', '{{ $ciclo['ciclo']->id_ciclo_cama }}')">
                                                 <i class="fa fa-fw fa-caret-right pull-left"></i>Media
                                             </a>
                                         </li>
@@ -48,7 +49,7 @@
                                             <a href="javascript:void(0)" style="color: white"
                                                 onmouseover="$(this).css('color', 'black')"
                                                 onmouseleave="$(this).css('color', 'white')"
-                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'baja', '{{ $ciclo->id_ciclo_cama }}')">
+                                                onclick="store_incidencia('{{ $p->id_plaga }}', 'baja', '{{ $ciclo['ciclo']->id_ciclo_cama }}')">
                                                 <i class="fa fa-fw fa-caret-right pull-left"></i>Baja
                                             </a>
                                         </li>
