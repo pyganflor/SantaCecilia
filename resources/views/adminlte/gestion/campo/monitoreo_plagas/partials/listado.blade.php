@@ -27,11 +27,11 @@
                         }
                     }
                 @endphp
-                <td class="text-right"
+                <td class="text-right" id="celda_ciclo_{{ $ciclo['ciclo']->id_ciclo_cama }}"
                     style="border: 2px solid black; position: relative; width: 100px; vertical-align: top; padding: 0">
                     <table
                         style="width: 100%; min-width: 160px; border: 1px solid #9d9d9d; border-collapse: collapse; border-spacing: 0;"
-                        class="table-bordered">
+                        class="table-bordered" id="tabla_celda_{{ $ciclo['ciclo']->id_ciclo_cama }}">
                         @foreach ($mis_plagas as $p)
                             @php
                                 switch ($p->incidencia) {
@@ -61,7 +61,7 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-xs btn-yura_default"
                                             title="Eliminar Incidencia"
-                                            onclick="delete_incidencia('{{ $p->id_ciclo_plaga }}')">
+                                            onclick="delete_incidencia('{{ $p->id_ciclo_plaga }}', '{{ $ciclo['ciclo']->id_ciclo_cama }}')">
                                             <i class="fa fa-fw fa-trash"></i>
                                         </button>
                                     </div>
@@ -139,17 +139,27 @@
             fecha: $('#filtro_fecha').val(),
         };
         post_jquery_m('{{ url('monitoreo_plagas/store_incidencia') }}', datos, function(retorno) {
-            listar_reporte();
+            get_celda(ciclo);
         });
     }
 
-    function delete_incidencia(id) {
+    function delete_incidencia(id, ciclo) {
         datos = {
             _token: '{{ csrf_token() }}',
             id: id,
         };
         post_jquery_m('{{ url('monitoreo_plagas/delete_incidencia') }}', datos, function(retorno) {
-            listar_reporte();
+            get_celda(ciclo);
+        });
+    }
+
+    function get_celda(ciclo) {
+        datos = {
+            fecha: $('#filtro_fecha').val(),
+            ciclo: ciclo,
+        };
+        get_jquery('{{ url('monitoreo_plagas/get_celda') }}', datos, function(retorno) {
+            $('#tabla_celda_' + ciclo).html(retorno);
         });
     }
 </script>

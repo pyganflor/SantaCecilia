@@ -74,6 +74,21 @@ class MonitoreoPlagasController extends Controller
         ]);
     }
 
+    public function get_celda(Request $request)
+    {
+        $plagas = CicloPlaga::where('id_ciclo_cama', $request->ciclo)
+            ->where('fecha', '<=', $request->fecha)
+            ->where('estado', 1)
+            ->orderBy('id_plaga')
+            ->orderBy('fecha', 'desc')
+            ->get();
+        $listado = $plagas;
+        return view('adminlte.gestion.campo.monitoreo_plagas.partials.get_celda', [
+            'ciclo' => $request->ciclo,
+            'listado' => $listado,
+        ]);
+    }
+
     public function store_incidencia(Request $request)
     {
         try {
@@ -122,8 +137,7 @@ class MonitoreoPlagasController extends Controller
         try {
             DB::beginTransaction();
             $model = CicloPlaga::find($request->id);
-            $model->estado = 0;
-            $model->save();
+            $model->delete();
 
             DB::commit();
             $success = true;
