@@ -1,20 +1,17 @@
 @foreach ($datos as $pos => $d)
     @for ($i = 1; $i <= $d['cantidad']; $i++)
-        <table
-            style="position: relative; top: -40px; left: 50px; font-family: Arial, Helvetica, sans-serif; max-width: 50%">
+        <table style="position: relative; font-family: Arial, Helvetica, sans-serif;">
             <tr style="padding: 0">
-                <th style="text-align: center; padding: 0; " colspan="3">
-                    {{ $d['variedad']->nombre }}
-                </th>
-            </tr>
-            <tr style="padding: 0">
-                <th style="text-align: center; padding: 0;" colspan="2">
+                <th style="text-align: center; padding: 0;">
                     {!! $barCode->getBarcode($d['inventario_frio']->id_inventario_frio, $barCode::TYPE_CODE_128, 2) !!}
                 </th>
-                <td style="text-align: left">
+                <th style="text-align: center; padding: 0;">
+                    {{ $d['variedad']->nombre }}
+                </th>
+                <td style="text-align: left;">
                     <b>{{ $d['longitud']->nombre }}</b><small><sup>cm</sup></small>
                     <br>
-                    {{ $d['tallos_x_ramo'] }}<small><sup>tallos</sup></small>
+                    {{ $d['tallos_x_ramo'] }}<small><sup>stems</sup></small>
                 </td>
             </tr>
             <tr style="padding: 0">
@@ -24,7 +21,6 @@
                 <td style="text-align: center; font-size: 10px; padding: 0" colspan="2">
                     PRODUCT of ECUADOR
                 </td>
-            </tr>
         </table>
 
         <div style="page-break-after:always;"></div>
