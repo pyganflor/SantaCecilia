@@ -1,4 +1,4 @@
-<div style="overflow-x: scroll; overflow-y: scroll; max-height: 550px">
+<div style="overflow-x: scroll; overflow-y: scroll; height: 700px">
     <table class="table-bordered" style="width: 100%; border: 1px solid #9d9d9d">
         <tr class="tr_fija_top_0">
             <th class="text-center th_yura_green">

@@ -54,7 +54,6 @@ class ArmadoCajasController extends Controller
                 $detalle->tallos_x_ramo = $inventario_frio->tallos_x_ramo;
                 $detalle->longitud = $inventario_frio->clasificacion_ramo->nombre;
                 $detalle->fecha = $inventario_frio->fecha;
-                $detalle->finca_destino = $inventario_frio->finca_destino;
                 $detalle->id_modulo = $inventario_frio->id_modulo;
                 $detalle->save();
 

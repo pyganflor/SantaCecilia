@@ -52,14 +52,6 @@
                     </tr>
                     <tr>
                         <th class="text-right th_yura_green" style="padding-right: 5px">
-                            Finca Origen
-                        </th>
-                        <th class="text-left bg-yura_dark" style="padding-left: 5px">
-                            {{ $inventario_frio->get_finca_destino->nombre }}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th class="text-right th_yura_green" style="padding-right: 5px">
                             Disponibles
                         </th>
                         <th class="text-left bg-yura_dark" style="padding-left: 5px">
@@ -90,7 +82,7 @@
                     </tr>
                     <tr style="padding: 0">
                         <td style="text-align: left; font-size: 10px; padding: 0" colspan="3">
-                            {{ getDias(TP_LETRA)[transformDiaPhp(date('w', strtotime($inventario_frio->fecha)))] }}{{ intVal(substr($inventario_frio->fecha, 5, 2)) }}.{{ substr($inventario_frio->fecha, 8, 2) }}F<small>in</small>{{ mb_strtoupper(substr($inventario_frio->get_finca_destino->nombre, 0, 2)) }}
+                            {{ getDias(TP_LETRA)[transformDiaPhp(date('w', strtotime($inventario_frio->fecha)))] }}{{ intVal(substr($inventario_frio->fecha, 5, 2)) }}.{{ substr($inventario_frio->fecha, 8, 2) }}
                             <span style="vertical-align: right">
                                 <b>PRODUCT of ECUADOR</b>
                             </span>
