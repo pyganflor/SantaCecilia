@@ -470,8 +470,6 @@ class PedidoController extends Controller
             $pedido = Pedido::find($request->ped);
             $pedido->id_cliente = $request->cliente;
             $pedido->fecha_pedido = $request->fecha;
-            $pedido->id_configuracion_empresa = $request->finca;
-            $pedido->id_exportador = $request->finca;
             $pedido->id_agencia_carga = $request->agencia;
             $pedido->id_consignatario = $request->consignatario;
             $pedido->marcacion = mb_strtoupper(espacios($request->marcacion));

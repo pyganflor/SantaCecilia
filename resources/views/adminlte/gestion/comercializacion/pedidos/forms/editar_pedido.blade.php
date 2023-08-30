@@ -379,7 +379,6 @@
                 ped: ped,
                 fecha: $('#edit_fecha').val(),
                 cliente: $('#edit_cliente').val(),
-                finca: $('#edit_finca').val(),
                 agencia: $('#edit_agencia').val(),
                 consignatario: $('#edit_consignatario').val(),
                 marcacion: $('#edit_marcacion').val(),
