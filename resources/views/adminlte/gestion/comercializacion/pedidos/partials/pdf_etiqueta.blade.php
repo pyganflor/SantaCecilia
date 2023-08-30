@@ -27,24 +27,24 @@
                 </th>
             </tr>
             <tr>
-                <td class="text-center" style="font-size: 0.8em" colspan="2">
+                <th class="text-center" style="font-size: 0.8em" colspan="2">
                     {{ $datos['pedido']->cliente->detalle()->nombre }}
+                </th>
+            </tr>
+            <tr>
+                <td style="font-size: 0.6em">
+                    <b>AWB: {{ $datos['pedido']->guia_madre }}</b>
+                </td>
+                <td style="font-size: 0.6em; text-align: right">
+                    <b>PO/Label: {{ $datos['pedido']->marcacion }}</b>
                 </td>
             </tr>
             <tr>
                 <td style="font-size: 0.6em">
-                    <em>AWB:</em> {{ $datos['pedido']->guia_madre }}
+                    <b>HAWB: {{ $datos['pedido']->guia_hija }}</b>
                 </td>
                 <td style="font-size: 0.6em; text-align: right">
-                    <em>PO/Label:</em> {{ $datos['pedido']->marcacion }}
-                </td>
-            </tr>
-            <tr>
-                <td style="font-size: 0.6em">
-                    <em>HAWB:</em> {{ $datos['pedido']->guia_hija }}
-                </td>
-                <td style="font-size: 0.6em; text-align: right">
-                    <em>INVOICE: {{ str_pad($datos['pedido']->factura, 8, '0', STR_PAD_LEFT) }}</em>
+                    <b>INVOICE: {{ str_pad($datos['pedido']->factura, 8, '0', STR_PAD_LEFT) }}</b>
                 </td>
             </tr>
             <tr>
@@ -56,18 +56,18 @@
 
         <table class="border-1px" style="font-size: 10px">
             <tr>
-                <td class="border-1px text-center" style="width: 110px">
+                <th class="border-1px text-center" style="width: 110px">
                     VARIETIES
-                </td>
-                <td class="border-1px text-center">
+                </th>
+                <th class="border-1px text-center">
                     LENGHT
-                </td>
-                <td class="border-1px text-center">
+                </th>
+                <th class="border-1px text-center">
                     BUNCH
-                </td>
-                <td class="border-1px text-center">
+                </th>
+                <th class="border-1px text-center">
                     STEMS
-                </td>
+                </th>
             </tr>
             @php
                 $total_tallos = 0;
@@ -80,24 +80,24 @@
                     $total_ramos += $item->ramos;
                 @endphp
                 <tr>
-                    <td class="text-center border-1px">
+                    <th class="text-center border-1px">
                         {{ $variedad->nombre }}
-                    </td>
-                    <td class="text-center border-1px">
+                    </th>
+                    <th class="text-center border-1px">
                         {{ $item->longitud }}
-                    </td>
-                    <td class="text-center border-1px">
+                    </th>
+                    <th class="text-center border-1px">
                         {{ $item->ramos }}
-                    </td>
-                    <td class="text-center border-1px">
+                    </th>
+                    <th class="text-center border-1px">
                         {{ $item->ramos * $item->tallos_x_ramo }}
-                    </td>
+                    </th>
                 </tr>
             @endforeach
             <tr>
-                <td colspan="2" style="text-align: right">
+                <th colspan="2" style="text-align: right">
                     TOTAL
-                </td>
+                </th>
                 <th class="border-1px text-center">
                     {{ $total_ramos }}
                 </th>
