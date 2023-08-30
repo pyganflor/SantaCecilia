@@ -78,8 +78,6 @@
                                     <small><b>Agencia:</b></small>{{ $ped->agencia_carga->nombre }}
                                     <br>
                                     <small><b>Marcacion:</b></small>{{ $ped->marcacion }}
-                                    <br>
-                                    <small><b>Finca:</b></small>{{ $ped->empresa->nombre }}
                                 </td>
                             @endif
                             @if ($pos_item == 0)

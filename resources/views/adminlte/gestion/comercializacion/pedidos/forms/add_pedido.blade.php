@@ -228,7 +228,6 @@
                 data_precio: JSON.stringify(data_precio),
                 fecha: $('#add_fecha').val(),
                 cliente: $('#add_cliente').val(),
-                finca: $('#add_finca').val(),
                 agencia: $('#add_agencia').val(),
                 consignatario: $('#add_consignatario').val(),
                 marcacion: $('#add_marcacion').val(),

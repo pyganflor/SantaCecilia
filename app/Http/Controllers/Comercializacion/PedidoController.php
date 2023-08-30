@@ -37,8 +37,6 @@ class PedidoController extends Controller
             ->where('pedido.fecha_pedido', $request->fecha);
         if ($request->cliente != '')
             $listado = $listado->where('pedido.id_cliente', $request->cliente);
-        if ($request->finca != '')
-            $listado = $listado->where('pedido.id_configuracion_empresa', $request->finca);
         $listado = $listado->where('c.estado', 1)
             ->orderBy('c.nombre')
             ->get();
@@ -106,9 +104,6 @@ class PedidoController extends Controller
             ->select('cc.id_consignatario', 'c.nombre')->distinct()
             ->where('cc.id_cliente', $pedido->id_cliente)
             ->get();
-        $fincas = DB::table('configuracion_empresa')
-            ->where('proveedor', 0)
-            ->get();
         $plantas = DB::table('planta')
             ->where('estado', 1)
             ->orderBy('nombre')
@@ -121,7 +116,6 @@ class PedidoController extends Controller
             'pedido' => $pedido,
             'clientes' => $clientes,
             'plantas' => $plantas,
-            'fincas' => $fincas,
             'longitudes' => $longitudes,
             'agencias_cliente' => $agencias_cliente,
             'consignatarios_cliente' => $consignatarios_cliente,
@@ -220,7 +214,6 @@ class PedidoController extends Controller
             $pedido = new Pedido();
             $pedido->id_cliente = $request->cliente;
             $pedido->fecha_pedido = $request->fecha;
-            $pedido->id_exportador = $request->finca;
             $pedido->id_agencia_carga = $request->agencia;
             $pedido->id_consignatario = $request->consignatario;
             $pedido->marcacion = mb_strtoupper(espacios($request->marcacion));
@@ -417,24 +410,10 @@ class PedidoController extends Controller
 
     public function add_caja(Request $request)
     {
-        $fincas = DB::table('configuracion_empresa')
-            ->select('id_configuracion_empresa', 'nombre')
-            ->where('proveedor', 0)
+        $listado = CajaFrio::where('armada', 0)
+            ->orderBy('id_empresa')
+            ->orderBy('nombre')
             ->get();
-
-        $listado = [];
-        foreach ($fincas as $f) {
-            $inventarios = CajaFrio::where('id_empresa', $f->id_configuracion_empresa)
-                ->where('armada', 0)
-                ->orderBy('id_empresa')
-                ->orderBy('nombre')
-                ->get();
-            if (count($inventarios) > 0)
-                $listado[] = [
-                    'finca' => $f,
-                    'inventarios' => $inventarios,
-                ];
-        }
 
         return view('adminlte.gestion.comercializacion.pedidos.forms.add_caja', [
             'listado' => $listado

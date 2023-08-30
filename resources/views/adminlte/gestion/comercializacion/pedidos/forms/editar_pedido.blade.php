@@ -59,25 +59,13 @@
                 </select>
             </div>
         </td>
-        <td>
+        <td colspan="2">
             <div class="input-group">
                 <div class="input-group-addon bg-yura_dark">
                     Marcacion
                 </div>
                 <input type="text" id="edit_marcacion" required class="form-control text-center"
                     value="{{ $pedido->marcacion }}" style="width: 100% !important;" maxlength="250">
-            </div>
-        </td>
-        <td>
-            <div class="input-group">
-                <div class="input-group-addon bg-yura_dark">
-                    Exportador
-                </div>
-                <select id="edit_finca" class="form-control input-yura_default" style="width: 100%">
-                    @foreach ($fincas as $f)
-                        <option value="{{ $f->id_configuracion_empresa }}">{{ $f->nombre }}</option>
-                    @endforeach
-                </select>
             </div>
         </td>
     </tr>

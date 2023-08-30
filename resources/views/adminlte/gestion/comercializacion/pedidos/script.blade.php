@@ -6,7 +6,6 @@
         datos = {
             fecha: $('#filtro_fecha').val(),
             cliente: $('#filtro_cliente').val(),
-            finca: $('#filtro_finca').val(),
         }
         get_jquery('{{ url('pedidos/listar_reporte') }}', datos, function(retorno) {
             $('#div_listado').html(retorno);

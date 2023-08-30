@@ -1235,7 +1235,7 @@ function getCantidadDetallesByPedido($pedido)
 {
     $r = 0;
     foreach ($pedido->detalles as $det_ped)
-        foreach ($det_ped->items as $item)
+        foreach ($det_ped->caja_frio->detalles as $item)
             $r++;
     return $r;
 }
@@ -3204,7 +3204,8 @@ function getCicloActivoByCamaCuadro($cama, $cuadro)
         ->first();
 }
 
-function getDiaLaboral($fecha) {
+function getDiaLaboral($fecha)
+{
     $diaSemana = date('N', strtotime($fecha));
 
     if ($diaSemana == 6 || $diaSemana == 7) {
