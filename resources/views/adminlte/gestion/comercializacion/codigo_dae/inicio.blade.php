@@ -1,14 +1,14 @@
 @extends('layouts.adminlte.master')
 
 @section('titulo')
-    Pedidos
+    Codigos DAE
 @endsection
 
 @section('contenido')
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            Pedidos
+            Codigos DAE
             <small class="text-color_yura">módulo de comercializacion</small>
         </h1>
 
@@ -42,37 +42,33 @@
                     <td>
                         <div class="input-group input-group">
                             <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
-                                Fecha
+                                Año
                             </div>
-                            <input type="date" id="filtro_fecha" name="filtro_fecha" required
-                                class="form-control input-yura_default text-center" onchange="listar_reporte()"
-                                style="width: 100% !important;" value="{{ hoy() }}">
+                            <input type="number" id="filtro_anno" name="filtro_anno" required value="{{ date('Y') }}"
+                                class="form-control input-yura_default text-center" style="width: 100% !important;">
                             <div class="input-group-addon bg-yura_dark">
-                                Cliente
+                                Mes
                             </div>
-                            <select id="filtro_cliente" class="form-control input-yura_default" style="width: 100%"
-                                onchange="listar_reporte()">
-                                <option value="">Todos</option>
-                                @foreach ($clientes as $c)
-                                    <option value="{{ $c->id_cliente }}">{{ $c->nombre }}</option>
-                                @endforeach
-                            </select>
+                            <input type="number" id="filtro_mes" name="filtro_mes" required value="{{ date('m') }}"
+                                class="form-control input-yura_default text-center" style="width: 100% !important;">
                             <div class="input-group-btn">
                                 <button class="btn btn-primary btn-yura_primary" onclick="listar_reporte()">
-                                    <i class="fa fa-fw fa-search"></i>
+                                    <i class="fa fa-fw fa-search"></i> Buscar
                                 </button>
-                                <button class="btn btn-primary btn-yura_dark" onclick="add_pedido()">
-                                    <i class="fa fa-fw fa-plus"></i>
+                                <button class="btn btn-primary btn-yura_dark" onclick="exportar_paises()"
+                                    title="Exportar Paises">
+                                    <i class="fa fa-fw fa-download"></i> Descargar Plantilla
                                 </button>
-                                <button class="btn btn-primary btn-yura_primary" onclick="modal_exportar()">
-                                    <i class="fa fa-fw fa-download"></i>
+                                <button class="btn btn-primary btn-yura_primary" onclick="importar_codigos_dae()"
+                                    title="Importar CODIGOS DAE">
+                                    <i class="fa fa-fw fa-upload"></i> Importar CODIGOS DAE
                                 </button>
                             </div>
                         </div>
                     </td>
                 </tr>
             </table>
-            <div id="div_listado" style="margin-top: 5px"></div>
+            <div id="div_listado" style="overflow-y: scroll; overflow-x: scroll; max-height: 500px; margin-top: 5px"></div>
         </div>
     </section>
 
@@ -89,5 +85,5 @@
     {{-- JS de Chart.js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 
-    @include('adminlte.gestion.comercializacion.pedidos.script')
+    @include('adminlte.gestion.comercializacion.codigo_dae.script')
 @endsection

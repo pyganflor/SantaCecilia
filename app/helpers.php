@@ -3206,10 +3206,23 @@ function getCicloActivoByCamaCuadro($cama, $cuadro)
 
 function getDiaLaboral($fecha) {
     $diaSemana = date('N', strtotime($fecha));
-    
+
     if ($diaSemana == 6 || $diaSemana == 7) {
         return false;
     } else {
         return true;
     }
+}
+
+function getPrecioByClienteLongitudVariedad($cliente, $longitud, $variedad)
+{
+    if ($cliente != '') {
+        $model = Precio::All()
+            ->where('id_cliente', $cliente)
+            ->where('longitud', $longitud)
+            ->where('id_variedad', $variedad)
+            ->first();
+        return $model != '' ? $model->cantidad : '';
+    } else
+        return '';
 }

@@ -3,6 +3,7 @@
 namespace yura\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use yura\Modelos\Cliente;
 use yura\Modelos\DetalleCliente;
 use yura\Modelos\DetalleEspecificacionEmpaque;
@@ -11,187 +12,152 @@ use yura\Modelos\Submenu;
 use yura\Modelos\ClientePedidoEspecificacion;
 use yura\Modelos\Especificacion;
 use Validator;
+use yura\Modelos\Planta;
 
 class PrecioController extends Controller
 {
     public function inicio(Request $request)
     {
-        return view('adminlte.gestion.postcocecha.precio.inicio',
+        $clientes = DB::table('detalle_cliente as dc')
+            ->join('cliente as c', 'c.id_cliente', '=', 'dc.id_cliente')
+            ->select('dc.id_cliente', 'dc.nombre')->distinct()
+            ->where('dc.estado', 1)
+            ->where('c.estado', 1)
+            ->orderBy('dc.nombre')
+            ->get();
+        return view(
+            'adminlte.gestion.postcocecha.precio.inicio',
             [
                 'url' => $request->getRequestUri(),
                 'submenu' => Submenu::Where('url', '=', substr($request->getRequestUri(), 1))->get()[0],
-                'text' => ['titulo' => 'Precios', 'subtitulo' => 'módulo de postcosecha']
-            ]);
+                'text' => ['titulo' => 'Precios', 'subtitulo' => 'modulo de comercializacion'],
+                'clientes' => $clientes
+            ]
+        );
     }
-
-    public function buscar_cliente(Request $request)
+    public function seleccionar_cliente(Request $request)
     {
-        return view('adminlte.gestion.postcocecha.precio.partials.listado_cliente', [
-            'clientes' => Cliente::join('detalle_cliente as dc', 'cliente.id_cliente', 'dc.id_cliente')->where('dc.estado', 1)->orderBy('dc.nombre', 'asc')->paginate(20)
+        $listado = Precio::join('variedad as v', 'v.id_variedad', '=', 'precio.id_variedad')
+            ->select('precio.*')->distinct()
+            ->where('precio.id_cliente', $request->cliente)
+            ->orderBy('precio.longitud')
+            ->orderBy('v.id_planta')
+            ->orderBy('v.nombre')
+            ->get();
+        $plantas = Planta::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+        return view('adminlte.gestion.postcocecha.precio.forms.seleccionar_cliente', [
+            'listado' => $listado,
+            'plantas' => $plantas,
+            'cliente' => $request->cliente,
         ]);
     }
 
-    public function buscar_especificacion(Request $request)
+    public function store_precio(Request $request)
     {
-        return view('adminlte.gestion.postcocecha.precio.partials.listado_especificacion', [
-            'especificacion' => Especificacion::where([['tipo', 'N'], ['estado', 1]])->paginate(20),
-        ]);
-    }
-
-    public function form_asignar_precio_especificacion_cliente(Request $request)
-    {
-        return view('adminlte.gestion.postcocecha.precio.form.add_precio_especificacion_cliente', [
-            'clientes' => DetalleCliente::where('estado', 1)->select('nombre', 'id_cliente')->get(),
-            'cliente_pedido_especificacion' => ClientePedidoEspecificacion::join('especificacion as esp', 'cliente_pedido_especificacion.id_especificacion', 'esp.id_especificacion')
-                ->where([
-                    ['cliente_pedido_especificacion.id_especificacion', $request->id_especificacion],
-                    ['tipo', 'N']
-                ])->get(),
-            'id_especificacion' => $request->id_especificacion
-        ]);
-    }
-
-    public function form_asignar_precio_cliente_especificacion(Request $request)
-    {
-        return view('adminlte.gestion.postcocecha.precio.form.add_precio_cliente_especificacion', [
-            'especificaciones_cliente' => ClientePedidoEspecificacion::join('especificacion as esp', 'cliente_pedido_especificacion.id_especificacion', 'esp.id_especificacion')
-                ->where([
-                    ['id_cliente', $request->id_cliente],
-                    ['tipo', 'N']
-                ])->get(),
-        ]);
-    }
-
-    public function add_input(Request $request)
-    {
-        return DetalleCliente::where('estado', 1)->select('nombre', 'id_cliente')->get();
-    }
-
-    public function store_precio_especificacio_cliente(Request $request)
-    {
-        $valida = Validator::make($request->all(), [
-            'arrPrecios' => 'required|Array',
-        ]);
-
-        if (!$valida->fails()) {
-
-            foreach ($request->arrPrecios as $data) {
-                $msg = '';
-                if (empty($data['id_cliente_pedido_especificacion'])) {
-                    $objClientePedidioEspecificacion = new ClientePedidoEspecificacion;
-                    $palabra = 'Inserción';
-                    $accion = 'I';
-                } else {
-                    $objClientePedidioEspecificacion = ClientePedidoEspecificacion::find($data['id_cliente_pedido_especificacion']);
-                    $palabra = 'Actualización';
-                    $accion = 'U';
-                }
-
-                $objClientePedidioEspecificacion->id_cliente = $data['id_cliente'];
-                $objClientePedidioEspecificacion->precio = $data['precio'];
-                $objClientePedidioEspecificacion->id_especificacion = $request->id_especificacion;
-
-                if ($objClientePedidioEspecificacion->save()) {
-                    $model = ClientePedidoEspecificacion::all()->last();
-                    $success = true;
-                    $msg = '<div class="alert alert-success text-center">' .
-                        '<p> Se ha guardado la especificacion a los cliented seleccionados exitosamente</p>'
-                        . '</div>';
-                    bitacora('cliente_pedidio_especificacion', $model->id_cliente_pedido_especificacion, $accion, $palabra . ' satisfactoria de una especificacion_cliente');
-                } else {
-                    $success = false;
-                    $msg = '<div class="alert alert-warning text-center">' .
-                        '<p> Ha ocurrido un problema al guardar la información al sistema</p>'
-                        . '</div>';
+        try {
+            DB::beginTransaction();
+            if ($request->longitud != '')
+                $longitudes = [$request->longitud];
+            else {
+                $longitudes = [40, 50, 60, 70, 80, 90, 100, 'Nacional'];
+            }
+            if ($request->variedad != '')
+                $variedades = [$request->variedad];
+            else {
+                $variedades = DB::table('variedad')
+                    ->select('id_variedad')
+                    ->where('estado', 1)
+                    ->where('id_planta', $request->planta)
+                    ->get()->pluck('id_variedad')->toArray();
+            }
+            foreach ($longitudes as $l) {
+                foreach ($variedades as $v) {
+                    $existe = Precio::All()
+                        ->where('id_cliente', $request->cliente)
+                        ->where('id_variedad', $v)
+                        ->where('longitud', $l)
+                        ->first();
+                    if ($existe == '') {
+                        $model = new Precio();
+                        $model->id_cliente = $request->cliente;
+                        $model->id_variedad = $v;
+                        $model->longitud = $l;
+                        $model->cantidad = $request->precio;
+                        $model->save();
+                    }
                 }
             }
-        } else {
+
+            DB::commit();
+            $success = true;
+            $msg = 'Se han <strong>GRABADO</strong> los precios correctamente';
+        } catch (\Exception $e) {
+            DB::rollBack();
             $success = false;
-            $errores = '';
-            foreach ($valida->errors()->all() as $mi_error) {
-                if ($errores == '') {
-                    $errores = '<li>' . $mi_error . '</li>';
-                } else {
-                    $errores .= '<li>' . $mi_error . '</li>';
-                }
-            }
-            $msg = '<div class="alert alert-danger">' .
-                '<p class="text-center">¡Por favor corrija los siguientes errores!</p>' .
-                '<ul>' .
-                $errores .
-                '</ul>' .
-                '</div>';
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
         }
+
         return [
+            'success' => $success,
             'mensaje' => $msg,
-            'success' => $success
         ];
     }
 
-    public function store_precio_cliente_especificacion(Request $request)
+    public function update_precio(Request $request)
     {
-        $valida = Validator::make($request->all(), [
-            'arrPrecios' => 'required|Array',
-            'id_cliente' => 'required',
-        ]);
-        $msg = '';
-        $success = true;
-        if (!$valida->fails()) {
-            foreach ($request->arrPrecios as $data) {
-                $precio = getPrecioByClienteDetEspEmp($request->id_cliente, $data['id_detalle_especificacionempaque']);
+        try {
+            DB::beginTransaction();
 
-                if ($precio == '') {
-                    $precio = new Precio();
-                    $precio->id_cliente = $request->id_cliente;
-                    $precio->id_detalle_especificacionempaque = $data['id_detalle_especificacionempaque'];
-                    $new = true;
-                } else{
-                    $precio = Precio::find($precio->id_precio);
-                    $new = false;
-                }
+            $model = Precio::find($request->id);
+            $model->cantidad = $request->precio;
+            $model->save();
 
-                $precio->cantidad = $data['precio'];
-
-                if ($precio->save()) {
-                    if ($new) {
-                        $precio = Precio::all()->last();
-                        bitacora('precio', $precio->id_precio, 'U', 'Actualización satisfactoria de los precios de las especificaciones del cliente');
-                    }
-                } else {
-                    $success = false;
-                    $det_esp = DetalleEspecificacionEmpaque::find($data['id_detalle_especificacionempaque']);
-                    $msg .= '<div class="alert alert-warning text-center">' .
-                        '<p> Ha ocurrido un problema al guardar el precio para: ' .
-                        $det_esp->variedad->siglas . ' ' . $det_esp->clasificacion_ramo . ' ' .
-                        explode('|', $det_esp->especificacion_empaque->nombre)[0] . ' ' . $det_esp->empaque_p->nombre . ' ' .
-                        $det_esp->cantidad . ' ramos por caja.</p>'
-                        . '</div>';
-                }
-            }
-            if ($success)
-                $msg = '<div class="alert alert-success text-center">' .
-                    '<p> Se han actualizado los precios de las especificaciones del cliente exitosamente</p>'
-                    . '</div>';
-        } else {
+            DB::commit();
+            $success = true;
+            $msg = 'Se ha <strong>MODIFICADO</strong> el precio correctamente';
+        } catch (\Exception $e) {
+            DB::rollBack();
             $success = false;
-            $errores = '';
-            foreach ($valida->errors()->all() as $mi_error) {
-                if ($errores == '') {
-                    $errores = '<li>' . $mi_error . '</li>';
-                } else {
-                    $errores .= '<li>' . $mi_error . '</li>';
-                }
-            }
-            $msg = '<div class="alert alert-danger">' .
-                '<p class="text-center">¡Por favor corrija los siguientes errores!</p>' .
-                '<ul>' .
-                $errores .
-                '</ul>' .
-                '</div>';
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
         }
+
         return [
+            'success' => $success,
             'mensaje' => $msg,
-            'success' => $success
+        ];
+    }
+
+    public function delete_precio(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $model = Precio::find($request->id);
+            $model->delete();
+
+            DB::commit();
+            $success = true;
+            $msg = 'Se ha <strong>ELIMINADO</strong> el precio correctamente';
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
         ];
     }
 }

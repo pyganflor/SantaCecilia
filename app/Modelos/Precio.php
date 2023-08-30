@@ -17,8 +17,8 @@ class Precio extends Model
         'fecha_registro',
         'estado',
         'cantidad',
-        'id_detalle_especificacionempaque',
-        'codigo_presentacion'
+        'id_variedad',
+        'longitud',
     ];
 
     public function cliente()
@@ -26,8 +26,8 @@ class Precio extends Model
         return $this->belongsTo('\yura\Modelos\Cliente', 'id_cliente');
     }
 
-    public function detalle_especificacion_empaque()
+    public function variedad()
     {
-        return $this->belongsTo('\yura\Modelos\DetalleEspecificacionEmpaque', 'id_detalle_especificacion_empaque');
+        return $this->belongsTo('\yura\Modelos\Variedad', 'id_variedad');
     }
 }

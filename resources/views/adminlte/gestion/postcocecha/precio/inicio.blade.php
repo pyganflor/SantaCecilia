@@ -7,48 +7,45 @@
 @section('contenido')
     @include('adminlte.gestion.partials.breadcrumb')
     <section class="content">
-        <div class="box box-info">
-            <div class="box-header with-border">
-                <div class="col-md-6">
-                    <h3 class="box-title">
-                        Precios para especificaciones
-                    </h3>
-                </div>
-                {{--<div class="col-md-6 text-right">
-                    <button class="btn btn-success" onclick="add_empaque()"
-                            onmouseover="$('#title_btn_agregar_empaque').html('Agregar empaque')"
-                            onmouseleave="$('#title_btn_agregar_empaque').html('')">
-                        <i class="fa fa-plus" aria-hidden="true"></i>
-                        <em id="title_btn_agregar_empaque"></em>
-                    </button>
-                    <button class="btn btn-primary" onclick="exportar_detalle_empaque()"
-                            onmouseover="$('#title_btn_exportar_excel').html('Exportar excel de detalles de empaques')"
-                            onmouseleave="$('#title_btn_exportar_excel').html('')">
-                        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
-                        <em id="title_btn_exportar_excel"></em>
-                    </button>
-                    <button class="btn btn-success"  onclick="form_add_detalle_empaque()"
-                            onmouseover="$('#title_btn_importar_excel').html('Importar Excel de detalles de empaques')"
-                            onmouseleave="$('#title_btn_importar_excel').html('')">
-                        <i class="fa fa-upload" aria-hidden="true"></i>
-                        <em id="title_btn_importar_excel"></em>
-                    </button>
-                </div>--}}
-            </div>
-            <div class="box-body" id="div_content_precio">
-                <ul class="nav nav-tabs">
-                    <li class="active tab-detalles">
-                        <a href="#listado_clientes" data-toggle="tab">Clientes</a>
-                    </li>
-                    {{--<li class="tab-detalles">
-                        <a href="#listado_especificaciones" data-toggle="tab">Especificaciones</a>
-                    </li>--}}
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="listado_clientes"></div>
-                    {{--<div class="tab-pane" id="listado_especificaciones"></div>--}}
-                </div>
-            </div>
+        <div style="overflow-x: scroll; width: 100%">
+            <table style="width:100%; margin-top: 0">
+                <tr>
+                    <td style="vertical-align: top; padding-right: 5px; width: 30%">
+                        <div class="panel panel-success" style="margin-bottom: 0px; min-width: 270px">
+                            <div class="panel-heading"
+                                style="display: flex; justify-content: space-between; align-items: center;">
+                                <b><i class="fa fa-users"></i> LISTADO DE CLIENTES </b>
+                            </div>
+                            <div class="panel-body" style="max-height: 500px">
+                                <table class="table table-bordered"
+                                    style="width: 100%; border: 1px solid #9d9d9d; margin-top: 0">
+                                    @foreach ($clientes as $c)
+                                        <tr onmouseover="$(this).addClass('bg-yura_dark')"
+                                            onmouseleave="$(this).removeClass('bg-yura_dark')"
+                                            class="mouse-hand tr_clientes" id="tr_cliente_{{ $c->id_cliente }}"
+                                            onclick="seleccionar_cliente('{{ $c->id_cliente }}')">
+                                            <th class="padding_lateral_5 text-right" style="border-color: #9d9d9d">
+                                                {{ $c->nombre }}
+                                            </th>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="vertical-align: top; padding-left: 5px;">
+                        <div class="panel panel-success" style="margin-bottom: 0px;">
+                            <div class="panel-heading"
+                                style="display: flex; justify-content: space-between; align-items: center;">
+                                <b><i class="fa fa-dollar"></i> PRECIOS DEL CLIENTE</b>
+                            </div>
+                            <div class="panel-body">
+                                <div style="max-height: 500px; overflow:auto" id="body_precios"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </section>
 @endsection

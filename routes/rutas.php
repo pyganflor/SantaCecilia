@@ -100,6 +100,7 @@ Route::group(['middleware' => 'autenticacion'], function () {
             /* ========================== COMERCIALIZACION ========================*/
             //include 'pedidos/pedido.php';
             include 'comercializacion/pedidos.php';
+            include 'comercializacion/codigo_dae.php';
 
             /* ========================== CRM ========================*/
             include 'crm/postcosecha.php';

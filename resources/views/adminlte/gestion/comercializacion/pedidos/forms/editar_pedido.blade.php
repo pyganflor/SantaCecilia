@@ -1,3 +1,4 @@
+<input type="hidden" id="pedido_selected" value="{{ $pedido->id_pedido }}">
 <table width="100%">
     <tr>
         <td>
@@ -5,7 +6,7 @@
                 <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                     Fecha de Entrega
                 </div>
-                <input type="date" id="add_fecha" required class="form-control text-center"
+                <input type="date" id="edit_fecha" required class="form-control text-center"
                     style="width: 100% !important;" value="{{ $pedido->fecha_pedido }}">
             </div>
         </td>
@@ -14,7 +15,7 @@
                 <div class="input-group-addon bg-yura_dark">
                     Cliente
                 </div>
-                <select id="add_cliente" class="form-control" style="width: 100%" onchange="seleccionar_cliente()">
+                <select id="edit_cliente" class="form-control" style="width: 100%" onchange="seleccionar_cliente()">
                     <option value="">Seleccione</option>
                     @foreach ($clientes as $c)
                         <option value="{{ $c->id_cliente }}"
@@ -30,7 +31,7 @@
                 <div class="input-group-addon bg-yura_dark">
                     Carguera
                 </div>
-                <select id="add_agencia" class="form-control input-yura_default input_seleccionar_cliente"
+                <select id="edit_agencia" class="form-control input-yura_default input_seleccionar_cliente"
                     style="width: 100%">
                     @foreach ($agencias_cliente as $a)
                         <option value="{{ $a->id_agencia_carga }}"
@@ -48,7 +49,7 @@
                 <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                     Consignatario
                 </div>
-                <select id="add_consignatario" class="form-control input_seleccionar_cliente" style="width: 100%">
+                <select id="edit_consignatario" class="form-control input_seleccionar_cliente" style="width: 100%">
                     @foreach ($consignatarios_cliente as $c)
                         <option value="{{ $c->id_consignatario }}"
                             {{ $c->id_consignatario == $pedido->id_consignatario ? 'selected' : '' }}>
@@ -63,7 +64,7 @@
                 <div class="input-group-addon bg-yura_dark">
                     Marcacion
                 </div>
-                <input type="text" id="add_marcacion" required class="form-control text-center"
+                <input type="text" id="edit_marcacion" required class="form-control text-center"
                     value="{{ $pedido->marcacion }}" style="width: 100% !important;" maxlength="250">
             </div>
         </td>
@@ -72,7 +73,7 @@
                 <div class="input-group-addon bg-yura_dark">
                     Exportador
                 </div>
-                <select id="add_finca" class="form-control input-yura_default" style="width: 100%">
+                <select id="edit_finca" class="form-control input-yura_default" style="width: 100%">
                     @foreach ($fincas as $f)
                         <option value="{{ $f->id_configuracion_empresa }}">{{ $f->nombre }}</option>
                     @endforeach
@@ -95,10 +96,10 @@
                             data-toggle="dropdown" aria-expanded="false">
                             Acciones <span class="fa fa-caret-down"></span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-right sombra_pequeña">
+                        <ul class="dropdown-menu dropdown-menu-left sombra_pequeña">
                             <li>
-                                <a href="javascript:void(0)">
-                                    <i class="fa fa-fw fa-gift"></i> Agregar detalle
+                                <a href="javascript:void(0)" onclick="add_caja()">
+                                    <i class="fa fa-fw fa-gift"></i> Agregar Caja
                                 </a>
                             </li>
                         </ul>
@@ -108,11 +109,10 @@
                     <div style="overflow-y: scroll; height: 460px">
                         <table class="table-bordered" style="width: 100%; border: 1px solid #9d9d9d">
                             <tr class="tr_fija_top_0">
-                                <th class="text-center th_yura_green" colspan="2">
-                                    Cajas
-                                </th>
                                 <th class="text-center th_yura_green">
-                                    Planta
+                                    <div style="width: 180px">
+                                        Cajas
+                                    </div>
                                 </th>
                                 <th class="text-center th_yura_green">
                                     Variedad
@@ -121,12 +121,12 @@
                                     Longitud
                                 </th>
                                 <th class="text-center th_yura_green">
-                                    Tallos x Ramo
+                                    Tallos
                                 </th>
                                 <th class="text-center th_yura_green">
-                                    Ramos x Caja
+                                    Ramos
                                 </th>
-                                <th class="text-center th_yura_green">
+                                <th class="text-center th_yura_green" style="width: 80px">
                                     Precio
                                 </th>
                                 <th class="text-center th_yura_green">
@@ -136,92 +136,54 @@
                                 $monto_pedido = 0;
                             @endphp
                             @foreach ($pedido->detalles as $pos_d => $det)
-                                @foreach ($det->items as $pos_i => $item)
+                                @php
+                                    $caja_frio = $det->caja_frio;
+                                @endphp
+                                @foreach ($caja_frio->detalles as $pos_i => $item)
                                     @php
                                         $variedad = $item->variedad;
-                                        $monto_pedido += $item->precio * $item->ramos_x_caja * $item->tallos_x_ramo;
+                                        $monto_pedido += $item->precio * $item->ramos * $item->tallos_x_ramo;
                                     @endphp
                                     <tr>
                                         @if ($pos_i == 0)
-                                            <td class="text-center" style="border-color: #9d9d9d"
-                                                rowspan="{{ count($det->items) }}">
+                                            <th class="text-center" style="border-color: #9d9d9d"
+                                                rowspan="{{ count($caja_frio->detalles) }}">
                                                 <input type="hidden" class="ids_detalles"
                                                     value="{{ $det->id_detalle_pedido }}">
-                                                <input type="number" value="{{ $det->cantidad }}" class="text-center"
-                                                    style="width: 100%; height: {{ 26 * count($det->items) }}px"
-                                                    id="cantidad_detalle_{{ $det->id_detalle_pedido }}">
-                                            </td>
-                                            <td class="text-center" style="border-color: #9d9d9d"
-                                                rowspan="{{ count($det->items) }}">
-                                                <div class="btn-group">
-                                                    <button type="button"
-                                                        class="btn btn-yura_dark btn-xs dropdown-toggle"
-                                                        data-toggle="dropdown">
-                                                        <i class="fa fa-fw fa-gears"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-right sombra_pequeña"
-                                                        role="menu" style="z-index: 10 !important">
-                                                        <li>
-                                                            <a href="javascript:void(0)">
-                                                                <i class="fa fa-fw fa-copy"></i> Duplicar detalle
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0)">
-                                                                <i class="fa fa-fw fa-plus"></i> Agregar al detalle
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="javascript:void(0)">
-                                                                <i class="fa fa-fw fa-trash"></i> Eliminar del Pedido
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td>
+                                                {{ $caja_frio->nombre }}
+                                                <br>
+                                                <input type="text" style="width: 100%" class="text-center"
+                                                    title="PO" id="marcacion_po_{{ $det->id_detalle_pedido }}"
+                                                    placeholder="PO" value="{{ $det->marcacion_po }}"
+                                                    onchange="update_marcacion_po('{{ $det->id_detalle_pedido }}', $(this).val())">
+                                                @if (count($pedido->detalles) > 1)
+                                                    <br>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-yura_danger btn-xs"
+                                                            onclick="eliminar_detalle_pedido('{{ $det->id_detalle_pedido }}')">
+                                                            <i class="fa fa-fw fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            </th>
                                         @endif
+                                        <th class="text-center" style="border-color: #9d9d9d">
+                                            {{ $item->variedad->nombre }}
+                                        </th>
+                                        <th class="text-center" style="border-color: #9d9d9d">
+                                            {{ $item->longitud }}<sup>cm</sup>
+                                        </th>
+                                        <th class="text-center" style="border-color: #9d9d9d">
+                                            {{ $item->tallos_x_ramo * $item->ramos }}
+                                        </th>
+                                        <th class="text-center" style="border-color: #9d9d9d">
+                                            {{ $item->ramos }} <sup>x{{ $item->tallos_x_ramo }}</sup>
+                                        </th>
                                         <td class="text-center" style="border-color: #9d9d9d">
-                                            <input type="hidden" class="ids_items"
-                                                value="{{ $item->id_item_detalle_pedido }}">
-                                            <select id="planta_items_{{ $item->id_item_detalle_pedido }}"
-                                                style="width: 100%; height: 26px;"
-                                                onchange="select_planta($(this).val(), 'variedad_items_{{ $item->id_item_detalle_pedido }}', 'variedad_items_{{ $item->id_item_detalle_pedido }}', '<option value=>Seleccione</option>')"
-                                                ondblclick="select_planta($(this).val(), 'variedad_items_{{ $item->id_item_detalle_pedido }}', 'variedad_items_{{ $item->id_item_detalle_pedido }}', '<option value=>Seleccione</option>')">
-                                                @foreach ($plantas as $p)
-                                                    <option value="{{ $p->id_planta }}"
-                                                        {{ $p->id_planta == $variedad->id_planta ? 'selected' : '' }}>
-                                                        {{ $p->nombre }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td class="text-center" style="border-color: #9d9d9d">
-                                            <select id="variedad_items_{{ $item->id_item_detalle_pedido }}"
-                                                style="width: 100%; height: 26px">
-                                                <option value="{{ $item->id_variedad }}">
-                                                    {{ $variedad->nombre }}
-                                                </option>
-                                            </select>
-                                        </td>
-                                        <td class="text-center" style="border-color: #9d9d9d">
-                                            <input type="number" value="{{ $item->longitud }}" style="width: 100%"
+                                            <input type="number" style="width: 100%" value="{{ $item->precio }}"
                                                 class="text-center"
-                                                id="longitud_detalle_{{ $item->id_item_detalle_pedido }}">
-                                        </td>
-                                        <td class="text-center" style="border-color: #9d9d9d">
-                                            <input type="number" value="{{ $item->tallos_x_ramo }}"
-                                                style="width: 100%" class="text-center"
-                                                id="tallos_x_ramo_detalle_{{ $item->id_item_detalle_pedido }}">
-                                        </td>
-                                        <td class="text-center" style="border-color: #9d9d9d">
-                                            <input type="number" value="{{ $item->ramos_x_caja }}"
-                                                style="width: 100%" class="text-center"
-                                                id="ramos_x_caja_detalle_{{ $item->id_item_detalle_pedido }}">
-                                        </td>
-                                        <td class="text-center" style="border-color: #9d9d9d">
-                                            <input type="number" value="{{ $item->precio }}" style="width: 100%"
-                                                class="text-center"
-                                                id="precio_detalle_{{ $item->id_item_detalle_pedido }}">
+                                                id="precio_det_caja_{{ $item->id_detalle_caja_frio }}"
+                                                onchange="update_precio('{{ $item->id_detalle_caja_frio }}', $(this).val())">
                                         </td>
                                         <td class="text-center" style="border-color: #9d9d9d">
                                             <div class="btn-group">
@@ -233,13 +195,15 @@
                                                 <ul class="dropdown-menu dropdown-menu-right sombra_pequeña"
                                                     role="menu" style="z-index: 10 !important">
                                                     <li>
-                                                        <a href="javascript:void(0)">
-                                                            <i class="fa fa-fw fa-copy"></i> Duplicar esta fila
+                                                        <a href="javascript:void(0)"
+                                                            onclick="cambiar_caja('{{ $item->id_detalle_caja_frio }}')">
+                                                            <i class="fa fa-fw fa-pencil"></i> Cambiar a otra Caja
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="javascript:void(0)">
-                                                            <i class="fa fa-fw fa-trash"></i> Eliminar del Pedido
+                                                        <a href="javascript:void(0)"
+                                                            onclick="eliminar_detalle('{{ $item->id_detalle_caja_frio }}')">
+                                                            <i class="fa fa-fw fa-trash"></i> Quitar de la Caja
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -254,7 +218,8 @@
                 <div class="panel-footer" id="footer_seleccionados">
                     <div class="text-center" style="margin-top: 5px">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-yura_primary">
+                            <button type="button" class="btn btn-yura_primary"
+                                onclick="update_pedido('{{ $pedido->id_pedido }}')">
                                 <i class="fa fa-fw fa-save"></i> Grabar Pedido
                             </button>
                             <button type="button" class="btn btn-yura_dark">
@@ -279,11 +244,11 @@
                 <div class="panel-heading"
                     style="display: flex; justify-content: space-between; align-items: center;">
                     <div id="titulo_inventarios">
-                        <b> <i class="fa fa-leaf"></i> INVENTARIO DISPONIBLE </b>
+                        <b> <i class="fa fa-gears"></i> OPCIONES </b>
                     </div>
                     <div>
                         <div class="btn-group">
-                            <button class="btn btn-xs btn-yura_default" onclick="modificar_div_inv('right')">
+                            <button class="btn btn-xs btn-yura_default" onclick="modificar_div_inv('left')">
                                 <i class="fa fa-arrow-left"></i>
                             </button>
                             {{-- 
@@ -291,14 +256,13 @@
                                 <i class="fa fa-compress"></i>
                             </button>
                              --}}
-                            <button class="btn btn-xs btn-yura_default" onclick="modificar_div_inv('left')">
+                            <button class="btn btn-xs btn-yura_default" onclick="modificar_div_inv('right')">
                                 <i class="fa fa-arrow-right"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body" id="body_inventarios">
-                    caca
                 </div>
             </div>
         </td>
@@ -306,5 +270,137 @@
 </table>
 
 <script>
-    modificar_div_inv('left')
+    setTimeout(() => {
+        modificar_div_inv('left');
+    }, 500);
+
+    function update_precio(det_caja, precio) {
+        texto =
+            "<div class='alert alert-warning text-center' style='font-size: 1.2em'>Esta a punto de <b>CAMBIAR</b> el precio a '" +
+            precio + "'</div>";
+
+        modal_quest('modal_update_precio', texto, 'Eliminar pedido', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                det_caja: det_caja,
+                precio: precio,
+            };
+            post_jquery_m('pedidos/update_precio', datos, function() {}, 'precio_det_caja_' + det_caja);
+        })
+    }
+
+    function update_marcacion_po(det_ped, marcacion_po) {
+        texto =
+            "<div class='alert alert-warning text-center' style='font-size: 1.2em'>Esta a punto de <b>CAMBIAR</b> el PO a '" +
+            marcacion_po + "'</div>";
+
+        modal_quest('modal_update_marcacion_po', texto, 'Eliminar pedido', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                det_ped: det_ped,
+                marcacion_po: marcacion_po,
+            };
+            post_jquery_m('pedidos/update_marcacion_po', datos, function() {}, 'marcacion_po_' + det_ped);
+        })
+    }
+
+    function cambiar_caja(det) {
+        datos = {
+            det: det
+        }
+        get_jquery('{{ url('pedidos/cambiar_caja') }}', datos, function(retorno) {
+            $('#body_inventarios').html(retorno);
+            modificar_div_inv('right')
+        });
+    }
+
+    function eliminar_detalle(det) {
+        texto =
+            "<div class='alert alert-warning text-center' style='font-size: 1.5em'>Esta a punto de <b>ELIMINAR</b> la FLOR de la CAJA</div>" +
+            "<div class='alert alert-info text-center' style='font-size: 1.5em'>¿Desea devolver el contenido al inventario de cuarto frio?" +
+            "<div class='row'>" +
+            "<div class='col-md-6'>" +
+            "<label class='mouse-hand' for='radio_devolver_detalle0'>No</label>" +
+            "<input type='radio' name='radio_devolver_detalle' id='radio_devolver_detalle0' value='0' style='width: 20px; height: 20px'>" +
+            "</div>" +
+            "<div class='col-md-6'>" +
+            "<input type='radio' name='radio_devolver_detalle' id='radio_devolver_detalle1' value='1' style='width: 20px; height: 20px' checked>" +
+            "<label class='mouse-hand' for='radio_devolver_detalle1'>Si</label>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+
+        modal_quest('modal_eliminar_detalle', texto, 'Eliminar flor de la caja', true, false, '50%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                det: det,
+                devolver: $('#radio_devolver_detalle1').prop('checked') == true ? 1 : 0,
+            };
+            post_jquery_m('inventario_cajas/eliminar_detalle', datos, function() {
+                cerrar_modals();
+                editar_pedido($('#pedido_selected').val());
+                listar_reporte();
+            });
+
+        })
+    }
+
+    function eliminar_detalle_pedido(det_ped) {
+        texto =
+            "<div class='alert alert-warning text-center' style='font-size: 1.5em'>Esta a punto de <b>ELIMINAR</b> la Caja</div>" +
+            "<div class='alert alert-info text-center' style='font-size: 1.5em'>¿Desea devolver la caja al inventario?" +
+            "<div class='row'>" +
+            "<div class='col-md-6'>" +
+            "<label class='mouse-hand' for='radio_devolver0'>No</label>" +
+            "<input type='radio' name='radio_devolver' id='radio_devolver0' value='0' style='width: 20px; height: 20px'>" +
+            "</div>" +
+            "<div class='col-md-6'>" +
+            "<input type='radio' name='radio_devolver' id='radio_devolver1' value='1' style='width: 20px; height: 20px' checked>" +
+            "<label class='mouse-hand' for='radio_devolver1'>Si</label>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+
+        modal_quest('modal_eliminar_pedido', texto, 'Eliminar caja del Pedido', true, false, '50%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                det_ped: det_ped,
+                devolver: $('#radio_devolver1').prop('checked') == true ? 1 : 0,
+            };
+            post_jquery_m('pedidos/eliminar_detalle_pedido', datos, function() {
+                cerrar_modals();
+                editar_pedido($('#pedido_selected').val());
+                listar_reporte();
+            });
+
+        })
+    }
+
+    function add_caja() {
+        datos = {}
+        get_jquery('{{ url('pedidos/add_caja') }}', datos, function(retorno) {
+            $('#body_inventarios').html(retorno);
+            modificar_div_inv('right')
+        });
+    }
+
+    function update_pedido(ped) {
+        if ($('#add_cliente').val() != '') {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                ped: ped,
+                fecha: $('#edit_fecha').val(),
+                cliente: $('#edit_cliente').val(),
+                finca: $('#edit_finca').val(),
+                agencia: $('#edit_agencia').val(),
+                consignatario: $('#edit_consignatario').val(),
+                marcacion: $('#edit_marcacion').val(),
+            };
+            post_jquery_m('{{ url('pedidos/update_pedido') }}', datos, function() {
+                cerrar_modals();
+                editar_pedido(ped);
+                listar_reporte();
+            });
+        }
+    }
 </script>

@@ -16,6 +16,14 @@
         });
     }
 
+    function exportar_resumen_pedidos() {
+        $.LoadingOverlay('show');
+        window.open('{{ url('pedidos/exportar_resumen_pedidos') }}?fecha=' + $('#filtro_fecha').val() +
+            '&cliente=' + $('#filtro_cliente').val() +
+            '&finca=' + $('#filtro_finca').val(), '_blank');
+        $.LoadingOverlay('hide');
+    }
+
     function add_pedido() {
         datos = {}
         get_jquery('{{ url('pedidos/add_pedido') }}', datos, function(retorno) {
@@ -25,20 +33,41 @@
         })
     }
 
+    function modal_exportar() {
+        datos = {}
+        get_jquery('{{ url('pedidos/modal_exportar') }}', datos, function(retorno) {
+            modal_view('modal_modal_exportar', retorno, '<i class="fa fa-fw fa-plus"></i> Exportar Pedidos',
+                true, false, '{{ isPC() ? '70%' : '' }}',
+                function() {});
+        })
+    }
+
     function eliminar_pedido(ped) {
         texto =
-            "<div class='alert alert-warning text-center'>Esta seguro de <b>ELIMINAR</b> el pedido?</div>";
+            "<div class='alert alert-warning text-center' style='font-size: 1.5em'>Esta a punto de <b>ELIMINAR</b> el Pedido</div>" +
+            "<div class='alert alert-info text-center' style='font-size: 1.5em'>¿Desea devolver el contenido al inventario de cajas?" +
+            "<div class='row'>" +
+            "<div class='col-md-6'>" +
+            "<label class='mouse-hand' for='radio_devolver0'>No</label>" +
+            "<input type='radio' name='radio_devolver' id='radio_devolver0' value='0' style='width: 20px; height: 20px'>" +
+            "</div>" +
+            "<div class='col-md-6'>" +
+            "<input type='radio' name='radio_devolver' id='radio_devolver1' value='1' style='width: 20px; height: 20px' checked>" +
+            "<label class='mouse-hand' for='radio_devolver1'>Si</label>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
 
         modal_quest('modal_eliminar_pedido', texto, 'Eliminar pedido', true, false, '40%', function() {
             datos = {
                 _token: '{{ csrf_token() }}',
-                id_pedido: ped
+                id_pedido: ped,
+                devolver: $('#radio_devolver1').prop('checked') == true ? 1 : 0,
             };
             post_jquery_m('pedidos/eliminar_pedido', datos, function() {
                 cerrar_modals();
                 listar_reporte();
             });
-
         })
     }
 
@@ -46,7 +75,6 @@
         datos = {
             finca: $('#finca_inventario').val(),
             buscar: $('#buscar_inventario').val(),
-            longitud: $('#longitud_inventario').val(),
         }
         get_jquery('{{ url('pedidos/buscar_inventario') }}', datos, function(retorno) {
             $('#div_inventario').html(retorno);
@@ -66,6 +94,8 @@
             for (i = 0; i < retorno.agencias.length; i++) {
                 $('#add_agencia').append('<option value="' + retorno.agencias[i].id_agencia_carga + '">' +
                     retorno.agencias[i].nombre + '</option>');
+            }
+            for (i = 0; i < retorno.consignatarios.length; i++) {
                 $('#add_consignatario').append('<option value="' + retorno.consignatarios[i].id_consignatario +
                     '">' +
                     retorno.consignatarios[i].nombre + '</option>');
