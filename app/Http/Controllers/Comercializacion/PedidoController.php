@@ -573,7 +573,7 @@ class PedidoController extends Controller
             'pedido' => $pedido,
         ];
         return PDF::loadView('adminlte.gestion.comercializacion.pedidos.partials.pdf_etiqueta', compact('datos', 'barCode'))
-            ->setPaper(array(0, 0, 360, 360), 'landscape')->stream();
+            ->setPaper(array(0, 0, 360, 220), 'landscape')->stream();
     }
 
     public function generar_prefactura(Request $request)

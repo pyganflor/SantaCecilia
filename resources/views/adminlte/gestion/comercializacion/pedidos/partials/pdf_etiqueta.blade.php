@@ -6,102 +6,76 @@
         <table class="text-center" style="font-size: 0.9em; width: 100%">
             <tr>
                 <td style="text-align: center;">
+                    <img src="{{ public_path('/images/logo_senae.png') }}" width="50px" alt="Logo">
+                </td>
+                <td style="text-align: left;">
                     {!! $barCode->getBarcode('05520234001224073', $barCode::TYPE_CODE_128, 1) !!}
+                    05520234001224073
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center; font-size: 0.8em; border-bottom: 1px solid black" colspan="2">
+                    PAIS DESTINO: {{ $datos['pedido']->consignatario->pais()->nombre }}
                 </td>
             </tr>
         </table>
 
         <table style="width: 100%">
             <tr>
-                <td rowspan="2">
-                    <img src="{{ public_path('/images/logo_senae.png') }}" width="50px" alt="Logo">
-                </td>
-                <td class="text-center" style="font-size: 0.6em" colspan="2">
-                    <b>{{ $datos['pedido']->codigo_dae }}</b>
+                <th class="text-center" colspan="2">
+                    ECSTACECILIA-ROSES
+                </th>
+            </tr>
+            <tr>
+                <td class="text-center" style="font-size: 0.8em" colspan="2">
+                    {{ $datos['pedido']->cliente->detalle()->nombre }}
                 </td>
             </tr>
             <tr>
-                <td class="text-center" style="font-size: 0.8em" colspan="3">
-                    <b>Miranda Flowers S.A.S.</b>
-                </td>
-            </tr>
-            <tr>
-                <td style="font-size: 0.6em" colspan="2">
-                    <em>RUC 1793204456001 .17020801</em>
+                <td style="font-size: 0.6em">
+                    <em>AWB:</em> {{ $datos['pedido']->guia_madre }}
                 </td>
                 <td style="font-size: 0.6em; text-align: right">
-                    <em>{{ str_pad($datos['pedido']->packing, 8, '0', STR_PAD_LEFT) }}</em>
+                    <em>PO/Label:</em> {{ $datos['pedido']->marcacion }}
                 </td>
             </tr>
             <tr>
-                <td style="font-size: 0.6em" colspan="2">
-                    <em>CUST {{ $datos['pedido']->consignatario->nombre }}</em><small><b>{{ $det->marcacion_po }}</b></small>
+                <td style="font-size: 0.6em">
+                    <em>HAWB:</em> {{ $datos['pedido']->guia_hija }}
                 </td>
                 <td style="font-size: 0.6em; text-align: right">
-                    <small><em>invoice:</em></small>
-                    <em>{{ str_pad($datos['pedido']->factura, 8, '0', STR_PAD_LEFT) }}</em>
+                    <em>INVOICE: {{ str_pad($datos['pedido']->factura, 8, '0', STR_PAD_LEFT) }}</em>
                 </td>
             </tr>
             <tr>
-                <td style="font-size: 0.6em" colspan="3">
-                    <em>AWB:</em> {{ $datos['pedido']->guia_madre }}___<em>HAWB:</em> {{ $datos['pedido']->guia_hija }}
-                </td>
+                <th style="font-size: 0.6em; text-align: right" colspan="2">
+                    BOX: <b>{{ $pos_det + 1 }}/{{ count($datos['pedido']->detalles) }}</b> {{ $caja_frio->tipo }}
+                </th>
             </tr>
         </table>
 
         <table class="border-1px" style="font-size: 10px">
             <tr>
-                @php
-                    $total_30 = 0;
-                    $total_40 = 0;
-                    $total_50 = 0;
-                    $total_60 = 0;
-                    $total_70 = 0;
-                    $total_80 = 0;
-                    $total_90 = 0;
-                    $total_100 = 0;
-                    $total_110 = 0;
-                    $total_120 = 0;
-                    $total_tallos = 0;
-                    $total_ramos = 0;
-                @endphp
                 <td class="border-1px text-center" style="width: 110px">
-                    VARIEDAD
+                    VARIETIES
                 </td>
                 <td class="border-1px text-center">
-                    30
+                    LENGHT
                 </td>
                 <td class="border-1px text-center">
-                    40
+                    BUNCH
                 </td>
                 <td class="border-1px text-center">
-                    50
-                </td>
-                <td class="border-1px text-center">
-                    60
-                </td>
-                <td class="border-1px text-center">
-                    70
-                </td>
-                <td class="border-1px text-center">
-                    80
-                </td>
-                <td class="border-1px text-center">
-                    90
-                </td>
-                <td class="border-1px text-center">
-                    100
-                </td>
-                <td class="border-1px text-center">
-                    110
-                </td>
-                <td class="border-1px text-center">
-                    120
+                    STEMS
                 </td>
             </tr>
-            @foreach ($caja_frio->getDetallesAgrupados() as $pos_item => $item)
+            @php
+                $total_tallos = 0;
+                $total_ramos = 0;
+            @endphp
+            @foreach ($caja_frio->detalles as $pos_item => $item)
                 @php
-                    $variedad = getVariedad($item->id_variedad);
+                    $variedad = $item->variedad;
                     $total_tallos += $item->ramos * $item->tallos_x_ramo;
                     $total_ramos += $item->ramos;
                 @endphp
@@ -109,133 +83,35 @@
                     <td class="text-center border-1px">
                         {{ $variedad->nombre }}
                     </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 30 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 30) {
-                                $total_30 += $item->ramos;
-                            }
-                        @endphp
+                    <td class="text-center border-1px">
+                        {{ $item->longitud }}
                     </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 40 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 40) {
-                                $total_40 += $item->ramos;
-                            }
-                        @endphp
+                    <td class="text-center border-1px">
+                        {{ $item->ramos }}
                     </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 50 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 50) {
-                                $total_50 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 60 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 60) {
-                                $total_60 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 70 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 70) {
-                                $total_70 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 80 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 80) {
-                                $total_80 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 90 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 90) {
-                                $total_90 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 100 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 100) {
-                                $total_100 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 110 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 110) {
-                                $total_110 += $item->ramos;
-                            }
-                        @endphp
-                    </td>
-                    <td class="border-1px text-center">
-                        {{ $item->longitud == 120 ? $item->ramos : '' }}
-                        @php
-                            if ($item->longitud == 120) {
-                                $total_120 += $item->ramos;
-                            }
-                        @endphp
+                    <td class="text-center border-1px">
+                        {{ $item->ramos * $item->tallos_x_ramo }}
                     </td>
                 </tr>
             @endforeach
             <tr>
-                <td class="text-center">
-                    Stems: <b>{{ number_format($total_tallos) }}</b>
+                <td colspan="2" style="text-align: right">
+                    TOTAL
                 </td>
                 <th class="border-1px text-center">
-                    {{ $total_30 > 0 ? $total_30 : '' }}
+                    {{ $total_ramos }}
                 </th>
                 <th class="border-1px text-center">
-                    {{ $total_40 > 0 ? $total_40 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_50 > 0 ? $total_50 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_60 > 0 ? $total_60 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_70 > 0 ? $total_70 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_80 > 0 ? $total_80 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_90 > 0 ? $total_90 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_100 > 0 ? $total_100 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_110 > 0 ? $total_110 : '' }}
-                </th>
-                <th class="border-1px text-center">
-                    {{ $total_120 > 0 ? $total_120 : '' }}
+                    {{ $total_tallos }}
                 </th>
             </tr>
             <tr>
-                <td class="border-1px" style="text-align: right; padding-right: 5px" colspan="8">
-                    <em style="font-size: 0.8em">AGENCY:</em><b>{{ $datos['pedido']->agencia_carga->nombre }}</b>
-                </td>
-                <td class="border-1px" style="text-align: right; padding-right: 5px" colspan="3">
-                    <b>{{ $pos_det + 1 }}/{{ count($datos['pedido']->detalles) }}</b> {{ $caja_frio->tipo }}
-                </td>
+                <th style="text-align: left" colspan="4">
+                    AGENCY: {{ $datos['pedido']->agencia_carga->nombre }}
+                </th>
             </tr>
         </table>
-        <div class="text-center" style="font-size: 0.8em; width: 100%">
+        <div class="text-center" style="font-size: 0.7em; width: 100%">
             <b>PRODUCT GROWN IN ECUADOR</b>
         </div>
     </div>
