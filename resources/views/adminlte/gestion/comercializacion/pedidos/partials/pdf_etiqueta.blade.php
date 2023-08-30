@@ -6,14 +6,7 @@
         <table class="text-center" style="font-size: 0.9em; width: 100%">
             <tr>
                 <td style="text-align: center;">
-                    @php
-                        if ($datos['pedido']->codigo_dae != '') {
-                            $codigo_dae = $datos['pedido']->codigo_dae;
-                        } else {
-                            $codigo_dae = '0123456789';
-                        }
-                    @endphp
-                    {!! $barCode->getBarcode($codigo_dae, $barCode::TYPE_CODE_128, 1) !!}
+                    {!! $barCode->getBarcode('05520234001224073', $barCode::TYPE_CODE_128, 1) !!}
                 </td>
             </tr>
         </table>

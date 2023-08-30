@@ -9,8 +9,12 @@ use DB;
 use yura\Modelos\CajaFrio;
 use yura\Modelos\DetalleCajaFrio;
 use yura\Modelos\DetallePedido;
-use yura\Modelos\ItemDetallePedido;
 use yura\Modelos\Pedido;
+use Barryvdh\DomPDF\Facade as PDF;
+use Picqer\Barcode\BarcodeGeneratorHTML;
+use yura\Modelos\Aerolinea;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PedidoController extends Controller
 {
@@ -498,7 +502,7 @@ class PedidoController extends Controller
         ini_set('memory_limit', '-1');
         $id_pedido = $request->ped;
         $pedido = Pedido::find($id_pedido);
-        if ($pedido->codigo_dae != '' && $pedido->guia_madre != '' && $pedido->guia_hija != '') {
+        if ($pedido->codigo_dae != '' && $pedido->guia_madre != '' && $pedido->guia_hija != '' || 1) {
             if ($pedido->packing <= 0) {
                 $last_packing = DB::table('pedido')
                     ->select(DB::raw('max(packing) as last'))
@@ -577,7 +581,7 @@ class PedidoController extends Controller
         $barCode = new BarcodeGeneratorHTML();
         $id_pedido = $request->ped;
         $pedido = Pedido::find($id_pedido);
-        if ($pedido->codigo_dae != '' && $pedido->guia_madre != '' && $pedido->guia_hija != '') {
+        if ($pedido->codigo_dae != '' && $pedido->guia_madre != '' && $pedido->guia_hija != '' || 1) {
             if ($pedido->packing <= 0) {
                 $last_packing = DB::table('pedido')
                     ->select(DB::raw('max(packing) as last'))
