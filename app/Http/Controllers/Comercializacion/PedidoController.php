@@ -126,7 +126,6 @@ class PedidoController extends Controller
     {
         $listado = CajaFrio::where('nombre', 'like', '%' . espacios(mb_strtoupper($request->buscar)) . '%')
             ->where('armada', 0)
-            ->orderBy('id_empresa')
             ->orderBy('nombre')
             ->get();
         return view('adminlte.gestion.comercializacion.pedidos.forms._buscar_inventario', [

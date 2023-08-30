@@ -72,7 +72,6 @@
 
     function buscar_inventario() {
         datos = {
-            finca: $('#finca_inventario').val(),
             buscar: $('#buscar_inventario').val(),
         }
         get_jquery('{{ url('pedidos/buscar_inventario') }}', datos, function(retorno) {
