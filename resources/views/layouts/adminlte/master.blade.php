@@ -447,6 +447,7 @@
                     action: function(modal) {
                         if (!!accion) {
                             accion();
+                            modal.close();
                         } else {
                             modal.close();
                         }
