@@ -569,6 +569,14 @@ class PedidoController extends Controller
             $pedido->packing = $packing;
             $pedido->save();
         }
+        if ($pedido->factura <= 0) {
+            $last_factura = DB::table('pedido')
+                ->select(DB::raw('max(factura) as last'))
+                ->get()[0]->last;
+            $factura = $last_factura;
+            $factura++;
+            $pedido->factura = $factura;
+        }
         $datos = [
             'pedido' => $pedido,
         ];
