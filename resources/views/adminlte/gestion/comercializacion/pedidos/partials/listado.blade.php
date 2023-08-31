@@ -170,7 +170,7 @@
                                                     <i class="fa fa-fw fa-money"></i> Generar Factura
                                                 </a>
                                             </li>
-                                            <li>
+                                            <li class="hidden">
                                                 <a href="javascript:void(0)" title="Generar Packing"
                                                     onclick="generar_prefactura('{{ $ped->id_pedido }}')">
                                                     <i class="fa fa-fw fa-shopping-cart"></i> Generar Pre-Factura

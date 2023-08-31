@@ -500,6 +500,7 @@ class PedidoController extends Controller
     {
         set_time_limit(600);
         ini_set('memory_limit', '-1');
+        $barCode = new BarcodeGeneratorHTML();
         $id_pedido = $request->ped;
         $pedido = Pedido::find($id_pedido);
         if ($pedido->codigo_dae != '' && $pedido->guia_madre != '' && $pedido->guia_hija != '' || 1) {
@@ -512,11 +513,19 @@ class PedidoController extends Controller
                 $pedido->packing = $packing;
                 $pedido->save();
             }
+            if ($pedido->factura <= 0) {
+                $last_factura = DB::table('pedido')
+                    ->select(DB::raw('max(factura) as last'))
+                    ->get()[0]->last;
+                $factura = $last_factura;
+                $factura++;
+                $pedido->factura = $factura;
+            }
             $datos = [
                 'pedido' => $pedido,
             ];
-            return PDF::loadView('adminlte.gestion.comercializacion.pedidos.partials.pdf_packing', compact('datos'))
-                ->setPaper(array(0, 0, 450, 360), 'landscape')->stream();
+            return PDF::loadView('adminlte.gestion.comercializacion.pedidos.partials.pdf_packing', compact('datos', 'barCode'))
+                ->setPaper(array(0, 0, 450, 400), 'landscape')->stream();
         } else {
             return 'Es Necesario ingresar la DAE y las guias';
         }
@@ -526,6 +535,7 @@ class PedidoController extends Controller
     {
         set_time_limit(600);
         ini_set('memory_limit', '-1');
+        $barCode = new BarcodeGeneratorHTML();
         $id_pedido = $request->ped;
         $pedido = Pedido::find($id_pedido);
         if ($pedido->packing <= 0) {
@@ -549,7 +559,7 @@ class PedidoController extends Controller
             'pedido' => $pedido,
         ];
 
-        $pdf = PDF::loadView('adminlte.gestion.comercializacion.pedidos.partials.pdf_factura', compact('datos'))
+        $pdf = PDF::loadView('adminlte.gestion.comercializacion.pedidos.partials.pdf_factura', compact('datos', 'barCode'))
             ->setPaper(array(0, 0, 450, 400), 'landscape');
 
         return $pdf->stream();
