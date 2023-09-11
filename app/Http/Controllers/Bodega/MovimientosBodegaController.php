@@ -64,7 +64,7 @@ class MovimientosBodegaController extends Controller
                 $ingreso->id_producto = $d->id_prod;
                 $ingreso->fecha = $request->fecha;
                 $ingreso->cantidad = $d->unidades;
-                $ingreso->precio = $d->precio_compra;
+                $ingreso->precio = $d->precio_compra != '' ? $d->precio_compra : 0;
                 $ingreso->save();
                 $ingreso = IngresoBodega::All()->last();
                 bitacora('ingreso_bodega', $ingreso->id_ingreso_bodega, 'I', 'INGRESO A BODEGA de ' . $d->unidades . ' UNIDADES de ' . $model->nombre);
