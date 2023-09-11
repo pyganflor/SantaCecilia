@@ -177,7 +177,7 @@
             id_prod = id_producto_seleccionado[i].value;
             unidades = $('#unidades_seleccionado_' + id_prod).val();
             modulo = $('#modulo_seleccionado_' + id_prod).val();
-            if (unidades > 0 && modulo != '') {
+            if (unidades > 0) {
                 data.push({
                     id_prod: id_prod,
                     unidades: unidades,
