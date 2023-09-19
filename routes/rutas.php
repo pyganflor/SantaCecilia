@@ -181,6 +181,7 @@ Route::group(['middleware' => 'autenticacion'], function () {
             /* ================== BODEGA =============== */
             include 'bodega/productos.php';
             include 'bodega/movimientos_bodega.php';
+            include 'bodega/categorias_producto.php';
 
             /* ================== COSECHA_DIARIA =============== */
             include 'crm/cosecha_diaria.php';

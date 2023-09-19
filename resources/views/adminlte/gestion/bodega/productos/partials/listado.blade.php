@@ -1,20 +1,22 @@
-
-<div style="overflow-y: scroll; overflow-x: scroll; height: 500px;">
+<div style="overflow-y: scroll; overflow-x: scroll; height: 700px;">
     <table class="table-striped table-bordered" style="width: 100%; border: 1px solid #9d9d9d">
         <tr id="tr_fija_top_0">
             <th class="text-center th_yura_green">
                 CODIGO
             </th>
-            <th class="text-center th_yura_green" style="width: 30%">
+            <th class="text-center th_yura_green">
                 NOMBRE
             </th>
-            <th class="text-center th_yura_green">
+            <th class="text-center th_yura_green" style="width: 110px">
+                CATEGORIA
+            </th>
+            <th class="text-center th_yura_green" style="width: 60px">
                 UM
             </th>
-            <th class="text-center th_yura_green">
+            <th class="text-center th_yura_green" style="width: 60px">
                 STOCK MINIMO
             </th>
-            <th class="text-center th_yura_green">
+            <th class="text-center th_yura_green" style="width: 60px">
                 CONVERSION
             </th>
             <th class="text-center th_yura_green" style="width: 60px">
@@ -29,12 +31,21 @@
         </tr>
         <tr id="tr_new_producto" class="hidden">
             <th class="text-center" style="border-color: #9d9d9d">
-                <input type="text" style="width: 100%" class="text-center bg-yura_dark" id="codigo_new" placeholder="Codigo"
-                    required>
+                <input type="text" style="width: 100%" class="text-center bg-yura_dark" id="codigo_new"
+                    placeholder="Codigo" required>
             </th>
             <th class="text-center" style="border-color: #9d9d9d">
-                <input type="text" style="width: 100%" class="text-center bg-yura_dark" id="nombre_new" placeholder="NOMBRE"
-                    required>
+                <input type="text" style="width: 100%" class="text-center bg-yura_dark" id="nombre_new"
+                    placeholder="NOMBRE" required>
+            </th>
+            <th class="text-center" style="border-color: #9d9d9d">
+                <select style="width: 100%" class="text-center" id="categoria_new" required>
+                    @foreach ($categorias as $cat)
+                        <option value="{{ $cat->id_categoria_producto }}">
+                            {{ $cat->nombre }}
+                        </option>
+                    @endforeach
+                </select>
             </th>
             <th class="text-center" style="border-color: #9d9d9d">
                 <input type="text" style="width: 100%" class="text-center bg-yura_dark" required min="0"
@@ -69,8 +80,20 @@
                         value="{{ $item->nombre }}" required>
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
-                    <input type="text" style="width: 100%" class="text-center" id="unidad_medida_{{ $item->id_producto }}"
-                        value="{{ $item->unidad_medida }}" required>
+                    <select style="width: 100%" class="text-center bg-yura_dark" id="categoria_{{ $item->id_producto }}"
+                        required>
+                        <option value="">Ninguna</option>
+                        @foreach ($categorias as $cat)
+                            <option value="{{ $cat->id_categoria_producto }}"
+                                {{ $cat->id_categoria_producto == $item->id_categoria_producto ? 'selected' : '' }}>
+                                {{ $cat->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </th>
+                <th class="text-center" style="border-color: #9d9d9d">
+                    <input type="text" style="width: 100%" class="text-center"
+                        id="unidad_medida_{{ $item->id_producto }}" value="{{ $item->unidad_medida }}" required>
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
                     <input type="number" style="width: 100%" class="text-center" required min="0"
@@ -107,6 +130,7 @@
             _token: '{{ csrf_token() }}',
             codigo: $('#codigo_new').val(),
             nombre: $('#nombre_new').val(),
+            categoria: $('#categoria_new').val(),
             unidad_medida: $('#unidad_medida_new').val(),
             stock_minimo: $('#stock_minimo_new').val(),
             disponibles: 0,
@@ -123,6 +147,7 @@
             _token: '{{ csrf_token() }}',
             codigo: $('#codigo_' + id).val(),
             nombre: $('#nombre_' + id).val(),
+            categoria: $('#categoria_' + id).val(),
             unidad_medida: $('#unidad_medida_' + id).val(),
             stock_minimo: $('#stock_minimo_' + id).val(),
             conversion: $('#conversion_' + id).val(),

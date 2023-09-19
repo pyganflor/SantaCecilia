@@ -1,14 +1,14 @@
 @extends('layouts.adminlte.master')
 
 @section('titulo')
-    Productos
+    Categorias de Producto
 @endsection
 
 @section('contenido')
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            Productos
+            Categorias de Producto
             <small class="text-color_yura">módulo de bodega</small>
         </h1>
 
@@ -34,24 +34,13 @@
     <section class="content">
         <table style="width: 100%">
             <tr>
-                <td class="text-center padding_lateral_5" style="border-color: #9d9d9d" id="td_cargar_longitudes">
+                <td>
                     <div class="input-group">
                         <span class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                             Búsqueda
                         </span>
                         <input type="text" id="filtro_busqueda" style="width: 100%" class="text-center form-control"
                             onkeyup="listar_reporte()">
-                        <span class="input-group-addon bg-yura_dark">
-                            Categoria
-                        </span>
-                        <select id="filtro_categoria" style="width: 100%" class="form-control" onkeyup="listar_reporte()">
-                            <option value="T">Todas</option>
-                            @foreach ($categorias as $cat)
-                                <option value="{{ $cat->id_categoria_producto }}">
-                                    {{ $cat->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
                         <span class="input-group-btn">
                             <button type="button" class="btn btn-yura_dark" onclick="listar_reporte()">
                                 <i class="fa fa-fw fa-search"></i>
@@ -78,9 +67,10 @@
             left: 0;
             z-index: 9;
         }
+
     </style>
 @endsection
 
 @section('script_final')
-    @include('adminlte.gestion.bodega.productos.script')
+    @include('adminlte.gestion.bodega.categorias_producto.script')
 @endsection

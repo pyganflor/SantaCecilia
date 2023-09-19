@@ -119,6 +119,7 @@
 
 <script>
     estructura_tabla('table_listado_add_salidas');
+    cant_prod_selected = 0;
 
     function agregar_productos() {
         select_sectores = $('#select_sectores').html();
@@ -127,40 +128,44 @@
             id_prod = tr_productos[i].value;
             unidades = $('#unidades_' + id_prod).val();
             if (unidades != '' && unidades > 0) {
+                cant_prod_selected++;
                 codigo = $('#codigo_' + id_prod).val();
                 nombre = $('#nombre_' + id_prod).val();
-                if ($('#unidades_seleccionado_' + id_prod).length == 0)
-                    $('#table_add_salidas').append('<tr id="tr_add_ingreso_' + id_prod + '">' +
-                        '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
-                        codigo +
-                        '<input type="hidden" class="id_producto_seleccionado" value="' + id_prod + '">' +
-                        '</th>' +
-                        '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
-                        nombre +
-                        '</th>' +
-                        '<td class="text-center" style="border-color: #9d9d9d">' +
-                        '<input type="number" style="width: 100%" class="text-center"' +
-                        'id="unidades_seleccionado_' + id_prod + '" min="0" value="' + unidades + '">' +
-                        '</td>' +
-                        '<td class="text-center" style="border-color: #9d9d9d">' +
-                        '<select style="width: 100%; height: 26px" onchange="seleccionar_sector(' + id_prod + ')"' +
-                        'id="sector_seleccionado_' + id_prod + '" min="0">' +
-                        select_sectores +
-                        '</select>' +
-                        '</td>' +
-                        '<td class="text-center" style="border-color: #9d9d9d">' +
-                        '<select style="width: 100%; height: 26px" ' +
-                        'id="modulo_seleccionado_' + id_prod + '" min="0">' +
-                        '<option value="">Seleccione</option' +
-                        '</select>' +
-                        '</td>' +
-                        '<td class="text-center" style="border-color: #9d9d9d">' +
-                        '<button type="button" class="btn btn-xs btn-yura_danger" onclick="quitar_fila(' + id_prod +
-                        ')">' +
-                        '<i class="fa fa-fw fa-trash"></i>' +
-                        '</button>' +
-                        '</td>' +
-                        '</tr>');
+                $('#table_add_salidas').append('<tr id="tr_add_ingreso_' + cant_prod_selected + '">' +
+                    '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
+                    codigo +
+                    '<input type="hidden" id="input_producto_selected_' + cant_prod_selected +
+                    '" class="id_producto_seleccionado" value="' + id_prod +
+                    '" data-pos_selected="' + cant_prod_selected + '">' +
+                    '</th>' +
+                    '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
+                    nombre +
+                    '</th>' +
+                    '<td class="text-center" style="border-color: #9d9d9d">' +
+                    '<input type="number" style="width: 100%" class="text-center"' +
+                    'id="unidades_seleccionado_' + cant_prod_selected + '" min="0" value="' + unidades + '">' +
+                    '</td>' +
+                    '<td class="text-center" style="border-color: #9d9d9d">' +
+                    '<select style="width: 100%; height: 26px" onchange="seleccionar_sector(' + cant_prod_selected +
+                    ')"' +
+                    'id="sector_seleccionado_' + cant_prod_selected + '" min="0">' +
+                    select_sectores +
+                    '</select>' +
+                    '</td>' +
+                    '<td class="text-center" style="border-color: #9d9d9d">' +
+                    '<select style="width: 100%; height: 26px" ' +
+                    'id="modulo_seleccionado_' + cant_prod_selected + '" min="0">' +
+                    '<option value="">Seleccione</option' +
+                    '</select>' +
+                    '</td>' +
+                    '<td class="text-center" style="border-color: #9d9d9d">' +
+                    '<button type="button" class="btn btn-xs btn-yura_danger" onclick="quitar_fila(' +
+                    cant_prod_selected +
+                    ')">' +
+                    '<i class="fa fa-fw fa-trash"></i>' +
+                    '</button>' +
+                    '</td>' +
+                    '</tr>');
 
             }
         }
@@ -175,8 +180,9 @@
         data = [];
         for (i = 0; i < id_producto_seleccionado.length; i++) {
             id_prod = id_producto_seleccionado[i].value;
-            unidades = $('#unidades_seleccionado_' + id_prod).val();
-            modulo = $('#modulo_seleccionado_' + id_prod).val();
+            pos = $('#' + id_producto_seleccionado[i].id).attr('data-pos_selected');
+            unidades = $('#unidades_seleccionado_' + pos).val();
+            modulo = $('#modulo_seleccionado_' + pos).val();
             if (unidades > 0) {
                 data.push({
                     id_prod: id_prod,

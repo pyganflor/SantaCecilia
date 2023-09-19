@@ -7,11 +7,19 @@
     <div class="input-group-addon bg-yura_dark">
         <i class="fa fa-fw fa-leaf"></i> Variedad
     </div>
-
     <select id="planta_blanco_filtro" class="form-control input-yura_default">
         <option value="T">Todas las variedades</option>
         @foreach($plantas as $p)
             <option value="{{$p->id_planta}}">{{$p->nombre}}</option>
+        @endforeach
+    </select>
+    <div class="input-group-addon bg-yura_dark">
+        Longitud
+    </div>
+    <select id="longitud_blanco_filtro" class="form-control input-yura_default">
+        <option value="T">Todas</option>
+        @foreach($longitudes as $p)
+            <option value="{{$p->id_clasificacion_ramo}}">{{$p->nombre}}</option>
         @endforeach
     </select>
     <div class="input-group-btn">

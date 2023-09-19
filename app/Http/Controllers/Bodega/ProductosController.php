@@ -7,14 +7,17 @@ use yura\Http\Controllers\Controller;
 use yura\Modelos\Producto;
 use yura\Modelos\Submenu;
 use Validator;
+use yura\Modelos\CategoriaProducto;
 
 class ProductosController extends Controller
 {
     public function inicio(Request $request)
     {
+        $categorias = CategoriaProducto::where('estado', 1)->orderBy('nombre')->get();
         return view('adminlte.gestion.bodega.productos.inicio', [
             'url' => $request->getRequestUri(),
             'submenu' => Submenu::Where('url', '=', substr($request->getRequestUri(), 1))->get()[0],
+            'categorias' => $categorias
         ]);
     }
 
@@ -24,12 +27,16 @@ class ProductosController extends Controller
         $listado = Producto::Where(function ($q) use ($request) {
             $q->Where('nombre', 'like', '%' . mb_strtoupper($request->busqueda) . '%')
                 ->orWhere('codigo', 'like', '%' . mb_strtoupper($request->busqueda) . '%');
-        })->where('id_empresa', $finca)
-            ->orderBy('nombre')
+        })->where('id_empresa', $finca);
+        if ($request->categoria != 'T')
+            $listado = $listado->where('id_categoria_producto', $request->categoria);
+        $listado = $listado->orderBy('nombre')
             ->get();
 
+        $categorias = CategoriaProducto::where('estado', 1)->orderBy('nombre')->get();
         return view('adminlte.gestion.bodega.productos.partials.listado', [
             'listado' => $listado,
+            'categorias' => $categorias
         ]);
     }
 
@@ -56,6 +63,7 @@ class ProductosController extends Controller
         ]);
         if (!$valida->fails()) {
             $model = new Producto();
+            $model->id_categoria_producto = $request->categoria;
             $model->codigo = $request->codigo;
             $model->nombre = espacios(mb_strtoupper($request->nombre));
             $model->unidad_medida = $request->unidad_medida;
@@ -131,6 +139,7 @@ class ProductosController extends Controller
                 } else {
                     $model = Producto::find($request->id);
                     $model->codigo = $request->codigo;
+                    $model->id_categoria_producto = $request->categoria;
                     $model->nombre = espacios(mb_strtoupper($request->nombre));
                     $model->stock_minimo = $request->stock_minimo;
                     $model->unidad_medida = $request->unidad_medida;

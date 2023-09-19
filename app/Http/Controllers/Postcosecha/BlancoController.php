@@ -44,8 +44,10 @@ class BlancoController extends Controller
                 ->where('i.basura', 0)
                 ->where('i.estado', 1)
                 ->where('v.id_planta', $p->id_planta)
-                ->where('i.id_empresa', $finca)
-                ->get()[0]->cantidad;
+                ->where('i.id_empresa', $finca);
+            if ($request->longitud != 'T')
+                $inventario = $inventario->where('i.id_clasificacion_ramo', $request->longitud);
+            $inventario = $inventario->get()[0]->cantidad;
 
             array_push($listado, [
                 'planta' => $p,
@@ -145,8 +147,10 @@ class BlancoController extends Controller
             ->where('v.id_planta', $request->planta)
             ->where('inventario_frio.id_empresa', $finca)
             ->where('inventario_frio.basura', 0)
-            ->where('inventario_frio.disponibilidad', 1)
-            ->orderBy('inventario_frio.fecha', 'asc')
+            ->where('inventario_frio.disponibilidad', 1);
+        if ($request->longitud != 'T')
+            $listado = $listado->where('inventario_frio.id_clasificacion_ramo', $request->longitud);
+        $listado = $listado->orderBy('inventario_frio.fecha', 'asc')
             ->get();
 
         $p = DB::table('inventario_frio as i')
@@ -156,8 +160,10 @@ class BlancoController extends Controller
             ->where('i.basura', 0)
             ->where('i.estado', 1)
             ->where('v.id_planta', $request->planta)
-            ->where('i.id_empresa', $finca)
-            ->get()[0]->cantidad;
+            ->where('i.id_empresa', $finca);
+        if ($request->longitud != 'T')
+            $p = $p->where('i.id_clasificacion_ramo', $request->longitud);
+        $p = $p->get()[0]->cantidad;
 
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.forms._inventario', [
             'listado' => $listado,

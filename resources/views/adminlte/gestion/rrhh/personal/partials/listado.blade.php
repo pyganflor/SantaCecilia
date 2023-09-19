@@ -55,11 +55,11 @@
                                     <i class="fa fa-fw fa-edit"></i>
                                 </button>
                             @endif
-                            <button type="button" class="btn btn-xs btn-yura_danger" title="Eliminar"
+                            {{-- <button type="button" class="btn btn-xs btn-yura_danger" title="Eliminar"
                                 onclick="eliminar_personal('{{ $item->id_personal }}')"
                                 id="btn_eliminar_personal_{{ $item->id_personal }}">
                                 <i class="fa fa-fw fa-trash"></i>
-                            </button>
+                            </button> --}}
                         </div>
                     </td>
                 </tr>
