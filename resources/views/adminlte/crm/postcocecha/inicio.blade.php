@@ -1,12 +1,11 @@
 @extends('layouts.adminlte.master')
 
 @section('titulo')
-    Dashboard - Postcosecha
+    Dashboard Postcosecha
 @endsection
 
 @section('script_inicio')
-    <script>
-    </script>
+    <script></script>
 @endsection
 
 @section('contenido')
@@ -14,20 +13,21 @@
     <section class="content-header">
         <h1>
             Dashboard
-            <small>Postcosecha</small>
+            <small class="text-color_yura">Postcosecha</small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="javascript:void(0)" onclick="cargar_url('')"><i class="fa fa-home"></i> Inicio</a></li>
-            <li>
-                {{$submenu->menu->grupo_menu->nombre}}
+            <li><a href="javascript:void(0)" class="text-color_yura" onclick="cargar_url('')"><i class="fa fa-home"></i>
+                    Inicio</a></li>
+            <li class="text-color_yura">
+                {{ $submenu->menu->grupo_menu->nombre }}
             </li>
-            <li>
-                {{$submenu->menu->nombre}}
+            <li class="text-color_yura">
+                {{ $submenu->menu->nombre }}
             </li>
 
             <li class="active">
-                <a href="javascript:void(0)" onclick="cargar_url('{{$submenu->url}}')">
-                    <i class="fa fa-fw fa-refresh"></i> {{$submenu->nombre}}
+                <a href="javascript:void(0)" class="text-color_yura" onclick="cargar_url('{{ $submenu->url }}')">
+                    <i class="fa fa-fw fa-refresh"></i> {{ $submenu->nombre }}
                 </a>
             </li>
         </ol>
@@ -35,71 +35,150 @@
 
     <section class="content">
         <div id="div_indicadores">
-            @if($cant_verde > 0)
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="small-box bg-teal-active">
-                            <div class="inner">
-                                <h3 class="info-box-number">
-                                    {{number_format($indicadores['cajas'], 2)}}
-                                </h3>
-                                <input type="hidden" id="indicador_cajas" name="indicador_cajas" value="{{$indicadores['cajas']}}">
-                            </div>
-                            <div class="icon">
-                                <i class="fa fa-fw fa-gift"></i>
-                            </div>
-                            <a href="javascript:void(0)" class="small-box-footer" onclick="show_data_cajas('{{$desde}}', '{{$hasta}}')">
-                                Cosecha cajas <i class="fa fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="small-box bg-aqua">
-                            <div class="inner">
-                                <h3 class="info-box-number">
-                                    {{number_format($indicadores['tallos'])}}
-                                </h3>
-                                <input type="hidden" id="indicador_tallos" name="indicador_tallos" value="{{$indicadores['tallos']}}">
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-leaf"></i>
-                            </div>
-                            <a href="javascript:void(0)" class="small-box-footer" onclick="show_data_tallos('{{$desde}}', '{{$hasta}}')">
-                                Tallos clasificados <i class="fa fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="small-box bg-orange">
-                            <div class="inner">
-                                <h3 class="info-box-number">
-                                    {{$indicadores['calibre']}}
-                                    <sup style="font-size: 0.4em">t/r</sup>
-                                </h3>
-                                <input type="hidden" id="indicador_calibre" name="indicador_calibre" value="{{$indicadores['calibre']}}">
-                            </div>
-                            <div class="icon">
-                                <i class="fa fa-tint"></i>
-                            </div>
-                            <a href="javascript:void(0)" class="small-box-footer" onclick="show_data_calibres('{{$desde}}', '{{$hasta}}')">
-                                Calibre <i class="fa fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="alert alert-info text-center">
-                    No se han encontrado resultados en los últimos 7 días
-                </div>
-            @endif
+            @include('adminlte.crm.postcocecha.partials.indicadores')
         </div>
 
-        <div id="div_cosecha"></div>
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 33%">
+                    <div class="input-group">
+                        <div class="input-group-btn bg-yura_dark">
+                            <button type="button" class="btn dropdown-toggle bg-yura_dark" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                                Mostrar <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu sombra_pequeña">
+                                <li>
+                                    <a href="javascript:void(0)" class="li_tipo_grafica bg-aqua-active"
+                                        onclick="$('#tipo_grafica').val('line'); $('.li_tipo_grafica').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_graficas();">
+                                        Lineal
+                                    </a>
+                                    <a href="javascript:void(0)" class="li_tipo_grafica"
+                                        onclick="$('#tipo_grafica').val('area'); $('.li_tipo_grafica').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_graficas();">
+                                        Area
+                                    </a>
+                                    <a href="javascript:void(0)" class="li_tipo_grafica"
+                                        onclick="$('#tipo_grafica').val('bar'); $('.li_tipo_grafica').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_graficas();">
+                                        Barra
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <input type="hidden" id="tipo_grafica" value="line">
+                        <select name="rango" id="rango" class="form-control">
+                            <option value="D">Diario</option>
+                            <option value="S">Semanal</option>
+                            <option value="M">Mensual</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-addon bg-yura_dark">
+                            Desde
+                        </span>
+                        <input type="date" id="filtro_desde" style="width: 100%" class="form-control text-center"
+                            value="{{ opDiasFecha('-', 30, hoy()) }}" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-addon bg-yura_dark ">
+                            Hasta
+                        </span>
+                        <input type="date" id="filtro_hasta" style="width: 100%"
+                            class="form-control text-center input-yura_default" value="{{ opDiasFecha('-', 1, hoy()) }}"
+                            required>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="input-group">
+                        <span class="input-group-addon bg-yura_dark">
+                            Flor
+                        </span>
+                        <select name="planta" id="planta" class="form-control" style="width: 100%"
+                            onchange="select_planta($(this).val(), 'variedad', 'variedad', '<option value=T>Todos</option>')">
+                            <option value="T">Todas las Flores</option>
+                            @foreach ($plantas as $p)
+                                <option value="{{ $p->id_planta }}">{{ $p->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <div class="input-group-btn bg-yura_dark">
+                            <button type="button" class="btn btn-default dropdown-toggle bg-yura_dark"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Años
+                                <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                @foreach ($annos as $a)
+                                    <li>
+                                        <a href="javascript:void(0)" onclick="select_anno('{{ $a->anno }}')"
+                                            class="li_anno" id="li_anno_{{ $a->anno }}">
+                                            {{ $a->anno }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <input type="text" class="form-control text-center input-yura_default" placeholder="Años"
+                            id="annos" name="annos" readonly>
+                        <div class="input-group-btn">
+                            <button type="button" id="btn_filtrar" class="btn btn-yura_dark" onclick="listar_graficas()"
+                                title="Buscar">
+                                <i class="fa fa-fw fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-        <input type="hidden" id="src_imagen_chart_cajas" name="src_imagen_chart_cajas">
-        <input type="hidden" id="src_imagen_chart_tallos" name="src_imagen_chart_tallos">
-        <input type="hidden" id="src_imagen_chart_calibres" name="src_imagen_chart_calibres">
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-8 border-radius_16" id="div_graficas"></div>
+            <div class="col-md-4 bg-yura_dark border-radius_16" id="div_master_ranking">
+                <legend class="text-center" style="margin-bottom: 5px">
+                    <div class="pull-left">
+                        <button type="button" class="btn btn-xs btn-yura_primary dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Criterio <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu sombra_pequeña" style="top: 28px;">
+                            <li>
+                                <a href="javascript:void(0)" class="li_criterio_ranking bg-aqua-active"
+                                    onclick="$('#criterio_ranking').val('C'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
+                                    Cosecha
+                                </a>
+                                <a href="javascript:void(0)" class="li_criterio_ranking"
+                                    onclick="$('#criterio_ranking').val('P'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
+                                    Postcosecha
+                                </a>
+                                <a href="javascript:void(0)" class="li_criterio_ranking"
+                                    onclick="$('#criterio_ranking').val('D'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
+                                    Desecho
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <strong style="color: white">Ranking <sup>-4 semanas</sup></strong>
+                </legend>
+                <input type="hidden" id="criterio_ranking" value="C">
+                <div id="div_ranking"></div>
+            </div>
+        </div>
     </section>
+
+    <style>
+        div.div_input_group span.select2-selection {
+            top: 0px;
+            border-radius: 0px;
+            height: 34px;
+        }
+    </style>
 @endsection
 
 @section('script_final')
