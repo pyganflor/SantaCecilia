@@ -16,25 +16,29 @@ class CosechaDiariaController extends Controller
 {
     public function inicio(Request $request)
     {
-        $finca = getFincaActiva();
         $sectores = DB::table('desglose_recepcion as dr')
             ->join('recepcion as r', 'r.id_recepcion', '=', 'dr.id_recepcion')
             ->join('modulo as m', 'm.id_modulo', '=', 'dr.id_modulo')
             ->join('sector as s', 's.id_sector', '=', 'm.id_sector')
             ->select('m.id_sector', 's.nombre')->distinct()
-            ->where('dr.id_empresa', $finca)
+            ->where('dr.estado', 1)
             ->where('r.estado', 1)
             ->where('m.estado', 1)
             ->orderBy('s.nombre')
             ->get();
+        $variedades = DB::table('desglose_recepcion as dr')
+            ->join('recepcion as r', 'r.id_recepcion', '=', 'dr.id_recepcion')
+            ->join('variedad as v', 'v.id_variedad', '=', 'dr.id_variedad')
+            ->select('dr.id_variedad', 'v.nombre')->distinct()
+            ->where('dr.estado', 1)
+            ->where('r.estado', 1)
+            ->where('v.estado', 1)
+            ->orderBy('v.nombre')
+            ->get();
         return view('adminlte.crm.cosecha_diaria.inicio', [
             'url' => $request->getRequestUri(),
             'submenu' => Submenu::Where('url', '=', substr($request->getRequestUri(), 1))->get()[0],
-            'plantas' => DB::table('cosecha_diaria')
-                ->select('id_planta', 'planta_nombre as nombre')->distinct()
-                ->where('id_empresa', $finca)
-                ->where('cosechados', '>', 0)
-                ->orderBy('planta_nombre')->get(),
+            'variedades' => $variedades,
             'sectores' => $sectores,
             'desde' => opDiasFecha('-', 7, hoy()),
             'hasta' => opDiasFecha('-', 1, hoy()),
@@ -43,70 +47,79 @@ class CosechaDiariaController extends Controller
 
     public function buscar_cosecha_diaria(Request $request)
     {
-        $finca = getFincaActiva();
-        $fechas = DB::table('cosecha_diaria')
-            ->select('fecha')->distinct()
-            ->where('id_empresa', $finca)
-            ->where('fecha', '>=', $request->desde)
-            ->where('fecha', '<=', $request->hasta)
-            ->where('cosechados', '>', 0)
-            ->orderBy('fecha')->get();
-        $variedades = DB::table('cosecha_diaria as c')
-            ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
+        $fechas = DB::table('desglose_recepcion as dr')
+            ->join('recepcion as r', 'r.id_recepcion', '=', 'dr.id_recepcion')
+            ->join('modulo as m', 'm.id_modulo', '=', 'dr.id_modulo')
+            ->select(DB::raw('DATE(r.fecha_ingreso) as fecha'))->distinct()
+            ->where('dr.estado', 1)
+            ->where('r.fecha_ingreso', '>=', $request->desde)
+            ->where('r.fecha_ingreso', '<=', $request->hasta);
+        if ($request->sector != '')
+            $fechas = $fechas->where('m.id_sector', $request->sector);
+        if ($request->variedad != '')
+            $fechas = $fechas->where('dr.id_variedad', $request->variedad);
+        $fechas = $fechas->orderBy('fecha')
+            ->get()->pluck('fecha')->toArray();
+
+        $variedades = DB::table('desglose_recepcion as dr')
+            ->join('recepcion as r', 'r.id_recepcion', '=', 'dr.id_recepcion')
+            ->join('modulo as m', 'm.id_modulo', '=', 'dr.id_modulo')
+            ->join('variedad as v', 'v.id_variedad', '=', 'dr.id_variedad')
             ->join('planta as p', 'p.id_planta', '=', 'v.id_planta')
-            ->select('c.id_variedad', 'v.id_planta', 'v.nombre as variedad_nombre', 'p.nombre as planta_nombre')->distinct()
-            ->where('c.id_empresa', $finca)
-            ->where('c.cosechados', '>', 0)
-            ->where('c.fecha', '>=', $request->desde)
-            ->where('c.fecha', '<=', $request->hasta);
-        if ($request->variedad != 'T')
-            $variedades = $variedades->where('c.id_variedad', $request->variedad);
-        elseif ($request->planta != '')
-            $variedades = $variedades->where('v.id_planta', $request->planta);
-        $variedades = $variedades
-            ->orderBy('p.nombre')
-            ->orderBy('v.nombre')
+            ->select('dr.id_variedad', 'v.id_planta', 'v.nombre as variedad_nombre', 'p.nombre as planta_nombre')->distinct()
+            ->where('dr.estado', 1)
+            ->where('r.fecha_ingreso', '>=', $request->desde)
+            ->where('r.fecha_ingreso', '<=', $request->hasta);
+        if ($request->sector != '')
+            $variedades = $variedades->where('m.id_sector', $request->sector);
+        if ($request->variedad != '')
+            $variedades = $variedades->where('dr.id_variedad', $request->variedad);
+        $variedades = $variedades->orderBy('planta_nombre')
+            ->orderBy('variedad_nombre')
             ->get();
         $data = [];
         if (count($variedades) > 0) {
             $planta_anterior = $variedades[0]->id_planta;
-            $resumen = DB::table('cosecha_diaria')
-                ->select(DB::raw('sum(cosechados) as cantidad'), 'fecha')
-                ->where('id_empresa', $finca)
-                ->where('id_planta', $variedades[0]->id_planta)
-                ->where('fecha', '>=', $request->desde)
-                ->where('fecha', '<=', $request->hasta);
+            $resumen = DB::table('desglose_recepcion as dr')
+                ->join('recepcion as r', 'r.id_recepcion', '=', 'dr.id_recepcion')
+                ->join('variedad as v', 'v.id_variedad', '=', 'dr.id_variedad')
+                ->select(
+                    DB::raw('sum(dr.tallos_x_malla * dr.cantidad_mallas) as cantidad'),
+                    DB::raw('DATE(r.fecha_ingreso) as fecha')
+                )
+                ->where('v.id_planta', $variedades[0]->id_planta)
+                ->where('r.fecha_ingreso', '>=', $request->desde)
+                ->where('r.fecha_ingreso', '<=', $request->hasta);
             if ($request->sector != '')
-                $resumen = $resumen->where('id_sector', $request->sector);
+                $resumen = $resumen->where('m.id_sector', $request->sector);
             $resumen = $resumen->groupBy('fecha')
                 ->orderBy('fecha')
                 ->get();
-            $plantas_iniciales_resumen = DB::table('ciclo as c')
-                ->join('variedad as v', 'v.id_variedad', '=', 'c.id_variedad')
+            $plantas_iniciales_resumen = DB::table('ciclo_cama as cc')
+                ->join('variedad as v', 'v.id_variedad', '=', 'cc.id_variedad')
+                ->join('cama as c', 'c.id_cama', '=', 'cc.id_cama')
                 ->join('modulo as m', 'm.id_modulo', '=', 'c.id_modulo')
-                ->select(DB::raw('sum(c.plantas_iniciales) as cant'))
-                ->where('c.estado', 1)
-                ->where('c.activo', 1)
-                ->where('c.id_empresa', $finca)
+                ->select(DB::raw('sum(cc.plantas_iniciales) as cant'))
+                ->where('cc.activo', 1)
                 ->where('v.id_planta', $variedades[0]->id_planta);
             if ($request->sector != '')
                 $plantas_iniciales_resumen = $plantas_iniciales_resumen->where('m.id_sector', $request->sector);
             $plantas_iniciales_resumen = $plantas_iniciales_resumen->Where(function ($q) use ($request) {
-                $q->where('c.fecha_fin', '>=', $request->desde)
-                    ->where('c.fecha_fin', '<=', $request->hasta)
+                $q->where('cc.fecha_fin', '>=', $request->desde)
+                    ->where('cc.fecha_fin', '<=', $request->hasta)
                     ->orWhere(function ($q) use ($request) {
-                        $q->where('c.fecha_inicio', '>=', $request->desde)
-                            ->where('c.fecha_inicio', '<=', $request->hasta);
+                        $q->where('cc.fecha_inicio', '>=', $request->desde)
+                            ->where('cc.fecha_inicio', '<=', $request->hasta);
                     })
                     ->orWhere(function ($q) use ($request) {
-                        $q->where('c.fecha_inicio', '<', $request->desde)
-                            ->where('c.fecha_fin', '>', $request->hasta);
+                        $q->where('cc.fecha_inicio', '<', $request->desde)
+                            ->where('cc.fecha_fin', '>', $request->hasta);
                     });
             })
                 ->get()[0]->cant;
+            dd($plantas_iniciales_resumen);
             $lista = DB::table('cosecha_diaria')
                 ->select(DB::raw('sum(cosechados) as cantidad'), 'fecha')
-                ->where('id_empresa', $finca)
                 ->where('id_variedad', $variedades[0]->id_variedad)
                 ->where('fecha', '>=', $request->desde)
                 ->where('fecha', '<=', $request->hasta);
@@ -121,7 +134,6 @@ class CosechaDiariaController extends Controller
                 ->select(DB::raw('sum(c.plantas_iniciales) as cant'))
                 ->where('c.estado', 1)
                 ->where('c.activo', 1)
-                ->where('c.id_empresa', $finca)
                 ->where('c.id_variedad', $variedades[0]->id_variedad);
             if ($request->sector != '')
                 $plantas_iniciales = $plantas_iniciales->where('m.id_sector', $request->sector);
@@ -151,7 +163,6 @@ class CosechaDiariaController extends Controller
                     if ($var->id_planta == $planta_anterior) {
                         $lista = DB::table('cosecha_diaria')
                             ->select(DB::raw('sum(cosechados) as cantidad'), 'fecha')
-                            ->where('id_empresa', $finca)
                             ->where('id_variedad', $var->id_variedad)
                             ->where('fecha', '>=', $request->desde)
                             ->where('fecha', '<=', $request->hasta);
@@ -166,7 +177,6 @@ class CosechaDiariaController extends Controller
                             ->select(DB::raw('sum(c.plantas_iniciales) as cant'))
                             ->where('c.estado', 1)
                             ->where('c.activo', 1)
-                            ->where('c.id_empresa', $finca)
                             ->where('c.id_variedad', $var->id_variedad);
                         if ($request->sector != '')
                             $plantas_iniciales = $plantas_iniciales->where('m.id_sector', $request->sector);
@@ -192,7 +202,6 @@ class CosechaDiariaController extends Controller
                     } else {
                         $resumen = DB::table('cosecha_diaria')
                             ->select(DB::raw('sum(cosechados) as cantidad'), 'fecha')
-                            ->where('id_empresa', $finca)
                             ->where('id_planta', $var->id_planta)
                             ->where('fecha', '>=', $request->desde)
                             ->where('fecha', '<=', $request->hasta);
@@ -207,7 +216,6 @@ class CosechaDiariaController extends Controller
                             ->select(DB::raw('sum(c.plantas_iniciales) as cant'))
                             ->where('c.estado', 1)
                             ->where('c.activo', 1)
-                            ->where('c.id_empresa', $finca)
                             ->where('v.id_planta', $var->id_planta);
                         if ($request->sector != '')
                             $plantas_iniciales_resumen = $plantas_iniciales_resumen->where('m.id_sector', $request->sector);
@@ -226,7 +234,6 @@ class CosechaDiariaController extends Controller
                             ->get()[0]->cant;
                         $lista = DB::table('cosecha_diaria')
                             ->select(DB::raw('sum(cosechados) as cantidad'), 'fecha')
-                            ->where('id_empresa', $finca)
                             ->where('id_variedad', $var->id_variedad)
                             ->where('fecha', '>=', $request->desde)
                             ->where('fecha', '<=', $request->hasta);
@@ -241,7 +248,6 @@ class CosechaDiariaController extends Controller
                             ->select(DB::raw('sum(c.plantas_iniciales) as cant'))
                             ->where('c.estado', 1)
                             ->where('c.activo', 1)
-                            ->where('c.id_empresa', $finca)
                             ->where('c.id_variedad', $var->id_variedad);
                         if ($request->sector != '')
                             $plantas_iniciales = $plantas_iniciales->where('m.id_sector', $request->sector);

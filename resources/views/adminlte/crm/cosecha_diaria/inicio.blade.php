@@ -55,24 +55,12 @@
                         <span class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
                             <i class="fa fa-fw fa-leaf"></i> Variedad
                         </span>
-                        <select name="filtro_predeterminado_planta" id="filtro_predeterminado_planta"
-                            class="form-control input-yura_default"
-                            onchange="select_planta($(this).val(), 'filtro_predeterminado_variedad', 'filtro_predeterminado_variedad', '<option value=T selected>Todos los tipos</option>')">
-                            <option value="">Todas las variedades</option>
-                            @foreach ($plantas as $p)
-                                <option value="{{ $p->id_planta }}">{{ $p->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </td>
-                <td style="padding: 5px">
-                    <div class="form-group input-group">
-                        <span class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
-                            <i class="fa fa-fw fa-leaf"></i> Tipo
-                        </span>
                         <select name="filtro_predeterminado_variedad" id="filtro_predeterminado_variedad"
                             class="form-control input-yura_default">
-                            <option value="T" selected>Todos los tipos</option>
+                            <option value="">Todas las variedades</option>
+                            @foreach ($variedades as $item)
+                                <option value="{{ $item->id_variedad }}">{{ $item->nombre }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </td>

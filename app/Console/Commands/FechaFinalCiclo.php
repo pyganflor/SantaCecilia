@@ -43,7 +43,7 @@ class FechaFinalCiclo extends Command
         dump('<<<<< ! >>>>> Ejecutando comando "ciclo:fecha_fin" <<<<< ! >>>>>');
         Log::info('<<<<< ! >>>>> Ejecutando comando "ciclo:fecha_fin" <<<<< ! >>>>>');
         /* ===================== CICLO ================== */
-        $ciclos_fin = Ciclo::All()->where('estado', '=', 1)
+        /*$ciclos_fin = Ciclo::All()->where('estado', '=', 1)
             ->where('activo', '=', 1)
             ->where('fecha_fin', '!=', hoy());
 
@@ -54,7 +54,7 @@ class FechaFinalCiclo extends Command
                 dump(porcentaje($pos_c, count($ciclos_fin), 1) . '% La fecha_fin del "ciclo" #' . $c->id_ciclo . ' ha sido actualizada a "' . date('Y-m-d') . '"');
                 Log::info('La fecha_fin del "ciclo" #' . $c->id_ciclo . ' ha sido actualizada a "' . date('Y-m-d') . '"');
             }
-        }
+        }*/
 
         /* ===================== CICLO_CAMA ================== */
         $ciclos_fin = CicloCama::All()
@@ -65,6 +65,7 @@ class FechaFinalCiclo extends Command
             foreach ($ciclos_fin as $pos_c => $c) {
                 $c->fecha_fin = date('Y-m-d');
                 $c->save();
+                dump(porcentaje($pos_c, count($ciclos_fin), 1) . '% La fecha_fin del "ciclo" #' . $c->id_ciclo . ' ha sido actualizada a "' . date('Y-m-d') . '"');
                 Log::info(porcentaje($pos_c, count($ciclos_fin), 1) . '% La fecha_fin del "ciclo_cama" #' . $c->id_ciclo . ' ha sido actualizada a "' . date('Y-m-d') . '"');
             }
         }
