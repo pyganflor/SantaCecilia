@@ -8,6 +8,7 @@ use yura\Modelos\Caja;
 use yura\Modelos\ClasificacionRamo;
 use yura\Modelos\ClasificacionUnitaria;
 use yura\Modelos\Empaque;
+use yura\Modelos\MotivosNacional;
 use yura\Modelos\Submenu;
 use yura\Modelos\UnidadMedida;
 
@@ -41,6 +42,15 @@ class ClasificacionesController extends Controller
             ->get();
         return view('adminlte.gestion.postcocecha.clasificaciones.partials.presentaciones', [
             'empaques' => $empaques,
+        ]);
+    }
+
+    public function listar_motivos_nacional(Request $request)
+    {
+        $listado = MotivosNacional::orderBy('nombre')
+            ->get();
+        return view('adminlte.gestion.postcocecha.clasificaciones.partials.motivos_nacional', [
+            'listado' => $listado,
         ]);
     }
 
@@ -80,6 +90,20 @@ class ClasificacionesController extends Controller
 
         $success = true;
         $msg = 'Se ha <strong>creado</strong> una nueva presentación satisfactoriamente';
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function store_motivo_nacional(Request $request)
+    {
+        $model = new MotivosNacional();
+        $model->nombre = $request->nombre;
+        $model->save();
+
+        $success = true;
+        $msg = 'Se ha <strong>creado</strong> una nuevo motivo de flor nacional satisfactoriamente';
         return [
             'success' => $success,
             'mensaje' => $msg,
@@ -127,6 +151,20 @@ class ClasificacionesController extends Controller
         ];
     }
 
+    public function update_motivo_nacional(Request $request)
+    {
+        $model = MotivosNacional::find($request->id);
+        $model->nombre = $request->nombre;
+        $model->save();
+
+        $success = true;
+        $msg = 'Se ha <strong>actualizado</strong> el motivo de flor nacional satisfactoriamente';
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
     public function cambiar_estado_ramo(Request $request)
     {
         $model = ClasificacionRamo::find($request->id);
@@ -149,6 +187,20 @@ class ClasificacionesController extends Controller
 
         $success = true;
         $msg = 'Se ha <strong>cambiado el estado</strong> de la presentación satisfactoriamente';
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function cambiar_estado_motivo_nacional(Request $request)
+    {
+        $model = MotivosNacional::find($request->id);
+        $model->estado = $model->estado == 1 ? 0 : 1;
+        $model->save();
+
+        $success = true;
+        $msg = 'Se ha <strong>cambiado el estado</strong> del motivo de flor nacional satisfactoriamente';
         return [
             'success' => $success,
             'mensaje' => $msg,

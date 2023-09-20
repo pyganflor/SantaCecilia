@@ -52,6 +52,11 @@ class InventarioFrio extends Model
         return $this->belongsTo('\yura\Modelos\ClasificacionRamo', 'id_clasificacion_ramo');
     }
 
+    public function motivo_nacional()
+    {
+        return $this->belongsTo('\yura\Modelos\MotivosNacional', 'id_motivos_nacional');
+    }
+
     public function empaque()
     {
         return $this->belongsTo('\yura\Modelos\Empaque', 'id_empaque');

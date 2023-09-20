@@ -13,3 +13,7 @@ Route::get('clasificaciones/listar_cajas', 'Postcosecha\ClasificacionesControlle
 Route::post('clasificaciones/store_caja', 'Postcosecha\ClasificacionesController@store_caja');
 Route::post('clasificaciones/update_caja', 'Postcosecha\ClasificacionesController@update_caja');
 Route::post('clasificaciones/cambiar_estado_caja', 'Postcosecha\ClasificacionesController@cambiar_estado_caja');
+Route::get('clasificaciones/listar_motivos_nacional', 'Postcosecha\ClasificacionesController@listar_motivos_nacional');
+Route::post('clasificaciones/store_motivo_nacional', 'Postcosecha\ClasificacionesController@store_motivo_nacional');
+Route::post('clasificaciones/update_motivo_nacional', 'Postcosecha\ClasificacionesController@update_motivo_nacional');
+Route::post('clasificaciones/cambiar_estado_motivo_nacional', 'Postcosecha\ClasificacionesController@cambiar_estado_motivo_nacional');

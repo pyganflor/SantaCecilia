@@ -14,6 +14,8 @@ use yura\Modelos\UnidadMedida;
 use yura\Modelos\Variedad;
 use Barryvdh\DomPDF\Facade as PDF;
 use Picqer\Barcode\BarcodeGeneratorHTML;
+use yura\Modelos\DetalleCajaFrio;
+use yura\Modelos\MotivosNacional;
 
 class BlancoController extends Controller
 {
@@ -60,10 +62,15 @@ class BlancoController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        $motivos_nacional = MotivosNacional::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.partials._blanco', [
             'fecha' => $request->fecha,
             'listado' => $listado,
             'clasificaciones_ramos' => $clasificaciones_ramos,
+            'motivos_nacional' => $motivos_nacional,
         ]);
     }
 
@@ -75,6 +82,7 @@ class BlancoController extends Controller
             ->where('id_variedad', $request->variedad)
             ->where('id_modulo', $request->modulo)
             ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
+            ->where('id_motivos_nacional', $request->motivo)
             ->where('tallos_x_ramo', $request->tallos_x_ramo)
             ->where('basura', 0)
             ->where('disponibilidad', 1)
@@ -88,6 +96,7 @@ class BlancoController extends Controller
             $model->id_variedad = $request->variedad;
             $model->id_modulo = $request->modulo != '' ? $request->modulo : -1;
             $model->id_clasificacion_ramo = $request->clasificacion_ramo;
+            $model->id_motivos_nacional = $request->motivo != '' ? $request->motivo : null;
             $model->tallos_x_ramo = $request->tallos_x_ramo;
             $model->disponibilidad = 1;
             $model->basura = 0;
@@ -199,6 +208,27 @@ class BlancoController extends Controller
         ];
     }
 
+    public function delete_inventario(Request $request)
+    {
+        $valida = DetalleCajaFrio::All()
+            ->where('id_inventario_frio', $request->id)
+            ->first();
+        if ($valida == '') {
+            $model = InventarioFrio::find($request->id);
+            $model->delete();
+
+            return [
+                'success' => true,
+                'mensaje' => 'Se han <strong>ELIMINADO</strong> el inventario satisfactoriamente',
+            ];
+        } else {
+            return [
+                'success' => false,
+                'mensaje' => '<div class="alert alert-warning text-center">NO SE PUEDE <b>ELIMIAR</b>. Este <b>INVENTARIO</b> ha sido usado por una <b>CAJA</b>.</div>',
+            ];
+        }
+    }
+
     public function buscar_modulos(Request $request)
     {
         $finca = getFincaActiva();
@@ -283,6 +313,7 @@ class BlancoController extends Controller
                 $model->id_variedad = $d->variedad;
                 $model->id_modulo = $d->modulo != '' ? $d->modulo : -1;
                 $model->id_clasificacion_ramo = $d->clasificacion_ramo;
+                $model->id_motivos_nacional = $d->motivo != '' ? $d->motivo : null;
                 $model->tallos_x_ramo = $d->tallos_x_ramo;
                 $model->disponibilidad = 1;
                 $model->basura = 0;

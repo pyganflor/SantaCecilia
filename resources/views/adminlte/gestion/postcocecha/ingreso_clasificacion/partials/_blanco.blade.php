@@ -75,6 +75,13 @@
     @endforeach
 </select>
 
+<select id="select_motivos_nacional" class="hidden">
+    <option value="">Ningun Motivo</option>
+    @foreach ($motivos_nacional as $item)
+        <option value="{{ $item->id_motivos_nacional }}">{{ $item->nombre }}</option>
+    @endforeach
+</select>
+
 <style>
     #tr_fija_top_0 th {
         position: sticky;
@@ -89,6 +96,7 @@
         count_form = $('#count_form_' + pta).val();
         count_form++;
         select_clasificacion_ramos = $('#select_clasificacion_ramos');
+        select_motivos_nacional = $('#select_motivos_nacional');
         select_variedades = $('#select_variedades_' + pta).html();
         $('#table_inventario_planta_' + pta).addClass('hidden');
         $('#table_desglose_planta_' + pta).removeClass('hidden');
@@ -112,6 +120,11 @@
             '</select>' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
+            '<select id="new_motivos_nacional_' + pta + '_' + count_form + '" style="width: 100%">' +
+            select_motivos_nacional.html() +
+            '</select>' +
+            '</td>' +
+            '<td style="border-color: #9d9d9d; width: 60px">' +
             '<input type="number" id="new_tallos_ramo_' + pta + '_' + count_form +
             '" style="width: 100%" placeholder="Tallos x ramo" ' +
             ' class="text-center" min="0" value="25" ' +
@@ -183,14 +196,16 @@
             clasificacion_ramo = $('#new_clasificacion_ramo_' + pta + '_' + i).val();
             tallos_x_ramo = $('#new_tallos_x_ramo_' + pta + '_' + i).val();
             cantidad = $('#new_cantidad_' + pta + '_' + i).val();
-            if (variedad != '' && modulo != '' && clasificacion_ramo != '' && tallos_x_ramo > 0 && cantidad > 0)
+            if (variedad != '' && modulo != '' && clasificacion_ramo != '' && tallos_x_ramo != '' && cantidad != '') {
                 data.push({
                     variedad: variedad,
                     modulo: modulo,
                     clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + i).val(),
+                    motivo: $('#new_motivos_nacional_' + pta + '_' + i).val(),
                     tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + i).val(),
                     cantidad: $('#new_cantidad_' + pta + '_' + i).val(),
                 });
+            }
         }
         if (data.length > 0) {
             datos = {
@@ -221,6 +236,7 @@
             variedad: $('#new_variedad_' + pta + '_' + count_form).val(),
             modulo: $('#new_modulo_' + pta + '_' + count_form).val(),
             clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + count_form).val(),
+            motivo: $('#new_motivos_nacional_' + pta + '_' + count_form).val(),
             tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + count_form).val(),
             cantidad: $('#new_cantidad_' + pta + '_' + count_form).val(),
         };
@@ -270,24 +286,50 @@
     }
 
     function update_inventario(id, pta) {
-        datos = {
-            _token: '{{ csrf_token() }}',
-            id: id,
-            disponibles: $('#edit_disponibles_' + id).val(),
-        };
-        post_jquery_m('{{ url('ingreso_clasificacion/update_inventario') }}', datos, function() {
-            inventario_frio(pta);
-        });
+        texto =
+            "<div class='alert alert-warning text-center'>¿Esta seguro de <b>MODIFICAR</b> el inventario?</div>";
+
+        modal_quest('modal_update_inventario', texto, 'MODIFICAR INVENTARIO', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                disponibles: $('#edit_disponibles_' + id).val(),
+            };
+            post_jquery_m('{{ url('ingreso_clasificacion/update_inventario') }}', datos, function() {
+                inventario_frio(pta);
+            });
+        })
     }
 
     function botar_inventario(id, pta) {
-        datos = {
-            _token: '{{ csrf_token() }}',
-            id: id,
-        };
-        post_jquery_m('{{ url('ingreso_clasificacion/botar_inventario') }}', datos, function() {
-            inventario_frio(pta);
-        });
+        texto =
+            "<div class='alert alert-warning text-center'>¿Esta seguro de <b>DAR DE BAJA</b> a la flor?</div>";
+
+        modal_quest('modal_delete_inventario', texto, 'FLOR DE BAJA', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                id: id,
+            };
+            post_jquery_m('{{ url('ingreso_clasificacion/botar_inventario') }}', datos, function() {
+                inventario_frio(pta);
+            });
+        })
+    }
+
+    function delete_inventario(id, pta) {
+        texto =
+            "<div class='alert alert-warning text-center'>¿Esta seguro de <b>ELIMINAR el REGISTRO</b> del inventario?</div>";
+
+        modal_quest('modal_delete_inventario', texto, 'Eliminar INVENTARIO', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                id: id,
+            }
+            post_jquery_m('{{ url('ingreso_clasificacion/delete_inventario') }}', datos, function() {
+                cerrar_modals();
+                inventario_frio(pta);
+            })
+        })
     }
 
     function ver_pdf_etiquetas(pta, count_form) {
