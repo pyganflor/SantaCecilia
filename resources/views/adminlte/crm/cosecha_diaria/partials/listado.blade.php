@@ -1,9 +1,10 @@
-<div style="height: 450px; overflow-x: scroll; overflow-y: scroll">
+<div style="max-height: 700px; overflow-x: scroll; overflow-y: scroll">
     <table class="table-bordered" style="width: 100%; border: 1px solid #9d9d9d; border-radius: 18px 18px 0 0"
         id="table_cosecha_diaria">
         <thead>
             <tr>
-                <th class="text-left th_yura_green fila_fija1 columna_fija_left_0" style="border-radius: 18px 0 0 0; padding-left: 5px; z-index: 10 !important">
+                <th class="text-left th_yura_green fila_fija1 columna_fija_left_0"
+                    style="border-radius: 18px 0 0 0; padding-left: 5px; z-index: 10 !important">
                     Variedad/Tipo
                 </th>
                 @php
@@ -12,7 +13,7 @@
                 @foreach ($fechas as $f)
                     <th class="text-center bg-yura_dark fila_fija1" style="color: white; padding: 5px;">
                         <div style="width: 80px">
-                            {{ $f->fecha }}
+                            {{ $f }}
                         </div>
                     </th>
                     @php
@@ -42,10 +43,11 @@
                 <input type="hidden" class="ids_variedad" value="{{ $d['variedad']->id_variedad }}">
                 <input type="hidden" class="ids_planta" value="{{ $d['variedad']->id_planta }}">
                 @if ($d['tipo'] == 'P')
-                    <tr class="mouse-hand" style="background-color: #00b3886b"
-                        onmouseover="$(this).css('color', '#007309');" onmouseleave="$(this).css('color', 'black')"
+                    <tr class="mouse-hand" onmouseover="$(this).css('color', '#007309');"
+                        onmouseleave="$(this).css('color', 'black')"
                         onclick="$('.tr_planta_{{ $d['variedad']->id_planta }}').toggleClass('hidden'); $('#icon_planta_{{ $d['variedad']->id_planta }}').toggleClass('fa-caret-down').toggleClass('fa-caret-left')">
-                        <th class="text-left columna_fija_left_0" style="border-color: #9d9d9d; padding-left: 5px; background-color: #00b3886b !important">
+                        <th class="text-left columna_fija_left_0 bg-yura_dark"
+                            style="border-color: #9d9d9d; padding-left: 5px; z-index: 8 !important">
                             {{ $d['variedad']->planta_nombre }}
                             <i class="fa fa-fw fa-caret-down pull-right"
                                 id="icon_planta_{{ $d['variedad']->id_planta }}"></i>
@@ -59,7 +61,7 @@
                             @endphp
                             @foreach ($d['resumen'] as $pos => $v)
                                 @php
-                                    if ($f->fecha == $v->fecha) {
+                                    if ($f == $v->fecha) {
                                         $valor = $v->cantidad;
                                     }
                                 @endphp
@@ -69,33 +71,33 @@
                                 $total += $valor;
                                 $total_fechas[$pos_f] += $valor;
                             @endphp
-                            <td class="text-center" style="border-color: #9d9d9d">
+                            <td class="text-center" style="border-color: #9d9d9d; background-color: #00b3886b">
                                 <span style="margin-left: 5px; margin-right: 5px">{{ number_format($valor) }}</span>
                             </td>
                         @endforeach
                         @php
                             $total_plantas_iniciales += $d['plantas_iniciales_resumen'];
                         @endphp
-                        <th class="text-center" style="border-color: #9d9d9d">
+                        <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px">
                                 {{ number_format($total_fila) }}
                             </span>
                         </th>
-                        <th class="text-center" style="border-color: #9d9d9d">
+                        <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
                                 {{ number_format($d['plantas_iniciales_resumen']) }}
                             </span>
                         </th>
-                        <th class="text-center" style="border-color: #9d9d9d">
+                        <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
                                 {{ $d['plantas_iniciales_resumen'] > 0 ? number_format($total_fila / $d['plantas_iniciales_resumen'], 2) : 0 }}
                             </span>
+                            <input type="hidden" id="total_planta_{{ $d['variedad']->id_planta }}"
+                                value="{{ $total_fila }}">
                         </th>
-                        <input type="hidden" id="total_planta_{{ $d['variedad']->id_planta }}"
-                            value="{{ $total_fila }}">
-                        <th class="text-center" style="border-color: #9d9d9d">
+                        <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_porcentaje_planta_{{ $d['variedad']->id_planta }}"></span>
                         </th>
@@ -116,7 +118,7 @@
                             @endphp
                             @foreach ($d['lista'] as $v)
                                 @php
-                                    if ($f->fecha == $v->fecha) {
+                                    if ($f == $v->fecha) {
                                         $valor = $v->cantidad;
                                     }
                                 @endphp
@@ -170,7 +172,7 @@
                             @endphp
                             @foreach ($d['lista'] as $v)
                                 @php
-                                    if ($f->fecha == $v->fecha) {
+                                    if ($f == $v->fecha) {
                                         $valor = $v->cantidad;
                                     }
                                 @endphp
@@ -211,7 +213,8 @@
             @endforeach
         </tbody>
         <tr id="tr_fijo_bottom_0">
-            <th class="text-right th_yura_green columna_fija_left_0" style="padding-right: 5px; z-index: 9 !important">
+            <th class="text-right th_yura_green columna_fija_left_0"
+                style="padding-right: 5px; z-index: 9 !important">
                 Totales
             </th>
             @foreach ($total_fechas as $v)
@@ -319,7 +322,7 @@
         bottom: 0;
     }
 
-    .columna_fija_left_0{
+    .columna_fija_left_0 {
         position: sticky;
         left: 0;
         z-index: 9;
