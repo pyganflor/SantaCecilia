@@ -43,6 +43,8 @@ use DB;
 use Session;
 use yura\Modelos\ConfiguracionEmpresa;
 use AWS;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class rrhhPersonalController extends Controller
 {
@@ -129,7 +131,7 @@ class rrhhPersonalController extends Controller
         //$departamento = Departamento::where('estado', 1)->get();
         //$estado_civil = EstadoCivil::where('estado', 1)->get();
         //$nacionalidad = Nacionalidad::where('estado', 1)->get();
-       // $cargo = Cargo::where('estado', 1)->get();
+        // $cargo = Cargo::where('estado', 1)->get();
         $tipo_rol = Tipo_rol::where('estado', 1)->get();
         //$tipo_pago = TipoPago::where('estado', 1)->get();
         //$tipo_contrato = TipoContrato::where('estado', 1)->get();
@@ -139,7 +141,7 @@ class rrhhPersonalController extends Controller
         //$grado_instruccion = GradoInstruccion::where('estado', 1)->get();
         $grupo = Grupo::where('estado', 1)->get();
         $area = Area::where('estado', 1)->get();
-       // $plantilla = Plantilla::where('estado', 1)->get();
+        // $plantilla = Plantilla::where('estado', 1)->get();
         //$tipo_cuenta = TipoCuenta::where('estado', 1)->get();
         //$detalle_contrato = DetalleContrato::where('estado', 1)->get();
         //$relacion_laboral = RelacionLaboral::where('estado', 1)->get();
@@ -150,7 +152,7 @@ class rrhhPersonalController extends Controller
             //'banco' => $banco,
             //'estado_civil' => $estado_civil,
             //'nacionalidad' => $nacionalidad,
-           // 'cargo' => $cargo,
+            // 'cargo' => $cargo,
             'tipo_rol' => $tipo_rol,
             //'tipo_pago' => $tipo_pago,
             //'tipo_contrato' => $tipo_contrato,
@@ -229,123 +231,100 @@ class rrhhPersonalController extends Controller
 
     public function excel_personal(Request $request)
     {
-        //---------------------- EXCEL --------------------------------------
-        $objPHPExcel = new PHPExcel;
-        $objPHPExcel->getDefaultStyle()->getFont()->setName('Calibri');
-        $objPHPExcel->getDefaultStyle()->getFont()->setSize(12);
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel2007");
-        $currencyFormat = '#,#0.## \€;[Red]-#,#0.## \€';
-        $numberFormat = '#,#0.##;[Red]-#,#0.##';
-        $objPHPExcel->removeSheetByIndex(0); //Eliminar la hoja inicial por defecto
+        $spread = new Spreadsheet();
+        $this->excelPersonal($spread, $request);
 
-        $this->excelPersonal($objPHPExcel, $request);
+        $fileName = "Personal.xlsx";
+        $writer = new Xlsx($spread);
 
         //--------------------------- GUARDAR EL EXCEL -----------------------
 
-        header("Content-Type: application/force-download");
-        header("Content-Type: application/octet-stream");
-        header("Content-Type: application/download");
-        header('Content-Disposition:inline;filename="Reporte del personal.xlsx"');
-        header("Content-Transfer-Encoding: binary");
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        header("Pragma: no-cache");
-        $objWriter->save('php://output');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+        $writer->save('php://output');
     }
 
-    public function excelPersonal($objPHPExcel, $request)
+    public function excelPersonal($spread, $request)
     {
         //dd($request->all());
+        $busqueda_personal = $request->busqueda_personal;
         $estado = $request->estado;
-        $busqueda = $request->has('busqueda') ? espacios($request->busqueda) : '';
-        $bus = str_replace(' ', '%%', $busqueda);
+        $listado = Personal::where('nombre', 'like', "%$busqueda_personal%")
+            ->orWhere('apellido', 'like', "%$busqueda_personal%")
+            ->orWhere('cedula_identidad', 'like', "%$busqueda_personal%")
+            ->orderBy('apellido', 'asc')->get();
+        //  dd($listado);
 
-        $listado = DB::table('personal as a');
-        //dd($listado);
-
-        if ($request->busqueda != null) $listado = $listado->Where(function ($q) use ($bus,$estado) {
-
-            $listado = Personal::where('nombre', 'like', '%' . $bus . '%')
-                ->orWhere('apellido', 'like', '%' . $bus . '%')
-                ->orWhere('cedula_identidad', 'like', '%' . $bus . '%')
-                ->orderBy('apellido', 'asc')->get();
-            //  dd($listado);
-            $listado->getDetalleActivo()->last();
-
-            $resultados = [];
-            foreach ($listado as $per) {
-                if ($estado == 1) {
-                    if ($per->getDetalleActivoDesin() != '')
-                        array_push($resultados, $per);
-                } else
-                    if ($per->getDetalleActivoDesin() == '')
+        $resultados = [];
+        foreach ($listado as $per) {
+            if ($estado == 1) {
+                if ($per->getDetalleActivoDesin() != '')
                     array_push($resultados, $per);
-            }
-        });
+            } else
+                if ($per->getDetalleActivoDesin() == '')
+                array_push($resultados, $per);
+        }
 
-        $listado = $listado->orderBy('a.nombre', 'asc')->paginate(20);
+        if (count($resultados) > 0) {
+            $sheet = $spread->getActiveSheet();
+            $sheet->setTitle('Cosecha Diaria');
 
-        if (count($listado) > 0) {
-            $objSheet = new PHPExcel_Worksheet($objPHPExcel, 'Personal');
-            $objPHPExcel->addSheet($objSheet, 0);
-
-            $objSheet->mergeCells('A1:B1');
-            $objSheet->getStyle('A1:B1')->getFont()->setBold(true)->setSize(12);
-            $objSheet->getStyle('A1:B1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objSheet->getStyle('A1:B1')
+            $sheet->mergeCells('A1:B1');
+            $sheet->getStyle('A1:B1')->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A1:B1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A1:B1')
                 ->getFill()
                 ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
                 ->getStartColor()
                 ->setRGB('CCFFCC');
 
-            $objSheet->getCell('A1')->setValue('Listado de Personal');
+            $sheet->getCell('A1')->setValue('Listado de Personal');
 
-            $objSheet->getCell('A3')->setValue('ID');
-            $objSheet->getCell('B3')->setValue('Nombre');
-            $objSheet->getCell('C3')->setValue('Apellido');
-            $objSheet->getCell('D3')->setValue('Cédula');
-            $objSheet->getCell('E3')->setValue('Fecha de Ingreso');
+            $sheet->getCell('A3')->setValue('ID');
+            $sheet->getCell('B3')->setValue('Nombre');
+            $sheet->getCell('C3')->setValue('Apellido');
+            $sheet->getCell('D3')->setValue('Cédula');
+            $sheet->getCell('E3')->setValue('Fecha de Ingreso');
 
-            $objSheet->getStyle('A3:B3')->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A3:B3')->getFont()->setBold(true)->setSize(12);
 
-            $objSheet->getStyle('A3:B3')
+            $sheet->getStyle('A3:B3')
                 ->getBorders()
                 ->getAllBorders()
                 ->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN)
                 ->getColor()
                 ->setRGB(PHPExcel_Style_Color::COLOR_BLACK);
 
-            $objSheet->getStyle('A3:B3')
+            $sheet->getStyle('A3:B3')
                 ->getFill()
                 ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
                 ->getStartColor()
                 ->setRGB('CCFFCC');
 
-            $objSheet->getStyle('A3:C3')->getFont()->setBold(true)->setSize(12);
+            $sheet->getStyle('A3:C3')->getFont()->setBold(true)->setSize(12);
 
-            $objSheet->getStyle('A3:C3')
+            $sheet->getStyle('A3:C3')
                 ->getFill()
                 ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
                 ->getStartColor()
                 ->setRGB('CCFFCC');
 
             //--------------------------- LLENAR LA TABLA ---------------------------------------------
-            for ($i = 0; $i < sizeof($listado); $i++) {
+            for ($i = 0; $i < sizeof($resultados); $i++) {
 
-                $objSheet->getStyle('A' . ($i + 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-                $objSheet->getStyle('B' . ($i + 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('A' . ($i + 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B' . ($i + 4))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 
-                $objSheet->getCell('A' . ($i + 4))->setValue($listado[$i]->id_personal);
-                $objSheet->getCell('B' . ($i + 4))->setValue($listado[$i]->nombre);
-                $objSheet->getCell('C' . ($i + 4))->setValue($listado[$i]->apellido);
-                $objSheet->getCell('D' . ($i + 4))->setValue($listado[$i]->cedula_identidad);
-                $pd = PersonalDetalle::where('id_personal', $listado[$i]->id_personal)->orderBy('id_personal_detalle','desc')->first();
-                $objSheet->getCell('E' . ($i + 4))->setValue(isset($pd) ? $pd->fecha_ingreso: '');
-
+                $sheet->getCell('A' . ($i + 4))->setValue($resultados[$i]->id_personal);
+                $sheet->getCell('B' . ($i + 4))->setValue($resultados[$i]->nombre);
+                $sheet->getCell('C' . ($i + 4))->setValue($resultados[$i]->apellido);
+                $sheet->getCell('D' . ($i + 4))->setValue($resultados[$i]->cedula_identidad);
+                $pd = PersonalDetalle::where('id_personal', $resultados[$i]->id_personal)->orderBy('id_personal_detalle', 'desc')->first();
+                $sheet->getCell('E' . ($i + 4))->setValue(isset($pd) ? $pd->fecha_ingreso : '');
             }
 
-            $objSheet->getColumnDimension('A')->setAutoSize(true);
-            $objSheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
         } else {
             return '<div>No se han encontrado coincidencias para exportar</div>';
         }
@@ -388,7 +367,7 @@ class rrhhPersonalController extends Controller
         return view('adminlte.gestion.rrhh.personal.forms.incorporar_personal', [
             'dataPersonal' => $dataPersonal,
             'detalle' => $dataPersonal->getDetalleInactivo()->last(),
-            'manoObra' => ManoObra::where('estado', 1)->orderBy('nombre','asc')->get()
+            'manoObra' => ManoObra::where('estado', 1)->orderBy('nombre', 'asc')->get()
         ]);
     }
 
@@ -456,7 +435,7 @@ class rrhhPersonalController extends Controller
         $area = Area::where('estado', 1 || 0)->get();
         $actividad = Actividad::where('estado', 1 || 0)->get();
         $mano_obra = ManoObra::where('estado', 1 || 0)->get();
-       // $causa_desvinculacion = CausaDesvinculacion::where('estado', 1 || 0)->get();
+        // $causa_desvinculacion = CausaDesvinculacion::where('estado', 1 || 0)->get();
         $tipo_rol = Tipo_rol::where('estado', 1)->get();
         $grupo = Grupo::ALL()->where('estado', 1 || 0);
 
@@ -467,7 +446,7 @@ class rrhhPersonalController extends Controller
             'sucursal' => $sucursal,
             'actividad' => $actividad,
             'mano_obra' => $mano_obra,
-           // 'causa_desvinculacion' => $causa_desvinculacion,
+            // 'causa_desvinculacion' => $causa_desvinculacion,
             'tipo_rol' => $tipo_rol,
             'grupo' => $grupo,
         ]);
@@ -503,8 +482,7 @@ class rrhhPersonalController extends Controller
                 $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la informacion</div>';
                 $success = false;
             }
-
-        }else{
+        } else {
 
             $success = false;
             $errores = '';
@@ -521,7 +499,6 @@ class rrhhPersonalController extends Controller
                 $errores .
                 '</ul>' .
                 '</div>';
-
         }
 
         return [
@@ -585,7 +562,7 @@ class rrhhPersonalController extends Controller
         if (!$valida->fails()) {
 
             DB::beginTransaction();
-            try{
+            try {
 
                 $success = true;
                 $personal = Personal::find($request->id_personal);
@@ -642,7 +619,7 @@ class rrhhPersonalController extends Controller
 
                 $ce = ConfiguracionEmpresa::find($usuario->finca_activa);
 
-                if($request->has('file_personal')){
+                if ($request->has('file_personal')) {
 
                     $aws = AWS::createClient('rekognition');
 
@@ -654,46 +631,43 @@ class rrhhPersonalController extends Controller
                         ]
                     ]);
 
-                    if($indexImg->get('@metadata')['statusCode'] !== 200){
+                    if ($indexImg->get('@metadata')['statusCode'] !== 200) {
                         $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la foto del personal, intente nuevamente</div>';
                         $success = false;
                     }
-
                 }
 
-                if($success)
+                if ($success)
                     $msg = '<div class="alert alert-success text-center">Se ha actualizado el personal satisfactoriamente</div>';
 
-                    DB::commit();
-            }catch(\Exception $e){
+                DB::commit();
+            } catch (\Exception $e) {
                 DB::rollBack();
                 $success = false;
                 $msg = "Ha ocurrido un error con los datos ingresados, por favor verifique y vuelva a intentar.";
                 // $msg = $e->getMessage();
             }
-
-        }else {
-                $success = false;
-                $errores = '';
-                foreach ($valida->errors()->all() as $mi_error) {
-                    if ($errores == '') {
-                        $errores = '<li>' . $mi_error . '</li>';
-                    } else {
-                        $errores .= '<li>' . $mi_error . '</li>';
-                    }
+        } else {
+            $success = false;
+            $errores = '';
+            foreach ($valida->errors()->all() as $mi_error) {
+                if ($errores == '') {
+                    $errores = '<li>' . $mi_error . '</li>';
+                } else {
+                    $errores .= '<li>' . $mi_error . '</li>';
                 }
-                $msg = '<div class="alert alert-danger">' .
-                    '<p class="text-center">¡Por favor corrija los siguientes errores!</p>' .
-                    '<ul>' .
-                    $errores .
-                    '</ul>' .
-                    '</div>';
             }
+            $msg = '<div class="alert alert-danger">' .
+                '<p class="text-center">¡Por favor corrija los siguientes errores!</p>' .
+                '<ul>' .
+                $errores .
+                '</ul>' .
+                '</div>';
+        }
         return [
             'success' => $success,
             'mensaje' => $msg,
         ];
-
     }
 
     public function reincorporar_personal(Request $request)
@@ -781,9 +755,7 @@ class rrhhPersonalController extends Controller
                 $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la informacion</div>';
                 $success = false;
             }
-
-
-        }else {
+        } else {
             $success = false;
             $errores = '';
             foreach ($valida->errors()->all() as $mi_error) {
@@ -804,11 +776,10 @@ class rrhhPersonalController extends Controller
             'mensaje' => $msg,
             'success' => $success
         ];
-
     }
 
     public function store_personal(Request $request)
-    {//dd($request->all());
+    { //dd($request->all());
         $valida = Validator::make($request->all(), [
             'cedula_identidad' => 'required|max:10|unique:personal',
             'nombre' => 'required|max:50',
@@ -883,7 +854,7 @@ class rrhhPersonalController extends Controller
                 $detalle->n_afiliacion = $request->n_afiliacion;
                 $detalle->save();
 
-                if(isset($ce->coleccion_aws) && $request->has('file_personal')){
+                if (isset($ce->coleccion_aws) && $request->has('file_personal')) {
 
                     $aws = AWS::createClient('rekognition');
                     $indexImg = $aws->IndexFaces([
@@ -894,21 +865,18 @@ class rrhhPersonalController extends Controller
                         ]
                     ]);
 
-                    if($indexImg->get('@metadata')['statusCode'] !== 200){
+                    if ($indexImg->get('@metadata')['statusCode'] !== 200) {
                         $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la foto del personal, intente nuevamente</div>';
                         $success = false;
                     }
-
                 }
 
-                if($success)
+                if ($success)
                     $msg = '<div class="alert alert-success text-center">Se ha guardado el personal satisfactoriamente</div>';
-
             } else {
                 $msg = '<div class="alert alert-danger text-center">Ha ocurrido un error al guardar la informacion</div>';
                 $success = false;
             }
-
         } else {
             $success = false;
             $errores = '';
@@ -967,5 +935,4 @@ class rrhhPersonalController extends Controller
             'manos_obra' => $manos_obra
         ]);
     }
-
 }
