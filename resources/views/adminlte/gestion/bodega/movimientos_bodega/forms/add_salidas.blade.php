@@ -131,7 +131,6 @@
                 cant_prod_selected++;
                 codigo = $('#codigo_' + id_prod).val();
                 nombre = $('#nombre_' + id_prod).val();
-                if($('#unidades_seleccionado_'+id_prod).length == 0)
                 $('#table_add_salidas').append('<tr id="tr_add_ingreso_' + cant_prod_selected + '">' +
                     '<th class="padding_lateral_5" style="border-color: #9d9d9d">' +
                     codigo +
@@ -144,7 +143,7 @@
                     '</th>' +
                     '<td class="text-center" style="border-color: #9d9d9d">' +
                     '<input type="number" style="width: 100%" class="text-center"' +
-                    'id="unidades_seleccionado_' + id_prod + '" min="0" value="' + unidades + '">' +
+                    'id="unidades_seleccionado_' + cant_prod_selected + '" min="0" value="' + unidades + '">' +
                     '</td>' +
                     '<td class="text-center" style="border-color: #9d9d9d">' +
                     '<select style="width: 100%; height: 26px" onchange="seleccionar_sector(' + cant_prod_selected +
