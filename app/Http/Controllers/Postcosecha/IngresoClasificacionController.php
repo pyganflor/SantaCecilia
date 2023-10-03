@@ -19,6 +19,7 @@ class IngresoClasificacionController extends Controller
             ->get();
 
         $longitudes = ClasificacionRamo::where('estado', 1)
+            ->whereNotIn('nombre', ['Nacional', 'Baja'])
             ->orderBy('nombre')
             ->get();
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.inicio', [

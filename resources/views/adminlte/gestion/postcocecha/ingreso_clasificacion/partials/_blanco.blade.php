@@ -5,6 +5,9 @@
                 Plantas
             </th>
             <th class="text-center th_yura_green" style="width: 10%">
+                Flor Nacional
+            </th>
+            <th class="text-center th_yura_green" style="width: 10%">
                 Cuarto Frío
             </th>
             <th class="text-center th_yura_green" style="width: 10%">
@@ -22,6 +25,17 @@
                             <option value="{{ $v->id_variedad }}">{{ $v->nombre }}</option>
                         @endforeach
                     </select>
+                </td>
+                <td class="text-center bg-yura_dark" style="width: 10%">
+                    <button type="button" class="btn btn-xs btn-yura_default btn-block"
+                        id="btn_nacional_planta_{{ $item['planta']->id_planta }}" title="Ver Flor Nacional"
+                        onclick="flor_nacional('{{ $item['planta']->id_planta }}')"
+                        onmouseover="$('#icon_nacional_planta_{{ $item['planta']->id_planta }}').removeClass('hidden')"
+                        onmouseleave="$('#icon_nacional_planta_{{ $item['planta']->id_planta }}').addClass('hidden')">
+                        {{ number_format($item['nacional']) }}
+                        <i class="fa fa-fw fa-eye hidden"
+                            id="icon_nacional_planta_{{ $item['planta']->id_planta }}"></i>
+                    </button>
                 </td>
                 <td class="text-center bg-yura_dark" style="width: 10%">
                     <button type="button" class="btn btn-xs btn-yura_default btn-block"
@@ -49,7 +63,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="border-color: #9d9d9d" colspan="3">
+                <td style="border-color: #9d9d9d" colspan="4">
                     <table class="table-striped table-bordered" style="width: 100%; border: 1px solid #9d9d9d"
                         id="table_desglose_planta_{{ $item['planta']->id_planta }}"></table>
                     <table class="table-striped table-bordered" style="width: 100%; border: 1px solid #9d9d9d"
@@ -285,7 +299,18 @@
         });
     }
 
-    function update_inventario(id, pta) {
+    function flor_nacional(pta) {
+        $('#table_desglose_planta_' + pta).addClass('hidden');
+        $('#table_inventario_planta_' + pta).removeClass('hidden');
+        datos = {
+            planta: pta,
+        };
+        get_jquery('{{ url('ingreso_clasificacion/flor_nacional') }}', datos, function(retorno) {
+            $('#table_inventario_planta_' + pta).html(retorno);
+        });
+    }
+
+    function update_inventario(id, pta, tipo_inv = 'F') {
         texto =
             "<div class='alert alert-warning text-center'>¿Esta seguro de <b>MODIFICAR</b> el inventario?</div>";
 
@@ -294,14 +319,18 @@
                 _token: '{{ csrf_token() }}',
                 id: id,
                 disponibles: $('#edit_disponibles_' + id).val(),
+                tallos_x_ramo: $('#edit_tallos_x_ramo_' + id).val(),
             };
             post_jquery_m('{{ url('ingreso_clasificacion/update_inventario') }}', datos, function() {
-                inventario_frio(pta);
+                if (tipo_inv == 'F')
+                    inventario_frio(pta);
+                if (tipo_inv == 'N')
+                    flor_nacional(pta);
             });
         })
     }
 
-    function botar_inventario(id, pta) {
+    function botar_inventario(id, pta, tipo_inv = 'F') {
         texto =
             "<div class='alert alert-warning text-center'>¿Esta seguro de <b>DAR DE BAJA</b> a la flor?</div>";
 
@@ -311,12 +340,15 @@
                 id: id,
             };
             post_jquery_m('{{ url('ingreso_clasificacion/botar_inventario') }}', datos, function() {
-                inventario_frio(pta);
+                if (tipo_inv == 'F')
+                    inventario_frio(pta);
+                if (tipo_inv == 'N')
+                    flor_nacional(pta);
             });
         })
     }
 
-    function delete_inventario(id, pta) {
+    function delete_inventario(id, pta, tipo_inv = 'F') {
         texto =
             "<div class='alert alert-warning text-center'>¿Esta seguro de <b>ELIMINAR el REGISTRO</b> del inventario?</div>";
 
@@ -327,7 +359,10 @@
             }
             post_jquery_m('{{ url('ingreso_clasificacion/delete_inventario') }}', datos, function() {
                 cerrar_modals();
-                inventario_frio(pta);
+                if (tipo_inv == 'F')
+                    inventario_frio(pta);
+                if (tipo_inv == 'N')
+                    flor_nacional(pta);
             })
         })
     }

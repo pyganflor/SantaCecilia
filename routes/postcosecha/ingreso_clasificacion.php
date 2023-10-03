@@ -16,3 +16,4 @@ Route::post('ingreso_clasificacion/store_all_blanco', 'Postcosecha\BlancoControl
 Route::get('ingreso_clasificacion/ver_all_pdf_etiquetas', 'Postcosecha\BlancoController@ver_all_pdf_etiquetas');
 Route::get('ingreso_clasificacion/view_pdf_inventario', 'Postcosecha\BlancoController@view_pdf_inventario');
 Route::post('ingreso_clasificacion/delete_inventario', 'Postcosecha\BlancoController@delete_inventario');
+Route::get('ingreso_clasificacion/flor_nacional', 'Postcosecha\BlancoController@flor_nacional');
