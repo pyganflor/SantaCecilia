@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage as Almacenamiento;
 use \PhpOffice\PhpSpreadsheet\IOFactory as IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use yura\Modelos\ClasificacionRamo;
 use yura\Modelos\ConfiguracionEmpresa;
 use yura\Modelos\InventarioFrio;
 
@@ -23,57 +24,91 @@ class ReporteCuartoFrioController extends Controller
             'url' => $request->getRequestUri(),
             'submenu' => Submenu::Where('url', '=', substr($request->getRequestUri(), 1))->get()[0],
             'plantas' => Planta::where('estado', 1)->orderBy('nombre')->get(),
-            'proveedores' => ConfiguracionEmpresa::orderBy('proveedor')->orderBy('nombre')->get()
         ]);
     }
 
     public function listar_reporte(Request $request)
     {
-        $finca = getFincaActiva();
-        $finca_destino = $request->finca;
         $plantas = Planta::where('estado', 1);
         if ($request->planta != '')
             $plantas = $plantas->where('id_planta', $request->planta);
         $plantas = $plantas->orderBy('nombre')->get();
-        $longitudes = [100, 90, 80, 70, 60, 50, 40];
+
+        $dias = [0, 1, 2, 3, 4, 5, 6, 7];
         $listado = [];
         foreach ($plantas as $p) {
-            $variedades = Variedad::where('estado', 1)
-                ->where('id_planta', $p->id_planta);
-            if ($request->variedad != '')
-                $variedades = $variedades->where('id_variedad', $request->variedad);
-            $variedades = $variedades->orderBy('nombre')
-                ->get();
+            if ($request->tipo == 'F') { // cuarto frio
+                $variedades = DB::table('inventario_frio as i')
+                    ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                    ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
+                    ->select('i.id_variedad', 'v.nombre', 'c.nombre as longitud')->distinct()
+                    ->where('i.estado', 1)
+                    ->where('i.disponibles', '>', 0)
+                    ->where('c.nombre', '!=', 'Baja')
+                    ->where('c.nombre', '!=', 'Nacional')
+                    ->where('v.id_planta', $p->id_planta);
+                if ($request->variedad != '')
+                    $variedades = $variedades->where('i.id_variedad', $request->variedad);
+                $variedades = $variedades->orderBy('v.nombre')
+                    ->get();
+            } else {    // flor nacional
+                $variedades = DB::table('inventario_frio as i')
+                    ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                    ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
+                    ->select('i.id_variedad', 'v.nombre', 'c.nombre as longitud')->distinct()
+                    ->where('i.estado', 1)
+                    ->where('i.disponibles', '>', 0)
+                    ->where('c.nombre', '!=', 'Baja')
+                    ->where('c.nombre', '=', 'Nacional')
+                    ->where('v.id_planta', $p->id_planta);
+                if ($request->variedad != '')
+                    $variedades = $variedades->where('i.id_variedad', $request->variedad);
+                $variedades = $variedades->orderBy('v.nombre')
+                    ->get();
+            }
+
             $valores_var = [];
             foreach ($variedades as $v) {
-                $valores_long = [];
+                $valores_dias = [];
                 $tiene = false;
-                foreach ($longitudes as $l) {
-                    $cantidad = DB::table('inventario_frio as i')
-                        ->join('clasificacion_ramo as l', 'l.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
-                        ->join('configuracion_empresa as f', 'f.id_configuracion_empresa', '=', 'i.finca_destino')
-                        ->select(DB::raw('sum(i.disponibles) as cantidad'))
-                        ->where('i.disponibilidad', 1)
-                        ->where('i.basura', 0)
-                        ->where('i.estado', 1)
-                        ->where('i.id_variedad', $v->id_variedad)
-                        ->where('l.nombre', $l)
-                        ->where('i.id_empresa', $finca);
-                    if ($finca_destino == 'F')
-                        $cantidad = $cantidad->where('f.proveedor', 0);
-                    else if ($finca_destino == 'P')
-                        $cantidad = $cantidad->where('f.proveedor', 1);
-                    elseif ($finca_destino != '')
-                        $cantidad = $cantidad->where('i.finca_destino', $finca_destino);
-                    $cantidad = $cantidad->get()[0]->cantidad;
-                    $valores_long[] = $cantidad;
+                foreach ($dias as $pos => $dia) {
+                    if ($request->tipo == 'F') {    // cuarto frio
+                        $cantidad = DB::table('inventario_frio as i')
+                            ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                            ->select(DB::raw('sum(i.disponibles) as cantidad'))
+                            ->where('i.disponibilidad', 1)
+                            ->where('i.basura', 0)
+                            ->where('i.estado', 1)
+                            ->where('i.id_variedad', $v->id_variedad)
+                            ->where('c.nombre', $v->longitud);
+                        if ($pos == count($dias) - 1)
+                            $cantidad = $cantidad->where('i.fecha', '<=', opDiasFecha('-', $dia, hoy()));
+                        else
+                            $cantidad = $cantidad->where('i.fecha', opDiasFecha('-', $dia, hoy()));
+                        $cantidad = $cantidad->get()[0]->cantidad;
+                    } else {    // flor nacional
+                        $cantidad = DB::table('inventario_frio as i')
+                            ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                            ->select(DB::raw('sum(i.disponibles) as cantidad'))
+                            ->where('i.disponibilidad', 1)
+                            ->where('i.basura', 0)
+                            ->where('i.estado', 1)
+                            ->where('i.id_variedad', $v->id_variedad)
+                            ->where('c.nombre', '=', 'Nacional');
+                        if ($pos == count($dias) - 1)
+                            $cantidad = $cantidad->where('i.fecha', '<=', opDiasFecha('-', $dia, hoy()));
+                        else
+                            $cantidad = $cantidad->where('i.fecha', opDiasFecha('-', $dia, hoy()));
+                        $cantidad = $cantidad->get()[0]->cantidad;
+                    }
+                    $valores_dias[] = $cantidad;
                     if ($cantidad > 0)
                         $tiene = true;
                 }
                 if ($tiene)
                     $valores_var[] = [
                         'variedad' => $v,
-                        'valores_long' => $valores_long,
+                        'valores_dias' => $valores_dias,
                     ];
             }
             if (count($valores_var) > 0)
@@ -84,7 +119,8 @@ class ReporteCuartoFrioController extends Controller
         }
         return view('adminlte.gestion.reporte_cuarto_frio.partials.listado', [
             'listado' => $listado,
-            'longitudes' => $longitudes,
+            'dias' => $dias,
+            'tipo' => $request->tipo
         ]);
     }
 
@@ -369,5 +405,71 @@ class ReporteCuartoFrioController extends Controller
 
         for ($i = 0; $i <= $col; $i++)
             $sheet->getColumnDimension($columnas[$i])->setAutoSize(true);
+    }
+
+    public function ver_inventario(Request $request)
+    {
+        $clasificacion_ramo = ClasificacionRamo::All()
+            ->where('nombre', $request->longitud)
+            ->first();
+        $listado = InventarioFrio::where('id_variedad', $request->variedad)
+            ->where('fecha', $request->fecha)
+            ->where('id_clasificacion_ramo', $clasificacion_ramo->id_clasificacion_ramo)
+            ->where('disponibles', '>', 0)
+            ->where('basura', 0)
+            ->get();
+        return view('adminlte.gestion.reporte_cuarto_frio.forms.ver_inventario', [
+            'listado' => $listado,
+            'tipo' => $request->tipo,
+            'variedad' => $request->variedad,
+            'fecha' => $request->fecha,
+            'longitud' => $request->longitud,
+        ]);
+    }
+
+    public function botar_inventario(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $model = InventarioFrio::find($request->id);
+            if ($model->disponibles <= $request->cantidad) {
+                $model->cantidad_basura = $model->disponibles;
+                $model->disponibles = 0;
+                $model->disponibilidad = 0;
+                $model->basura = 1;
+            } else {
+                $model->disponibles -= $request->cantidad;
+                $basura = new InventarioFrio();
+                $basura->fecha = hoy();
+                $basura->cantidad = $model->clasificacion_ramo->nombre == 'Nacional' ? 1 : $request->cantidad;
+                $basura->disponibles = $request->cantidad;
+                $basura->id_variedad = $model->id_variedad;
+                $basura->id_modulo = $model->id_modulo;
+                $basura->id_clasificacion_ramo = $model->id_clasificacion_ramo;
+                $basura->id_motivos_nacional = $model->id_motivos_nacional;
+                $basura->tallos_x_ramo = $model->clasificacion_ramo->nombre == 'Nacional' ? $request->cantidad : $model->tallos_x_ramo;
+                $basura->disponibilidad = 0;
+                $basura->basura = 1;
+                $basura->cantidad_basura = $request->cantidad;
+                $basura->id_empresa = getFincaActiva();
+                $basura->save();
+            }
+            $model->save();
+
+            $success = true;
+            $msg = 'Se ha guardado el registro correctamente';
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-warning text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema </p>
+                        <p><strong>Error:</strong> ' . $e->getMessage() . 'en la línea ' . $e->getLine() . ' del archivo ' . $e->getFile() . '</p>'
+                . '</div>';
+        }
+        return [
+            'mensaje' => $msg,
+            'success' => $success
+        ];
     }
 }

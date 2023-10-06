@@ -7,3 +7,5 @@ Route::post('reporte_cuarto_frio/importar_file_bajas', 'ReporteCuartoFrioControl
 Route::get('reporte_cuarto_frio/get_importar_file_bajas', 'ReporteCuartoFrioController@get_importar_file_bajas');
 Route::post('reporte_cuarto_frio/store_bajas', 'ReporteCuartoFrioController@store_bajas');
 Route::get('reporte_cuarto_frio/exportar_reporte', 'ReporteCuartoFrioController@exportar_reporte');
+Route::get('reporte_cuarto_frio/ver_inventario', 'ReporteCuartoFrioController@ver_inventario');
+Route::post('reporte_cuarto_frio/botar_inventario', 'ReporteCuartoFrioController@botar_inventario');

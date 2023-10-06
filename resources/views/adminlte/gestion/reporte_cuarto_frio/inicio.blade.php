@@ -37,25 +37,9 @@
                 <td>
                     <div class="input-group">
                         <div class="input-group-addon span-input-group-yura-fixed bg-yura_dark">
-                            <i class="fa fa-fw fa-tree"></i> Finca
+                            Planta
                         </div>
-                        <select name="filtro_finca" id="filtro_finca" class="form-control input-yura_default"
-                            onchange="listar_reporte()">
-                            <option value="">Todas</option>
-                            <option value="F">Todas la Fincas Propias</option>
-                            <option value="P">Todos los Proveedores</option>
-                            @foreach ($proveedores as $p)
-                                <option value="{{ $p->id_configuracion_empresa }}">{{ $p->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <div class="input-group-addon span-input-group-yura-fixed bg-yura_dark">
-                            <i class="fa fa-fw fa-leaf"></i> Variedad
-                        </div>
-                        <select name="filtro_planta" id="filtro_planta" class="form-control input-yura_default"
+                        <select name="filtro_planta" id="filtro_planta" class="form-control"
                             onchange="select_planta($(this).val(), 'filtro_variedad', 'filtro_variedad',
                             '<option value=>Todos los tipos</option>')">
                             <option value="">Seleccione</option>
@@ -67,24 +51,32 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <div class="input-group-addon span-input-group-yura-fixed bg-yura_dark">
-                            <i class="fa fa-fw fa-leaf"></i> Tipo
+                        <div class="input-group-addon bg-yura_dark">
+                            Variedad
                         </div>
-                        <select name="filtro_variedad" id="filtro_variedad" class="form-control input-yura_default"
+                        <select name="filtro_variedad" id="filtro_variedad" class="form-control"
                             onchange="listar_reporte()">
                             <option value="" selected>Seleccione</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <div class="input-group-addon bg-yura_dark">
+                            Tipo
+                        </div>
+                        <select name="filtro_tipo" id="filtro_tipo" class="form-control" onchange="listar_reporte()">
+                            <option value="F">Cuarto Frio</option>
+                            <option value="N">Flor Nacional</option>
                         </select>
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-yura_dark" onclick="listar_reporte()">
                                 <i class="fa fa-fw fa-search"></i>
                             </button>
-                            <button class="btn btn-primary btn-yura_primary" onclick="importar_bajas()">
-                                <i class="fa fa-fw fa-upload"></i>
-                            </button>
-                            <button type="button" class="btn btn-yura_default" title="Exportar"
+                            {{--<button type="button" class="btn btn-yura_default" title="Exportar"
                                 onclick="exportar_reporte()">
                                 <i class="fa fa-fw fa-file-excel-o"></i>
-                            </button>
+                            </button>--}}
                         </div>
                     </div>
                 </td>
