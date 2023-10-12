@@ -1,63 +1,95 @@
 <div class="row">
-    <div class="col-md-3">
-        <div class="small-box bg-teal-active">
-            <div class="inner">
-                <h3 class="info-box-number">
-                    {{number_format($precioXTallo, 2)}}
-                </h3>
-            </div>
-            <div class="icon">
-                <i class="fa fa-fw fa-usd"></i>
-            </div>
-            <a href="javascript:void(0)" class="small-box-footer" onclick="desglose_indicador('valor')">
-                Valor $ <i class="fa fa-arrow-circle-right"></i>
-            </a>
+    <div class="col-md-4">
+        <div class="div_indicadores border-radius_16" style="background-color: #30BBBB; margin-bottom: 5px">
+            <legend class="text-center" style="font-size: 1.1em; margin-bottom: 5px; color: white">
+                <strong>Tallos <sup>-4 semanas</sup></strong>
+            </legend>
+            <table style="width: 100%;">
+                @php
+                    $total_tallos = 0;
+                @endphp
+                @foreach ($indicadores as $item)
+                    @php
+                        $total_tallos += $item['tallos'];
+                    @endphp
+                    <tr>
+                        <th style="color: white">
+                            Semana: {{ $item['semana']->codigo }}
+                        </th>
+                        <th class="text-right">
+                            {{ number_format($item['tallos']) }}
+                        </th>
+                    </tr>
+                @endforeach
+            </table>
+            <legend style="margin-bottom: 5px; color: white"></legend>
+            <p class="text-center" style="margin-bottom: 0px">
+                <a href="javascript:void(0)" class="text-center" style="color: white">
+                    <strong>{{ number_format($total_tallos) }}</strong>
+                </a>
+            </p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="small-box bg-aqua">
-            <div class="inner">
-                <h3 class="info-box-number">
-                    {{number_format($precioPromedioRamo, 2)}}
-                </h3>
-            </div>
-            <div class="icon">
-                <i class="fa fa-fw fa-gift"></i>
-            </div>
-            <a href="javascript:void(0)" class="small-box-footer" onclick="desglose_indicador('cajas')">
-                Cajas <i class="fa fa-arrow-circle-right"></i>
-            </a>
+    <div class="col-md-4">
+        <div class="div_indicadores border-radius_16" style="background-color: #30BBBB; margin-bottom: 5px">
+            <legend class="text-center" style="font-size: 1.1em; margin-bottom: 5px; color: white">
+                <strong>Ramos <sup>-4 semanas</sup></strong>
+            </legend>
+            <table style="width: 100%;">
+                @php
+                    $total_ramos = 0;
+                @endphp
+                @foreach ($indicadores as $item)
+                    @php
+                        $total_ramos += $item['ramos'];
+                    @endphp
+                    <tr>
+                        <th style="color: white">
+                            Semana: {{ $item['semana']->codigo }}
+                        </th>
+                        <th class="text-right">
+                            {{ number_format($item['ramos']) }}
+                        </th>
+                    </tr>
+                @endforeach
+            </table>
+            <legend style="margin-bottom: 5px; color: white"></legend>
+            <p class="text-center" style="margin-bottom: 0px">
+                <a href="javascript:void(0)" class="text-center" style="color: white">
+                    <strong>{{ number_format($total_ramos) }}</strong>
+                </a>
+            </p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="small-box bg-orange">
-            <div class="inner">
-                <h3 class="info-box-number">
-                    {{number_format($cajasEquivalentes, 2)}}
-                </h3>
-            </div>
-            <div class="icon">
-                <i class="fa fa-fw fa-usd"></i>
-            </div>
-            <a href="javascript:void(0)" class="small-box-footer" onclick="desglose_indicador('precios')">
-                Precio x Ramo <i class="fa fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="small-box bg-green-gradient">
-            <div class="inner">
-                <h3 class="info-box-number">
-                    {{number_format($dinero, 2)}}
-                    <sup style="font-size: 0.4em"></sup>
-                </h3>
-            </div>
-            <div class="icon">
-                <i class="fa fa-fw fa-usd"></i>
-            </div>
-            <a href="javascript:void(0)" class="small-box-footer" onclick="desglose_indicador('tallos')">
-                Precio x Tallo <i class="fa fa-arrow-circle-right"></i>
-            </a>
+    <div class="col-md-4">
+        <div class="div_indicadores border-radius_16" style="background-color: #30BBBB; margin-bottom: 5px">
+            <legend class="text-center" style="font-size: 1.1em; margin-bottom: 5px; color: white">
+                <strong>Monto <sup>-4 semanas</sup></strong>
+            </legend>
+            <table style="width: 100%;">
+                @php
+                    $total_monto = 0;
+                @endphp
+                @foreach ($indicadores as $item)
+                    @php
+                        $total_monto += $item['monto'];
+                    @endphp
+                    <tr>
+                        <th style="color: white">
+                            Semana: {{ $item['semana']->codigo }}
+                        </th>
+                        <th class="text-right">
+                            {{ number_format($item['monto']) }}
+                        </th>
+                    </tr>
+                @endforeach
+            </table>
+            <legend style="margin-bottom: 5px; color: white"></legend>
+            <p class="text-center" style="margin-bottom: 0px">
+                <a href="javascript:void(0)" class="text-center" style="color: white">
+                    <strong>{{ number_format($total_monto) }}</strong>
+                </a>
+            </p>
         </div>
     </div>
 </div>
