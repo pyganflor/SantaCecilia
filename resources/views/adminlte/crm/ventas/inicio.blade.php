@@ -148,6 +148,10 @@
                         </button>
                         <ul class="dropdown-menu sombra_pequeña" style="top: 28px;">
                             <li>
+                                <a href="javascript:void(0)" class="li_criterio_ranking"
+                                    onclick="$('#criterio_ranking').val('M'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
+                                    Ventas
+                                </a>
                                 <a href="javascript:void(0)" class="li_criterio_ranking bg-aqua-active"
                                     onclick="$('#criterio_ranking').val('T'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
                                     Tallos
@@ -156,16 +160,12 @@
                                     onclick="$('#criterio_ranking').val('R'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
                                     Ramos
                                 </a>
-                                <a href="javascript:void(0)" class="li_criterio_ranking"
-                                    onclick="$('#criterio_ranking').val('M'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
-                                    Monto
-                                </a>
                             </li>
                         </ul>
                     </div>
                     <strong style="color: white">Ranking <sup>-4 semanas</sup></strong>
                 </legend>
-                <input type="hidden" id="criterio_ranking" value="T">
+                <input type="hidden" id="criterio_ranking" value="M">
                 <div id="div_ranking"></div>
             </div>
         </div>

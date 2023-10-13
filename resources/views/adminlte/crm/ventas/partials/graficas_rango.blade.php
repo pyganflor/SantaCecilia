@@ -2,6 +2,11 @@
     <!-- Tabs within a box -->
     <ul class="nav nav-pills nav-justified">
         <li class="active">
+            <a href="#monto-chart" data-toggle="tab" aria-expanded="true">
+                Ventas
+            </a>
+        </li>
+        <li class="">
             <a href="#tallos-chart" data-toggle="tab" aria-expanded="false">
                 Tallos
             </a>
@@ -11,21 +16,16 @@
                 Ramos
             </a>
         </li>
-        <li class="">
-            <a href="#monto-chart" data-toggle="tab" aria-expanded="true">
-                Monto
-            </a>
-        </li>
     </ul>
     <div class="tab-content no-padding">
-        <div class="chart tab-pane active" id="tallos-chart" style="position: relative">
+        <div class="chart tab-pane active" id="monto-chart" style="position: relative">
+            <canvas id="chart_monto" width="100%" height="40" style="margin-top: 5px"></canvas>
+        </div>
+        <div class="chart tab-pane" id="tallos-chart" style="position: relative">
             <canvas id="chart_tallos" width="100%" height="40" style="margin-top: 5px"></canvas>
         </div>
         <div class="chart tab-pane" id="ramos-chart" style="position: relative">
             <canvas id="chart_ramos" width="100%" height="40" style="margin-top: 5px"></canvas>
-        </div>
-        <div class="chart tab-pane" id="monto-chart" style="position: relative">
-            <canvas id="chart_monto" width="100%" height="40" style="margin-top: 5px"></canvas>
         </div>
     </div>
 </div>
