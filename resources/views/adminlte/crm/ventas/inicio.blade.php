@@ -148,11 +148,11 @@
                         </button>
                         <ul class="dropdown-menu sombra_pequeña" style="top: 28px;">
                             <li>
-                                <a href="javascript:void(0)" class="li_criterio_ranking"
+                                <a href="javascript:void(0)" class="li_criterio_ranking bg-aqua-active"
                                     onclick="$('#criterio_ranking').val('M'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
                                     Ventas
                                 </a>
-                                <a href="javascript:void(0)" class="li_criterio_ranking bg-aqua-active"
+                                <a href="javascript:void(0)" class="li_criterio_ranking"
                                     onclick="$('#criterio_ranking').val('T'); $('.li_criterio_ranking').removeClass('bg-aqua-active'); $(this).addClass('bg-aqua-active'); listar_ranking();">
                                     Tallos
                                 </a>
