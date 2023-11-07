@@ -4,6 +4,9 @@
             <th class="text-center th_yura_green">
                 NOMBRE
             </th>
+            <th class="text-center th_yura_green">
+                TIPO
+            </th>
             <th class="text-center th_yura_green" style="width: 90px">
                 <button type="button" class="btn btn-xs btn-yura_default"
                     onclick="$('#tr_new_plaga').removeClass('hidden'); $('#nombre_new').focus()">
@@ -17,6 +20,12 @@
                     placeholder="NOMBRE" required>
             </th>
             <th class="text-center" style="border-color: #9d9d9d">
+                <select style="width: 100%; height: 26px;" class="text-center bg-yura_dark" id="tipo_new" required>
+                    <option value="H">Hongos</option>
+                    <option value="I">Insectos</option>
+                </select>
+            </th>
+            <th class="text-center" style="border-color: #9d9d9d">
                 <button type="button" class="btn btn-xs btn-yura_primary" onclick="store_plaga()">
                     <i class="fa fa-fw fa-save"></i>
                 </button>
@@ -27,6 +36,13 @@
                 <th class="text-center" style="border-color: #9d9d9d">
                     <input type="text" style="width: 100%" class="text-center" id="nombre_{{ $item->id_plaga }}"
                         value="{{ $item->nombre }}" required>
+                </th>
+                <th class="text-center" style="border-color: #9d9d9d">
+                    <select style="width: 100%; height: 26px;" class="text-center"
+                        id="tipo_{{ $item->id_plaga }}" required>
+                        <option value="H">Hongos</option>
+                        <option value="I">Insectos</option>
+                    </select>
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
                     <div class="btn-group">

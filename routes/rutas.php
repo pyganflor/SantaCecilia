@@ -57,8 +57,9 @@ Route::group(['middleware' => 'autenticacion'], function () {
             include "postcosecha/exportadores.php";
             include "postcosecha/armado_cajas.php";
             include "postcosecha/inventario_cajas.php";
+            include "postcosecha/flor_nacional.php";
 
-            /* ========================== POSTCPCECHA ========================*/
+            /* ========================== POSTCOCECHA ========================*/
             include 'postcocecha/lotes.php';
             include 'postcocecha/clasificacion_blanco.php';
             include 'postcocecha/cuarto_frio.php';

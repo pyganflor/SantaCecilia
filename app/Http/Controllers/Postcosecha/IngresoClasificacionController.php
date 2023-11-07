@@ -10,8 +10,6 @@ use yura\Modelos\Submenu;
 
 class IngresoClasificacionController extends Controller
 {
-
-
     public function inicio(Request $request)
     {
         $plantas = Planta::where('estado', 1)
