@@ -1,15 +1,15 @@
 <table class="table-striped table-bordered" style="width: 100%; border: 1px solid #9d9d9d" id="table_add_formulario">
     <tr>
-        <th class="text-center th_yura_green">
+        <th class="padding_lateral_5 th_yura_green">
             Planta
         </th>
-        <th class="text-center th_yura_green">
+        <th class="padding_lateral_5 th_yura_green">
             Variedad
         </th>
-        <th class="text-center th_yura_green" style="width: 200px">
+        <th class="padding_lateral_5 th_yura_green" style="width: 200px">
             Modulo
         </th>
-        <th class="text-center th_yura_green">
+        <th class="padding_lateral_5 th_yura_green">
             Motivo
         </th>
         <th class="text-center th_yura_green" style="width: 70px">
@@ -24,7 +24,7 @@
     <tr id="tr_form_1">
         <td class="text-center" style="border-color: #9d9d9d">
             <select id="add_planta_1" style="width: 100%; height: 26px;"
-                onchange="select_planta($(this).val(), 'add_variedad_1', 'new_variedad_1', '<option>Seleccione</option>')">
+                onchange="select_planta($(this).val(), 'add_variedad_1', 'add_variedad_1', '<option>Seleccione</option>')">
                 <option value="">Seleccione</option>
                 @foreach ($plantas as $p)
                     <option value="{{ $p->id_planta }}">{{ $p->nombre }}</option>
@@ -97,7 +97,7 @@
             '</select>' +
             '</td>' +
             '<td class="text-center" style="border-color: #9d9d9d">' +
-            '<select id="add_motivo_1" style="width: 100%; height: 26px;">' +
+            '<select id="add_motivo_' + cant_forms + '" style="width: 100%; height: 26px;">' +
             motivos_nacional.html() +
             '</select>' +
             '</td>' +

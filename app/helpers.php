@@ -865,6 +865,23 @@ function getVariedadesByPlanta($p, $formato = 'option')
     }
 }
 
+function getModulosByVariedad($var)
+{
+    $finca = getFincaActiva();
+    $modulos = DB::table('ciclo_cama as cc')
+        ->join('cama as ca', 'ca.id_cama', '=', 'cc.id_cama')
+        ->join('modulo as m', 'm.id_modulo', '=', 'ca.id_modulo')
+        ->join('sector as s', 's.id_sector', '=', 'm.id_sector')
+        ->select('s.nombre as sector_nombre', 'm.nombre as modulo_nombre', 'ca.id_modulo', 'm.id_sector')->distinct()
+        ->where('cc.activo', 1)
+        ->where('cc.id_variedad', $var)
+        ->where('cc.id_empresa', $finca)
+        ->orderBy('s.nombre')
+        ->orderBy('m.nombre')
+        ->get();
+    return $modulos;
+}
+
 function getVariedadesNormales()
 {
     return Variedad::join('planta as p', 'p.id_planta', '=', 'variedad.id_planta')
@@ -877,7 +894,12 @@ function getVariedadesNormales()
 
 function getPlantas()
 {
-    return Planta::All()->where('estado', 1)->sortBy('nombre');
+    return Planta::where('estado', 1)->orderBy('nombre')->get();
+}
+
+function getPlantaById($id)
+{
+    return Planta::find($id);
 }
 
 function getPlantasNormales($tipo = 'N')
