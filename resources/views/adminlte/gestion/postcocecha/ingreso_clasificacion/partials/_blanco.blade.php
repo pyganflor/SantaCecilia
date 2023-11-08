@@ -5,9 +5,6 @@
                 Plantas
             </th>
             <th class="text-center th_yura_green" style="width: 10%">
-                Flor Nacional
-            </th>
-            <th class="text-center th_yura_green" style="width: 10%">
                 Cuarto Frío
             </th>
             <th class="text-center th_yura_green" style="width: 10%">
@@ -25,17 +22,6 @@
                             <option value="{{ $v->id_variedad }}">{{ $v->nombre }}</option>
                         @endforeach
                     </select>
-                </td>
-                <td class="text-center bg-yura_dark" style="width: 10%">
-                    <button type="button" class="btn btn-xs btn-yura_default btn-block"
-                        id="btn_nacional_planta_{{ $item['planta']->id_planta }}" title="Ver Flor Nacional"
-                        onclick="flor_nacional('{{ $item['planta']->id_planta }}')"
-                        onmouseover="$('#icon_nacional_planta_{{ $item['planta']->id_planta }}').removeClass('hidden')"
-                        onmouseleave="$('#icon_nacional_planta_{{ $item['planta']->id_planta }}').addClass('hidden')">
-                        {{ number_format($item['nacional']) }}
-                        <i class="fa fa-fw fa-eye hidden"
-                            id="icon_nacional_planta_{{ $item['planta']->id_planta }}"></i>
-                    </button>
                 </td>
                 <td class="text-center bg-yura_dark" style="width: 10%">
                     <button type="button" class="btn btn-xs btn-yura_default btn-block"
@@ -89,13 +75,6 @@
     @endforeach
 </select>
 
-<select id="select_motivos_nacional" class="hidden">
-    <option value="">Ningun Motivo</option>
-    @foreach ($motivos_nacional as $item)
-        <option value="{{ $item->id_motivos_nacional }}">{{ $item->nombre }}</option>
-    @endforeach
-</select>
-
 <style>
     #tr_fija_top_0 th {
         position: sticky;
@@ -110,7 +89,6 @@
         count_form = $('#count_form_' + pta).val();
         count_form++;
         select_clasificacion_ramos = $('#select_clasificacion_ramos');
-        select_motivos_nacional = $('#select_motivos_nacional');
         select_variedades = $('#select_variedades_' + pta).html();
         $('#table_inventario_planta_' + pta).addClass('hidden');
         $('#table_desglose_planta_' + pta).removeClass('hidden');
@@ -131,11 +109,6 @@
             '<select id="new_clasificacion_ramo_' + pta + '_' + count_form + '" style="width: 100%" ' +
             'onchange="buscar_inventario(' + pta + ',' + count_form + ')">' +
             select_clasificacion_ramos.html() +
-            '</select>' +
-            '</td>' +
-            '<td style="border-color: #9d9d9d">' +
-            '<select id="new_motivos_nacional_' + pta + '_' + count_form + '" style="width: 100%">' +
-            select_motivos_nacional.html() +
             '</select>' +
             '</td>' +
             '<td style="border-color: #9d9d9d; width: 60px">' +
@@ -215,7 +188,6 @@
                     variedad: variedad,
                     modulo: modulo,
                     clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + i).val(),
-                    motivo: $('#new_motivos_nacional_' + pta + '_' + i).val(),
                     tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + i).val(),
                     cantidad: $('#new_cantidad_' + pta + '_' + i).val(),
                 });
@@ -250,7 +222,6 @@
             variedad: $('#new_variedad_' + pta + '_' + count_form).val(),
             modulo: $('#new_modulo_' + pta + '_' + count_form).val(),
             clasificacion_ramo: $('#new_clasificacion_ramo_' + pta + '_' + count_form).val(),
-            motivo: $('#new_motivos_nacional_' + pta + '_' + count_form).val(),
             tallos_x_ramo: $('#new_tallos_ramo_' + pta + '_' + count_form).val(),
             cantidad: $('#new_cantidad_' + pta + '_' + count_form).val(),
         };

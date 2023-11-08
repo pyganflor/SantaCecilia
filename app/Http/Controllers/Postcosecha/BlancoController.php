@@ -53,89 +53,52 @@ class BlancoController extends Controller
                 $inventario = $inventario->where('i.id_clasificacion_ramo', $request->longitud);
             $inventario = $inventario->get()[0]->cantidad;
 
-            $nacional = DB::table('inventario_frio as i')
-                ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
-                ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
-                ->select(DB::raw('sum(i.disponibles) as cantidad'))
-                ->where('i.disponibilidad', 1)
-                ->where('i.basura', 0)
-                ->where('i.estado', 1)
-                ->where('c.nombre', '=', 'Nacional')
-                ->where('v.id_planta', $p->id_planta)
-                ->where('i.id_empresa', $finca);
-            $nacional = $nacional->get()[0]->cantidad;
-
             array_push($listado, [
                 'planta' => $p,
                 'variedades' => $variedades,
                 'inventario' => $inventario,
-                'nacional' => $nacional,
             ]);
         }
 
         $clasificaciones_ramos = ClasificacionRamo::where('estado', 1)
             ->orderBy('nombre')
             ->get();
-
-        $motivos_nacional = MotivosNacional::where('estado', 1)
-            ->orderBy('nombre')
-            ->get();
-
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.partials._blanco', [
             'fecha' => $request->fecha,
             'listado' => $listado,
             'clasificaciones_ramos' => $clasificaciones_ramos,
-            'motivos_nacional' => $motivos_nacional,
         ]);
     }
 
     public function store_blanco(Request $request)
     {
         $finca = getFincaActiva();
-        $clasificacion_ramo = ClasificacionRamo::find($request->clasificacion_ramo);
-        if ($clasificacion_ramo->nombre == 'Nacional') {
+        $model = InventarioFrio::All()
+            ->where('fecha', $request->fecha)
+            ->where('id_variedad', $request->variedad)
+            ->where('id_modulo', $request->modulo)
+            ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
+            ->where('tallos_x_ramo', $request->tallos_x_ramo)
+            ->where('basura', 0)
+            ->where('disponibilidad', 1)
+            ->where('id_empresa', $finca)
+            ->first();
+        if ($model == '') {
             $model = new InventarioFrio();
             $model->fecha = $request->fecha;
-            $model->cantidad = 1;
+            $model->cantidad = $request->cantidad;
             $model->disponibles = $request->cantidad;
             $model->id_variedad = $request->variedad;
             $model->id_modulo = $request->modulo != '' ? $request->modulo : -1;
             $model->id_clasificacion_ramo = $request->clasificacion_ramo;
-            $model->id_motivos_nacional = $request->motivo != '' ? $request->motivo : null;
-            $model->tallos_x_ramo = $request->cantidad;
+            $model->tallos_x_ramo = $request->tallos_x_ramo;
             $model->disponibilidad = 1;
             $model->basura = 0;
             $model->id_empresa = $finca;
         } else {
-            $model = InventarioFrio::All()
-                ->where('fecha', $request->fecha)
-                ->where('id_variedad', $request->variedad)
-                ->where('id_modulo', $request->modulo)
-                ->where('id_clasificacion_ramo', $request->clasificacion_ramo)
-                ->where('id_motivos_nacional', $request->motivo)
-                ->where('tallos_x_ramo', $request->tallos_x_ramo)
-                ->where('basura', 0)
-                ->where('disponibilidad', 1)
-                ->where('id_empresa', $finca)
-                ->first();
-            if ($model == '') {
-                $model = new InventarioFrio();
-                $model->fecha = $request->fecha;
-                $model->cantidad = $request->cantidad;
-                $model->disponibles = $request->cantidad;
-                $model->id_variedad = $request->variedad;
-                $model->id_modulo = $request->modulo != '' ? $request->modulo : -1;
-                $model->id_clasificacion_ramo = $request->clasificacion_ramo;
-                $model->tallos_x_ramo = $request->tallos_x_ramo;
-                $model->disponibilidad = 1;
-                $model->basura = 0;
-                $model->id_empresa = $finca;
-            } else {
-                $model->cantidad += $request->cantidad;
-                $model->disponibles += $request->cantidad;
-            }
+            $model->cantidad += $request->cantidad;
+            $model->disponibles += $request->cantidad;
         }
-
         $model->save();
 
         return [

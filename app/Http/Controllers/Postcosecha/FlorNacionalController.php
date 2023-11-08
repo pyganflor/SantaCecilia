@@ -116,6 +116,7 @@ class FlorNacionalController extends Controller
     {
         try {
             DB::beginTransaction();
+            $finca = getFincaActiva();
             foreach (json_decode($request->data) as $d) {
                 $model = new FlorNacional();
                 $model->id_variedad = $d->variedad;
@@ -123,6 +124,7 @@ class FlorNacionalController extends Controller
                 $model->id_motivos_nacional = $d->motivo;
                 $model->tallos = $d->tallos;
                 $model->fecha = $request->fecha;
+                $model->id_empresa = $finca;
                 $model->save();
             }
 
