@@ -124,8 +124,9 @@
         @foreach ($datos['pedido']->detalles as $pos_det => $det)
             @php
                 $caja_frio = $det->caja_frio;
+                $detalles = $caja_frio->detalles;
             @endphp
-            @foreach ($caja_frio->detalles as $pos_item => $item)
+            @foreach ($detalles as $pos_item => $item)
                 @php
                     $variedad = getVariedad($item->id_variedad);
                     $planta = $variedad->planta;

@@ -3093,6 +3093,7 @@ function setColorTextToCeldaExcel($sheet, $celda, $color)
 function setTextCenterToCeldaExcel($sheet, $celda)
 {
     $sheet->getStyle($celda)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+    $sheet->getStyle($celda)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 }
 
 function setValueToCeldaExcel($sheet, $celda, $valor)

@@ -11,10 +11,14 @@ use yura\Modelos\DetalleCajaFrio;
 use yura\Modelos\DetallePedido;
 use yura\Modelos\Pedido;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\File;
 use Picqer\Barcode\BarcodeGeneratorHTML;
 use yura\Modelos\Aerolinea;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Picqer\Barcode\BarcodeGeneratorPNG;
+use Storage as Almacenamiento;
 
 class PedidoController extends Controller
 {
@@ -563,6 +567,159 @@ class PedidoController extends Controller
             ->setPaper(array(0, 0, 450, 400), 'landscape');
 
         return $pdf->stream();
+    }
+
+    public function exportar_factura(Request $request)
+    {
+        $spread = new Spreadsheet();
+        $this->excel_factura($spread, $request);
+
+        $fileName = "Factura.xlsx";
+        $writer = new Xlsx($spread);
+
+        //--------------------------- GUARDAR EL EXCEL -----------------------
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . urlencode($fileName) . '"');
+        $writer->save('php://output');
+
+        //$writer->save('/var/www/html/Dasalflor/storage/storage/excel/excel_prueba.xlsx');
+    }
+
+    public function excel_factura($spread, $request)
+    {
+        $id_pedido = $request->ped;
+        $pedido = Pedido::find($id_pedido);
+        if ($pedido->packing <= 0) {
+            $last_packing = DB::table('pedido')
+                ->select(DB::raw('max(packing) as last'))
+                ->get()[0]->last;
+            $packing = $last_packing;
+            $packing++;
+            $pedido->packing = $packing;
+        }
+        if ($pedido->factura <= 0) {
+            $last_factura = DB::table('pedido')
+                ->select(DB::raw('max(factura) as last'))
+                ->get()[0]->last;
+            $factura = $last_factura;
+            $factura++;
+            $pedido->factura = $factura;
+        }
+        $pedido->save();
+
+        $columnas = getColumnasExcel();
+        $sheet = $spread->getActiveSheet();
+        $sheet->setTitle('FACTURA');
+
+        $generator  = new BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode(str_pad($pedido->factura, 8, '0', STR_PAD_LEFT), $generator::TYPE_CODE_128, 2, 60);
+        $nombre_archivo = 'codigo_de_barras.png';
+        Almacenamiento::disk('file_loads')->put($nombre_archivo, $barcode);
+
+        $barcodePath = public_path('storage\file_loads\codigo_de_barras.png'); // Ruta al archivo de la imagen del código de barras
+        $drawing = new Drawing();
+        $drawing->setPath($barcodePath);
+        $drawing->setCoordinates('A1'); // Ubicación en la hoja de cálculo
+        $drawing->setWorksheet($sheet);
+
+        $sheet->mergeCells('A1:A3');
+        setValueToCeldaExcel($sheet, 'B1', 'ECSTACECILIA-ROSES');
+        $sheet->getStyle('B1')->getFont()->setSize(16);
+        $sheet->mergeCells('B1:J4');
+        setValueToCeldaExcel($sheet, 'A4', 'INVOICE: ' . str_pad($pedido->factura, 8, '0', STR_PAD_LEFT));
+        setValueToCeldaExcel($sheet, 'A5', 'CUSTOMER:');
+        setValueToCeldaExcel($sheet, 'B5', $pedido->cliente->detalle()->nombre);
+        setValueToCeldaExcel($sheet, 'E5', 'M.A.W.B::');
+        setValueToCeldaExcel($sheet, 'F5', $pedido->guia_madre);
+        setValueToCeldaExcel($sheet, 'A6', 'COUNTRY:');
+        setValueToCeldaExcel($sheet, 'B6', $pedido->consignatario->pais()->nombre);
+        setValueToCeldaExcel($sheet, 'E6', 'H.A.W.B:');
+        setValueToCeldaExcel($sheet, 'F6', $pedido->guia_hija);
+        setValueToCeldaExcel($sheet, 'A7', 'DAE:');
+        setValueToCeldaExcel($sheet, 'B7', $pedido->codigo_dae);
+        setValueToCeldaExcel($sheet, 'E7', 'CARRIER:');
+        setValueToCeldaExcel($sheet, 'F7', $pedido->agencia_carga->nombre);
+        setValueToCeldaExcel($sheet, 'I7', 'DATE:');
+        setValueToCeldaExcel($sheet, 'J7', $pedido->fecha_pedido);
+
+        $row = 8;
+        $col = 0;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, '#BOX');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'BOX.T');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'FLOWER');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'VARIETIES');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'NANDINA');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'LENGHT');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'BUNCH');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'STEMS');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'UNIT. $');
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'TOTAL');
+
+        $total_tallos = 0;
+        $total_ramos = 0;
+        $total_monto = 0;
+        foreach ($pedido->detalles as $pos_det => $det) {
+            $caja_frio = $det->caja_frio;
+            $detalles = $caja_frio->detalles;
+            foreach ($detalles as $pos_item => $item) {
+                $variedad = getVariedad($item->id_variedad);
+                $planta = $variedad->planta;
+                $total_tallos += $item->ramos * $item->tallos_x_ramo;
+                $total_ramos += $item->ramos;
+                $total_monto += $item->precio * $item->ramos * $item->tallos_x_ramo;
+
+                $row++;
+                $col = 0;
+                if ($pos_item == 0) {
+                    setValueToCeldaExcel($sheet, $columnas[$col] . $row, $pos_det + 1);
+                    $sheet->mergeCells($columnas[$col] . $row . ':' . $columnas[$col] . ($row + count($detalles) - 1));
+                }
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $caja_frio->tipo);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $planta->nombre);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $variedad->nombre);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $planta->nandina);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $item->longitud);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $item->ramos);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $item->ramos * $item->tallos_x_ramo);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $item->precio);
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($item->precio * $item->ramos * $item->tallos_x_ramo, 2));
+            }
+        }
+        $row++;
+        $col = 0;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'TOTALS');
+        $sheet->mergeCells($columnas[$col] . $row . ':' . $columnas[$col + 5] . $row);
+        $col = 6;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_ramos);
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_tallos);
+        $col += 2;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($total_monto, 2));
+
+        setTextCenterToCeldaExcel($sheet, 'A1:' . $columnas[$col] . $row);
+        setBorderToCeldaExcel($sheet, 'A8:' . $columnas[$col] . $row);
+
+        for ($i = 0; $i <= $col; $i++)
+            $sheet->getColumnDimension($columnas[$i])->setAutoSize(true);
     }
 
     public function exportar_etiqueta(Request $request)

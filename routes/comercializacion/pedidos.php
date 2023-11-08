@@ -26,3 +26,4 @@ Route::get('pedidos/modal_exportar', 'Comercializacion\PedidoController@modal_ex
 Route::get('pedidos/exportar_pedidos', 'Comercializacion\PedidoController@exportar_pedidos');
 Route::get('pedidos/exportar_resumen_pedidos', 'Comercializacion\PedidoController@exportar_resumen_pedidos');
 Route::get('pedidos/exportar_estado_cliente', 'Comercializacion\PedidoController@exportar_estado_cliente');
+Route::get('pedidos/exportar_factura', 'Comercializacion\PedidoController@exportar_factura');

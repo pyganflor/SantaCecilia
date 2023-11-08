@@ -164,10 +164,16 @@
                                                     <i class="fa fa-fw fa-gift"></i> Generar Packing
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="javascript:void(0)" title="Generar Packing"
+                                            {{-- <li>
+                                                <a href="javascript:void(0)" title="Generar Factura"
                                                     onclick="generar_factura('{{ $ped->id_pedido }}')">
                                                     <i class="fa fa-fw fa-money"></i> Generar Factura
+                                                </a>
+                                            </li> --}}
+                                            <li>
+                                                <a href="javascript:void(0)" title="Exportar Factura"
+                                                    onclick="exportar_factura('{{ $ped->id_pedido }}')">
+                                                    <i class="fa fa-fw fa-file-excel-o"></i> Exportar Factura
                                                 </a>
                                             </li>
                                             <li class="hidden">
@@ -297,6 +303,12 @@
     function generar_factura(ped) {
         $.LoadingOverlay('show');
         window.open('{{ url('pedidos/generar_factura') }}?ped=' + ped, '_blank');
+        $.LoadingOverlay('hide');
+    }
+
+    function exportar_factura(ped) {
+        $.LoadingOverlay('show');
+        window.open('{{ url('pedidos/exportar_factura') }}?ped=' + ped, '_blank');
         $.LoadingOverlay('hide');
     }
 

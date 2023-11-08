@@ -40,9 +40,6 @@ class FlorNacionalController extends Controller
             ->orderBy('s.nombre')
             ->orderBy('m.nombre')
             ->get();
-        $clasificaciones_ramos = ClasificacionRamo::where('estado', 1)
-            ->orderBy('nombre')
-            ->get();
         $motivos_nacional = MotivosNacional::where('estado', 1)
             ->orderBy('nombre')
             ->get();
@@ -57,7 +54,6 @@ class FlorNacionalController extends Controller
             ->get();
         return view('adminlte.gestion.postcocecha.flor_nacional.partials.listado', [
             'listado' => $listado,
-            'clasificaciones_ramos' => $clasificaciones_ramos,
             'motivos_nacional' => $motivos_nacional,
             'plantas' => $plantas,
         ]);
@@ -66,9 +62,6 @@ class FlorNacionalController extends Controller
     public function add_flor_nacional(Request $request)
     {
         $finca = getFincaActiva();
-        $clasificaciones_ramos = ClasificacionRamo::where('estado', 1)
-            ->orderBy('nombre')
-            ->get();
         $motivos_nacional = MotivosNacional::where('estado', 1)
             ->orderBy('nombre')
             ->get();
@@ -82,7 +75,6 @@ class FlorNacionalController extends Controller
             ->orderBy('p.nombre')
             ->get();
         return view('adminlte.gestion.postcocecha.flor_nacional.forms.add_flor_nacional', [
-            'clasificaciones_ramos' => $clasificaciones_ramos,
             'motivos_nacional' => $motivos_nacional,
             'plantas' => $plantas,
         ]);
