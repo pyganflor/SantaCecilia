@@ -617,7 +617,7 @@ class PedidoController extends Controller
         $nombre_archivo = 'codigo_de_barras.png';
         Almacenamiento::disk('file_loads')->put($nombre_archivo, $barcode);
 
-        $barcodePath = public_path('storage\file_loads\codigo_de_barras.png'); // Ruta al archivo de la imagen del código de barras
+        $barcodePath = public_path('storage/file_loads/codigo_de_barras.png'); // Ruta al archivo de la imagen del código de barras
         $drawing = new Drawing();
         $drawing->setPath($barcodePath);
         $drawing->setCoordinates('A1'); // Ubicación en la hoja de cálculo
