@@ -687,7 +687,7 @@ class PedidoController extends Controller
                     setValueToCeldaExcel($sheet, $columnas[$col] . $row, $caja_frio->tipo);
                     $sheet->mergeCells($columnas[$col] . $row . ':' . $columnas[$col] . ($row + count($detalles) - 1));
                 }
-                $col++;
+                $col = 2;
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $planta->nombre);
                 $col++;
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $variedad->nombre);
