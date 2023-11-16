@@ -47,7 +47,7 @@
                             $variedad = $item->variedad;
                             $pos_en_resumen = -1;
                             foreach ($resumen_variedades as $pos => $r) {
-                                if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud) {
+                                if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud && $r['precio'] == $item->precio) {
                                     $pos_en_resumen = $pos;
                                 }
                             }
@@ -61,6 +61,7 @@
                                     'longitud' => $item->longitud,
                                     'tallos' => $item->ramos * $item->tallos_x_ramo,
                                     'ramos' => $item->ramos,
+                                    'precio' => $item->precio,
                                     'monto' => $item->ramos * $item->tallos_x_ramo * $item->precio,
                                 ];
                             }
@@ -223,6 +224,9 @@
                         Ramos
                     </th>
                     <th class="text-center th_yura_green">
+                        Precio
+                    </th>
+                    <th class="text-center th_yura_green">
                         Monto
                         <button class="btn btn-xs btn-yura_default" onclick="exportar_resumen_pedidos()">
                             <i class="fa fa-fw fa-file-excel-o"></i>
@@ -257,6 +261,9 @@
                             {{ number_format($r['ramos']) }}
                         </td>
                         <td class="text-center" style="border-color: #9d9d9d">
+                            {{ number_format($r['precio'], 2) }}
+                        </td>
+                        <td class="text-center" style="border-color: #9d9d9d">
                             ${{ number_format($r['monto'], 2) }}
                         </td>
                     </tr>
@@ -271,6 +278,8 @@
                 </th>
                 <th class="text-center th_yura_green">
                     {{ number_format($total_ramos) }}
+                </th>
+                <th class="text-center th_yura_green">
                 </th>
                 <th class="text-center th_yura_green">
                     ${{ number_format($total_monto, 2) }}

@@ -885,7 +885,7 @@ class PedidoController extends Controller
         $spread = new Spreadsheet();
         $this->excel_resumen_pedidos($spread, $request);
 
-        $fileName = "Cuarto_Frío.xlsx";
+        $fileName = "RESUMEN_PEDIDOS.xlsx";
         $writer = new Xlsx($spread);
 
         //--------------------------- GUARDAR EL EXCEL -----------------------
@@ -904,8 +904,6 @@ class PedidoController extends Controller
             ->where('pedido.fecha_pedido', $request->fecha);
         if ($request->cliente != '')
             $listado = $listado->where('pedido.id_cliente', $request->cliente);
-        if ($request->finca != '')
-            $listado = $listado->where('pedido.id_configuracion_empresa', $request->finca);
         $listado = $listado->where('c.estado', 1)
             ->orderBy('c.nombre')
             ->get();
@@ -917,7 +915,7 @@ class PedidoController extends Controller
                     $variedad = $item->variedad;
                     $pos_en_resumen = -1;
                     foreach ($resumen_variedades as $pos => $r) {
-                        if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud) {
+                        if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud && $r['precio'] == $item->precio) {
                             $pos_en_resumen = $pos;
                         }
                     }
@@ -931,6 +929,7 @@ class PedidoController extends Controller
                             'longitud' => $item->longitud,
                             'tallos' => $item->ramos * $item->tallos_x_ramo,
                             'ramos' => $item->ramos,
+                            'precio' => $item->precio,
                             'monto' => $item->ramos * $item->tallos_x_ramo * $item->precio,
                         ];
                     }
@@ -952,6 +951,8 @@ class PedidoController extends Controller
         $col++;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Ramos');
         $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Precio');
+        $col++;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Monto');
 
         $total_tallos = 0;
@@ -972,6 +973,8 @@ class PedidoController extends Controller
             $col++;
             setValueToCeldaExcel($sheet, $columnas[$col] . $row, $r['ramos']);
             $col++;
+            setValueToCeldaExcel($sheet, $columnas[$col] . $row, $r['precio']);
+            $col++;
             setValueToCeldaExcel($sheet, $columnas[$col] . $row, $r['monto']);
         }
 
@@ -982,7 +985,7 @@ class PedidoController extends Controller
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_tallos);
         $col++;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_ramos);
-        $col++;
+        $col += 2;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($total_monto, 2));
 
         setTextCenterToCeldaExcel($sheet, 'A1:' . $columnas[$col] . $row);

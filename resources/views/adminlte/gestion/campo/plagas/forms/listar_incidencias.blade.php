@@ -11,6 +11,9 @@
         </th>
         <th class="text-center bg-yura_dark" style="width: 100px">
             Ltrs x Cama
+            <input type="number" style="width: 100%" class="text-center bg-yura_dark"
+                onchange="$('.input_litros_{{ $incidencia }}').val($(this).val())"
+                onkeyup="$('.input_litros_{{ $incidencia }}').val($(this).val())">
         </th>
         <th class="text-center bg-yura_dark" style="width: 80px">
             <button type="button" class="btn btn-xs btn-yura_default"
@@ -36,8 +39,9 @@
                 style="width: 100%; background-color: #dddddd" placeholder="Dosis">
         </th>
         <th class="text-center" style="border-color: #9d9d9d;">
-            <input type="number" class="text-center" min="0" id="new_litros_x_cama_{{ $incidencia }}"
-                style="width: 100%; background-color: #dddddd" placeholder="Ltrs x Cama">
+            <input type="number" class="text-center" min="0"
+                id="new_litros_x_cama_{{ $incidencia }}" style="width: 100%; background-color: #dddddd"
+                placeholder="Ltrs x Cama">
         </th>
         <th class="text-center" style="border-color: #9d9d9d;">
             <button type="button" class="btn btn-xs btn-yura_primary" onclick="store_rotacion('{{ $incidencia }}')">
@@ -68,7 +72,7 @@
                     value="{{ $item->dosis }}">
             </th>
             <th class="text-center" style="border-color: #9d9d9d;">
-                <input type="number" class="text-center" min="0"
+                <input type="number" class="text-center input_litros_{{ $incidencia }}" min="0"
                     id="edit_litros_x_cama_{{ $item->id_rotaciones_plaga }}" style="width: 100%"
                     placeholder="Ltrs x Cama" value="{{ $item->litros_x_cama }}">
             </th>
