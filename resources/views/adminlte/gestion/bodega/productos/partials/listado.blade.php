@@ -2,10 +2,13 @@
     <table class="table-striped table-bordered" style="width: 100%; border: 1px solid #9d9d9d">
         <tr id="tr_fija_top_0">
             <th class="text-center th_yura_green">
-                CODIGO
+                CODIGO (Ingrediente Activo)
             </th>
             <th class="text-center th_yura_green">
                 NOMBRE
+            </th>
+            <th class="text-center th_yura_green">
+                MODO de ACCION
             </th>
             <th class="text-center th_yura_green" style="width: 110px">
                 CATEGORIA
@@ -39,7 +42,11 @@
                     placeholder="NOMBRE" required>
             </th>
             <th class="text-center" style="border-color: #9d9d9d">
-                <select style="width: 100%" class="text-center" id="categoria_new" required>
+                <input type="text" style="width: 100%" class="text-center bg-yura_dark" id="modo_accion_new"
+                    required>
+            </th>
+            <th class="text-center" style="border-color: #9d9d9d">
+                <select style="width: 100%; height: 26px;" class="text-center bg-yura_dark" id="categoria_new" required>
                     @foreach ($categorias as $cat)
                         <option value="{{ $cat->id_categoria_producto }}">
                             {{ $cat->nombre }}
@@ -76,12 +83,16 @@
                         value="{{ $item->codigo }}" required>
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
-                    <input type="text" style="width: 100%" class="text-center" id="nombre_{{ $item->id_producto }}"
-                        value="{{ $item->nombre }}" required>
+                    <input type="text" style="width: 100%" class="text-center"
+                        id="nombre_{{ $item->id_producto }}" value="{{ $item->nombre }}" required>
                 </th>
                 <th class="text-center" style="border-color: #9d9d9d">
-                    <select style="width: 100%" class="text-center bg-yura_dark" id="categoria_{{ $item->id_producto }}"
-                        required>
+                    <input type="text" style="width: 100%" class="text-center"
+                        id="modo_accion_{{ $item->id_producto }}" value="{{ $item->modo_accion }}" required>
+                </th>
+                <th class="text-center" style="border-color: #9d9d9d">
+                    <select style="width: 100%; height: 26px;" class="text-center"
+                        id="categoria_{{ $item->id_producto }}" required>
                         <option value="">Ninguna</option>
                         @foreach ($categorias as $cat)
                             <option value="{{ $cat->id_categoria_producto }}"
@@ -136,6 +147,7 @@
             disponibles: 0,
             conversion: $('#conversion_new').val(),
             precio_compra: $('#precio_compra_new').val(),
+            modo_accion: $('#modo_accion_new').val(),
         }
         post_jquery_m('{{ url('bodega_productos/store_producto') }}', datos, function() {
             listar_reporte();
@@ -152,6 +164,7 @@
             stock_minimo: $('#stock_minimo_' + id).val(),
             conversion: $('#conversion_' + id).val(),
             precio_compra: $('#precio_compra_' + id).val(),
+            modo_accion: $('#modo_accion_' + id).val(),
             id: id,
         }
         post_jquery_m('{{ url('bodega_productos/update_producto') }}', datos, function() {

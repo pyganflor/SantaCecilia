@@ -71,6 +71,7 @@ class ProductosController extends Controller
             $model->disponibles = 0;
             $model->conversion = $request->conversion;
             $model->precio_compra = $request->precio_compra;
+            $model->modo_accion = $request->modo_accion;
             $model->save();
             $model = Producto::All()->last();
             bitacora('producto', $model->id_producto, 'I', 'Creacion del producto');
@@ -145,6 +146,7 @@ class ProductosController extends Controller
                     $model->unidad_medida = $request->unidad_medida;
                     $model->conversion = $request->conversion;
                     $model->precio_compra = $request->precio_compra;
+                    $model->modo_accion = $request->modo_accion;
                     $model->save();
 
                     if ($model->save()) {
