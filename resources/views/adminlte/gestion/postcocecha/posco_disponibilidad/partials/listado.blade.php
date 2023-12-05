@@ -60,7 +60,6 @@
                         @endif
                         <th class="padding_lateral_5" style="border-color: #9d9d9d">
                             {{ $long['longitud']->longitud }}cm
-                            <sup>{{ $long['longitud']->id_clasificacion_ramo }}</sup>
                         </th>
                         <th class="padding_lateral_5" style="border-color: #9d9d9d">
                             {{ $long['longitud']->cantidad }}
