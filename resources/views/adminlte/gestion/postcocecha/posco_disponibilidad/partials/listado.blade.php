@@ -84,7 +84,7 @@
                 @endforeach
             @endforeach
         </tbody>
-        <tr>
+        <tr class="tr_fija_bottom_0">
             <th class="padding_lateral_5 th_yura_green" colspan="4">
                 TOTALES
             </th>
