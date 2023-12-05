@@ -9,10 +9,10 @@
                     Longitud
                 </th>
                 <th class="padding_lateral_5 th_yura_green" style="width: 60px">
-                    Ramos x Caja
+                    Inventario
                 </th>
                 <th class="padding_lateral_5 th_yura_green" style="width: 60px">
-                    Inventario
+                    Ramos x Caja
                 </th>
                 <th class="padding_lateral_5 th_yura_green" style="width: 60px">
                     Cajas
@@ -62,12 +62,12 @@
                             {{ $long['longitud']->longitud }}cm
                             <sup>{{ $long['longitud']->id_clasificacion_ramo }}</sup>
                         </th>
-                        <td class="padding_lateral_5" style="border-color: #9d9d9d">
-                            <small>x</small>{{ $long['param']->ramos_x_caja }}
-                        </td>
                         <th class="padding_lateral_5" style="border-color: #9d9d9d">
                             {{ $long['longitud']->cantidad }}
                         </th>
+                        <td class="padding_lateral_5" style="border-color: #9d9d9d">
+                            <small>x</small>{{ $long['param']->ramos_x_caja }}
+                        </td>
                         <th class="padding_lateral_5 bg-yura_dark">
                             {{ $long['cajas'] }}
                         </th>
