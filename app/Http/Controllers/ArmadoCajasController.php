@@ -98,6 +98,7 @@ class ArmadoCajasController extends Controller
         if ($request->variedad != '')
             $listado = $listado->where('inventario_frio.id_variedad', $request->variedad);
         $listado = $listado->orderBy('v.nombre')
+            ->orderBy('inventario_frio.fecha', 'asc')
             ->get();
         return view('adminlte.gestion.postcocecha.armado_cajas.partials.buscar_inventario', [
             'listado' => $listado,
