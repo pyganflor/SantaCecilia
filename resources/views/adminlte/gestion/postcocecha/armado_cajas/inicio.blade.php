@@ -37,7 +37,7 @@
     <!-- Main content -->
     <section class="content">
         <div id="div_content_recepciones">
-            <table width="100%" style="margin-bottom: 0;">
+            <table width="100%" style="margin-bottom: 0;" class="hidden">
                 <tr>
                     <td>
                         <div class="input-group">
@@ -71,7 +71,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="panel-body" id="body_contenido_caja" style="max-height: 500px">
+                                <div class="panel-body" id="body_contenido_caja" style="max-height: 700px">
                                     <div class="text-center">
                                         <div class="input-group">
                                             <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
@@ -83,8 +83,9 @@
                                                 <i class="fa fa-fw fa-calendar"></i> Fecha
                                             </div>
                                             <input type="date" id="fecha_caja" required
-                                                class="form-control input-yura_default text-center" value="{{ hoy() }}"
-                                                style="width: 100% !important;" placeholder="Fecha de Armado">
+                                                class="form-control input-yura_default text-center"
+                                                value="{{ hoy() }}" style="width: 100% !important;"
+                                                placeholder="Fecha de Armado">
                                         </div>
                                     </div>
                                     <table class="table-bordered"
@@ -127,7 +128,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td style="vertical-align: top; padding-left: 5px;" id="td_seleccionados">
+                        <td style="vertical-align: top; padding-left: 5px;" id="td_seleccionados" class="hidden">
                             <div class="panel panel-success" style="margin-bottom:0px; min-width: 440px;"
                                 id="panel_seleccionados">
                                 <div class="panel-heading"
@@ -147,6 +148,31 @@
                                     </div>
                                 </div>
                                 <div class="panel-body" style="max-height: 500px; overflow:auto" id="body_escaneado">
+                                </div>
+                            </div>
+                        </td>
+                        <td style="vertical-align: top; padding-left: 5px;" id="td_inventario">
+                            <div class="panel panel-success" style="margin-bottom:0px; min-width: 440px;"
+                                id="panel_inventario">
+                                <div class="panel-heading"
+                                    style="display: flex; justify-content: space-between; align-items: center;">
+                                    <b> <i class="fa fa-th"></i> CUARTO FRIO</b>
+                                    <div class="text-center">
+                                        <div class="input-group">
+                                            <div class="input-group-addon bg-yura_dark span-input-group-yura-fixed">
+                                                <i class="fa fa-fw fa-filter"></i> Variedad
+                                            </div>
+                                            <select id="filtro_inventario_variedad" style="width: 100%"
+                                                class="form-control input-yura_default" onchange="buscar_inventario()">
+                                                <option value="">Todas</option>
+                                                @foreach ($variedades as $var)
+                                                    <option value="{{ $var->id_variedad }}">{{ $var->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="body_inventario">
                                 </div>
                             </div>
                         </td>

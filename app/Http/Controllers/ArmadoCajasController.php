@@ -9,14 +9,22 @@ use yura\Modelos\CajaFrio;
 use yura\Modelos\DetalleCajaFrio;
 use yura\Modelos\InventarioFrio;
 use yura\Modelos\Submenu;
+use yura\Modelos\Variedad;
 
 class ArmadoCajasController extends Controller
 {
     public function inicio(Request $request)
     {
+        $variedades = DB::table('inventario_frio as i')
+            ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
+            ->select('i.id_variedad', 'v.nombre')->distinct()
+            ->where('disponibles', '>', 0)
+            ->orderBy('v.nombre')
+            ->get();
         return view('adminlte.gestion.postcocecha.armado_cajas.inicio', [
             'url' => $request->getRequestUri(),
             'submenu' => Submenu::Where('url', '=', substr($request->getRequestUri(), 1))->get()[0],
+            'variedades' => $variedades
         ]);
     }
 
@@ -79,5 +87,20 @@ class ArmadoCajasController extends Controller
             'success' => $success,
             'mensaje' => $msg,
         ];
+    }
+
+    public function buscar_inventario(Request $request)
+    {
+        $listado = InventarioFrio::join('variedad as v', 'v.id_variedad', '=', 'inventario_frio.id_variedad')
+            ->select('inventario_frio.*')->distinct()
+            ->where('inventario_frio.disponibles', '>', 0)
+            ->where('inventario_frio.basura', 0);
+        if ($request->variedad != '')
+            $listado = $listado->where('inventario_frio.id_variedad', $request->variedad);
+        $listado = $listado->orderBy('v.nombre')
+            ->get();
+        return view('adminlte.gestion.postcocecha.armado_cajas.partials.buscar_inventario', [
+            'listado' => $listado,
+        ]);
     }
 }

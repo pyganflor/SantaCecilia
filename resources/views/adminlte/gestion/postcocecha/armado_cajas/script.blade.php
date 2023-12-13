@@ -12,6 +12,7 @@
     setTimeout(() => {
         $('#filtro_codigo_barra').focus();
     }, 500);
+    buscar_inventario();
 
     function escanear_codigo(consulta = false, codigo = '') {
         datos = {
@@ -77,7 +78,7 @@
                 '<button type="button" class="btn btn-xs btn-yura_danger" onclick="eliminar_fila_caja(' + id_inv +
                 ')">' +
                 '<i class="fa fa-fw fa-trash"></i>' +
-                '</button>'+
+                '</button>' +
                 '</td>' +
                 '</tr>');
         }
@@ -156,5 +157,14 @@
         post_jquery_m('{{ url('armado_cajas/store_caja') }}', datos, function() {
             cargar_url('armado_cajas');
         });
+    }
+
+    function buscar_inventario() {
+        datos = {
+            variedad: $('#filtro_inventario_variedad').val()
+        }
+        get_jquery('{{ url('armado_cajas/buscar_inventario') }}', datos, function(retorno) {
+            $('#body_inventario').html(retorno);
+        })
     }
 </script>
