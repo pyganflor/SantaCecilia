@@ -6,6 +6,7 @@
         datos = {
             fecha: $('#fecha_blanco_filtro').val(),
             planta: $('#planta_blanco_filtro').val(),
+            variedad: $('#variedad_blanco_filtro').val(),
             longitud: $('#longitud_blanco_filtro').val(),
         };
         get_jquery('{{ url('ingreso_clasificacion/listar_blanco') }}', datos, function(retorno) {

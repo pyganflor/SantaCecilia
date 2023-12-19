@@ -263,6 +263,7 @@
         $('#table_inventario_planta_' + pta).removeClass('hidden');
         datos = {
             planta: pta,
+            variedad: $('#variedad_blanco_filtro').val(),
             longitud: $('#longitud_blanco_filtro').val(),
         };
         get_jquery('{{ url('ingreso_clasificacion/inventario_frio') }}', datos, function(retorno) {

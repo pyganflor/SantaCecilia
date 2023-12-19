@@ -36,8 +36,10 @@ class BlancoController extends Controller
                 ->where('v.estado', 1)
                 ->where('v.id_planta', $p->id_planta)
                 ->where('c.activo', 1)
-                ->where('c.id_empresa', $finca)
-                ->orderBy('nombre')
+                ->where('c.id_empresa', $finca);
+            if ($request->variedad != 'T')
+                $variedades = $variedades->where('c.id_variedad', $request->variedad);
+            $variedades = $variedades->orderBy('v.nombre')
                 ->get();
             $inventario = DB::table('inventario_frio as i')
                 ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
@@ -51,6 +53,8 @@ class BlancoController extends Controller
                 ->where('i.id_empresa', $finca);
             if ($request->longitud != 'T')
                 $inventario = $inventario->where('i.id_clasificacion_ramo', $request->longitud);
+            if ($request->variedad != 'T')
+                $inventario = $inventario->where('i.id_variedad', $request->variedad);
             $inventario = $inventario->get()[0]->cantidad;
 
             array_push($listado, [
@@ -156,6 +160,8 @@ class BlancoController extends Controller
             ->where('inventario_frio.disponibilidad', 1);
         if ($request->longitud != 'T')
             $listado = $listado->where('inventario_frio.id_clasificacion_ramo', $request->longitud);
+        if ($request->variedad != 'T')
+            $listado = $listado->where('inventario_frio.id_variedad', $request->variedad);
         $listado = $listado->orderBy('inventario_frio.fecha', 'asc')
             ->get();
 
@@ -171,6 +177,8 @@ class BlancoController extends Controller
             ->where('i.id_empresa', $finca);
         if ($request->longitud != 'T')
             $p = $p->where('i.id_clasificacion_ramo', $request->longitud);
+        if ($request->variedad != 'T')
+            $p = $p->where('i.id_variedad', $request->variedad);
         $p = $p->get()[0]->cantidad;
 
         return view('adminlte.gestion.postcocecha.ingreso_clasificacion.forms._inventario', [
