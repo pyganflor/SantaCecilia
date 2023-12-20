@@ -9,3 +9,4 @@ Route::post('reporte_cuarto_frio/store_bajas', 'ReporteCuartoFrioController@stor
 Route::get('reporte_cuarto_frio/exportar_reporte', 'ReporteCuartoFrioController@exportar_reporte');
 Route::get('reporte_cuarto_frio/ver_inventario', 'ReporteCuartoFrioController@ver_inventario');
 Route::post('reporte_cuarto_frio/botar_inventario', 'ReporteCuartoFrioController@botar_inventario');
+Route::get('reporte_cuarto_frio/exportar_reporte', 'ReporteCuartoFrioController@exportar_reporte');

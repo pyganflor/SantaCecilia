@@ -73,10 +73,10 @@
                             <button type="button" class="btn btn-yura_dark" onclick="listar_reporte()">
                                 <i class="fa fa-fw fa-search"></i>
                             </button>
-                            {{--<button type="button" class="btn btn-yura_default" title="Exportar"
+                            <button type="button" class="btn btn-yura_default" title="Exportar"
                                 onclick="exportar_reporte()">
                                 <i class="fa fa-fw fa-file-excel-o"></i>
-                            </button>--}}
+                            </button>
                         </div>
                     </div>
                 </td>

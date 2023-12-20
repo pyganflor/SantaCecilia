@@ -289,51 +289,86 @@ class ReporteCuartoFrioController extends Controller
 
     public function excel_reporte($spread, $request)
     {
-        $finca = getFincaActiva();
-        $finca_destino = $request->finca;
         $plantas = Planta::where('estado', 1);
         if ($request->planta != '')
             $plantas = $plantas->where('id_planta', $request->planta);
         $plantas = $plantas->orderBy('nombre')->get();
-        $longitudes = [100, 90, 80, 70, 60, 50, 40];
+
+        $dias = [0, 1, 2, 3, 4, 5, 6, 7];
         $listado = [];
         foreach ($plantas as $p) {
-            $variedades = Variedad::where('estado', 1)
-                ->where('id_planta', $p->id_planta);
-            if ($request->variedad != '')
-                $variedades = $variedades->where('id_variedad', $request->variedad);
-            $variedades = $variedades->orderBy('nombre')
-                ->get();
+            if ($request->tipo == 'F') { // cuarto frio
+                $variedades = DB::table('inventario_frio as i')
+                    ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                    ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
+                    ->select('i.id_variedad', 'v.nombre', 'c.nombre as longitud')->distinct()
+                    ->where('i.estado', 1)
+                    ->where('i.disponibles', '>', 0)
+                    ->where('c.nombre', '!=', 'Baja')
+                    ->where('c.nombre', '!=', 'Nacional')
+                    ->where('v.id_planta', $p->id_planta);
+                if ($request->variedad != '')
+                    $variedades = $variedades->where('i.id_variedad', $request->variedad);
+                $variedades = $variedades->orderBy('v.nombre')
+                    ->get();
+            } else {    // flor nacional
+                $variedades = DB::table('inventario_frio as i')
+                    ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                    ->join('variedad as v', 'v.id_variedad', '=', 'i.id_variedad')
+                    ->select('i.id_variedad', 'v.nombre', 'c.nombre as longitud')->distinct()
+                    ->where('i.estado', 1)
+                    ->where('i.disponibles', '>', 0)
+                    ->where('c.nombre', '!=', 'Baja')
+                    ->where('c.nombre', '=', 'Nacional')
+                    ->where('v.id_planta', $p->id_planta);
+                if ($request->variedad != '')
+                    $variedades = $variedades->where('i.id_variedad', $request->variedad);
+                $variedades = $variedades->orderBy('v.nombre')
+                    ->get();
+            }
+
             $valores_var = [];
             foreach ($variedades as $v) {
-                $valores_long = [];
+                $valores_dias = [];
                 $tiene = false;
-                foreach ($longitudes as $l) {
-                    $cantidad = DB::table('inventario_frio as i')
-                        ->join('clasificacion_ramo as l', 'l.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
-                        ->join('configuracion_empresa as f', 'f.id_configuracion_empresa', '=', 'i.finca_destino')
-                        ->select(DB::raw('sum(i.disponibles) as cantidad'))
-                        ->where('i.disponibilidad', 1)
-                        ->where('i.basura', 0)
-                        ->where('i.estado', 1)
-                        ->where('i.id_variedad', $v->id_variedad)
-                        ->where('l.nombre', $l)
-                        ->where('i.id_empresa', $finca);
-                    if ($finca_destino == 'F')
-                        $cantidad = $cantidad->where('f.proveedor', 0);
-                    else if ($finca_destino == 'P')
-                        $cantidad = $cantidad->where('f.proveedor', 1);
-                    elseif ($finca_destino != '')
-                        $cantidad = $cantidad->where('i.finca_destino', $finca_destino);
-                    $cantidad = $cantidad->get()[0]->cantidad;
-                    $valores_long[] = $cantidad;
+                foreach ($dias as $pos => $dia) {
+                    if ($request->tipo == 'F') {    // cuarto frio
+                        $cantidad = DB::table('inventario_frio as i')
+                            ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                            ->select(DB::raw('sum(i.disponibles) as cantidad'))
+                            ->where('i.disponibilidad', 1)
+                            ->where('i.basura', 0)
+                            ->where('i.estado', 1)
+                            ->where('i.id_variedad', $v->id_variedad)
+                            ->where('c.nombre', $v->longitud);
+                        if ($pos == count($dias) - 1)
+                            $cantidad = $cantidad->where('i.fecha', '<=', opDiasFecha('-', $dia, hoy()));
+                        else
+                            $cantidad = $cantidad->where('i.fecha', opDiasFecha('-', $dia, hoy()));
+                        $cantidad = $cantidad->get()[0]->cantidad;
+                    } else {    // flor nacional
+                        $cantidad = DB::table('inventario_frio as i')
+                            ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                            ->select(DB::raw('sum(i.disponibles) as cantidad'))
+                            ->where('i.disponibilidad', 1)
+                            ->where('i.basura', 0)
+                            ->where('i.estado', 1)
+                            ->where('i.id_variedad', $v->id_variedad)
+                            ->where('c.nombre', '=', 'Nacional');
+                        if ($pos == count($dias) - 1)
+                            $cantidad = $cantidad->where('i.fecha', '<=', opDiasFecha('-', $dia, hoy()));
+                        else
+                            $cantidad = $cantidad->where('i.fecha', opDiasFecha('-', $dia, hoy()));
+                        $cantidad = $cantidad->get()[0]->cantidad;
+                    }
+                    $valores_dias[] = $cantidad;
                     if ($cantidad > 0)
                         $tiene = true;
                 }
                 if ($tiene)
                     $valores_var[] = [
                         'variedad' => $v,
-                        'valores_long' => $valores_long,
+                        'valores_dias' => $valores_dias,
                     ];
             }
             if (count($valores_var) > 0)
@@ -342,6 +377,7 @@ class ReporteCuartoFrioController extends Controller
                     'valores_var' => $valores_var,
                 ];
         }
+        $tipo = $request->tipo;
 
         $columnas = getColumnasExcel();
         $sheet = $spread->getActiveSheet();
@@ -351,12 +387,15 @@ class ReporteCuartoFrioController extends Controller
         $col = 0;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Variedad/Medida');
         setBgToCeldaExcel($sheet, $columnas[$col] . $row, '00b388');
-        $totales_longitudes = [];
-        foreach ($longitudes as $l) {
+        $col++;
+        setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Longitud');
+        setBgToCeldaExcel($sheet, $columnas[$col] . $row, '00b388');
+        $totales_dias = [];
+        foreach ($dias as $pos => $l) {
             $col++;
-            setValueToCeldaExcel($sheet, $columnas[$col] . $row, $l);
+            setValueToCeldaExcel($sheet, $columnas[$col] . $row, $l . $pos == count($dias) - 1 ? '...' : '');
             setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
-            $totales_longitudes[] = 0;
+            $totales_dias[] = 0;
         }
         $col++;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'Total');
@@ -370,10 +409,14 @@ class ReporteCuartoFrioController extends Controller
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $var['variedad']->nombre);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
                 setColorTextToCeldaExcel($sheet, $columnas[$col] . $row, 'ffffff');
+                $col++;
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $var['variedad']->nombre);
+                setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
+                setColorTextToCeldaExcel($sheet, $columnas[$col] . $row, 'ffffff');
                 $total_var = 0;
-                foreach ($var['valores_long'] as $pos => $val) {
+                foreach ($var['valores_dias'] as $pos => $val) {
                     $total_var += $val;
-                    $totales_longitudes[$pos] += $val;
+                    $totales_dias[$pos] += $val;
                     $col++;
                     setValueToCeldaExcel($sheet, $columnas[$col] . $row, $val);
                 }
@@ -387,8 +430,9 @@ class ReporteCuartoFrioController extends Controller
         $col = 0;
         setValueToCeldaExcel($sheet, $columnas[$col] . $row, 'TOTALES');
         setBgToCeldaExcel($sheet, $columnas[$col] . $row, '00b388');
+        $col++;
         $total = 0;
-        foreach ($totales_longitudes as $v) {
+        foreach ($totales_dias as $v) {
             $col++;
             setValueToCeldaExcel($sheet, $columnas[$col] . $row, $v);
             setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
