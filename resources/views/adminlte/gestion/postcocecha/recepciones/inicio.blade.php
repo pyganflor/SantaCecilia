@@ -56,7 +56,8 @@
                     </td>
                 </tr>
             </table>
-            <div id="div_listado_recepciones" style="overflow-y: scroll; overflow-x: scroll; height: 450px; margin-top: 5px"></div>
+            <div id="div_listado_recepciones"
+                style="overflow-y: scroll; overflow-x: scroll; max-height: 700px; margin-top: 5px"></div>
         </div>
     </section>
 @endsection

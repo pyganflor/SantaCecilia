@@ -9,11 +9,14 @@
         <th class="text-center th_yura_green">
             BLOQUE
         </th>
-        <th class="text-center th_yura_green">
+        <th class="text-center th_yura_green" style="width: 60px">
             MALLAS
         </th>
-        <th class="text-center th_yura_green">
+        <th class="text-center th_yura_green" style="width: 60px">
             Tallos x Malla
+        </th>
+        <th class="text-center th_yura_green" style="width: 60px">
+            Total Tallos
         </th>
         <th class="text-center th_yura_green">
             COSECHADOR
@@ -56,11 +59,15 @@
         </td>
         <td style="border-color: #9d9d9d">
             <input type="number" id="new_mallas_1" class="text-center" min="1" value="1" required
-                style="width: 100%">
+                style="width: 100%" onchange="calcular_total_tallos()" onkeyup="calcular_total_tallos()">
         </td>
         <td style="border-color: #9d9d9d">
             <input type="number" id="new_tallos_x_malla_1" class="text-center" min="0" value="0" required
-                style="width: 100%">
+                style="width: 100%" onchange="calcular_total_tallos()" onkeyup="calcular_total_tallos()">
+        </td>
+        <td style="border-color: #9d9d9d">
+            <input type="number" id="new_total_tallos_1" class="text-center" value="0" style="width: 100%"
+                readonly>
         </td>
         <td style="border-color: #9d9d9d">
             <select id="new_cosechador_1" style="width: 100%; height: 26px;">
@@ -133,12 +140,17 @@
             '<td style="border-color: #9d9d9d">' +
             '<input type="number" id="new_mallas_' + cant_forms +
             '" class="text-center" min="1" value="1" required' +
-            ' style="width: 100%">' +
+            ' style="width: 100%" onchange="calcular_total_tallos()" onkeyup="calcular_total_tallos()">' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
             '<input type="number" id="new_tallos_x_malla_' + cant_forms +
             '" class="text-center" min="0" value="0" required' +
-            ' style="width: 100%">' +
+            ' style="width: 100%" onchange="calcular_total_tallos()" onkeyup="calcular_total_tallos()">' +
+            '</td>' +
+            '<td style="border-color: #9d9d9d">' +
+            '<input type="number" id="new_total_tallos_' + cant_forms +
+            '" class="text-center" value="0" style="width: 100%" ' +
+            ' readonly>' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
             '<select id="new_cosechador_' + cant_forms + '" style="width: 100%; height: 26px;">' +
@@ -182,6 +194,16 @@
             });
         } else {
             alerta('<div class="text-center alert alert-warning">Faltan datos necesarios</div>')
+        }
+    }
+
+    function calcular_total_tallos() {
+        for (i = 1; i <= cant_forms; i++) {
+            mallas = parseInt($('#new_mallas_' + i).val());
+            tallos_x_malla = parseInt($('#new_tallos_x_malla_' + i).val());
+            total_tallos = parseInt(mallas * tallos_x_malla);
+            if (total_tallos > 0)
+                $('#new_total_tallos_' + i).val(total_tallos);
         }
     }
 </script>
