@@ -6,12 +6,14 @@ Route::get('pedidos/add_pedido', 'Comercializacion\PedidoController@add_pedido')
 Route::get('pedidos/buscar_inventario', 'Comercializacion\PedidoController@buscar_inventario');
 Route::post('pedidos/store_pedido', 'Comercializacion\PedidoController@store_pedido');
 Route::post('pedidos/eliminar_pedido', 'Comercializacion\PedidoController@eliminar_pedido');
+Route::post('pedidos/eliminar_pedido_futuro', 'Comercializacion\PedidoController@eliminar_pedido_futuro');
 Route::post('pedidos/seleccionar_cliente', 'Comercializacion\PedidoController@seleccionar_cliente');
 Route::get('pedidos/editar_pedido', 'Comercializacion\PedidoController@editar_pedido');
 Route::get('pedidos/agregar_inventario', 'Comercializacion\PedidoController@agregar_inventario');
 Route::post('pedidos/regresar_inventario', 'Comercializacion\PedidoController@regresar_inventario');
 Route::post('pedidos/deshacer_pedido', 'Comercializacion\PedidoController@deshacer_pedido');
 Route::post('pedidos/update_precio', 'Comercializacion\PedidoController@update_precio');
+Route::post('pedidos/update_ramos', 'Comercializacion\PedidoController@update_ramos');
 Route::post('pedidos/update_marcacion_po', 'Comercializacion\PedidoController@update_marcacion_po');
 Route::get('pedidos/cambiar_caja', 'Comercializacion\PedidoController@cambiar_caja');
 Route::post('pedidos/eliminar_detalle_pedido', 'Comercializacion\PedidoController@eliminar_detalle_pedido');
@@ -27,3 +29,8 @@ Route::get('pedidos/exportar_pedidos', 'Comercializacion\PedidoController@export
 Route::get('pedidos/exportar_resumen_pedidos', 'Comercializacion\PedidoController@exportar_resumen_pedidos');
 Route::get('pedidos/exportar_estado_cliente', 'Comercializacion\PedidoController@exportar_estado_cliente');
 Route::get('pedidos/exportar_factura', 'Comercializacion\PedidoController@exportar_factura');
+Route::post('pedidos/eliminar_detalle_futuro', 'Comercializacion\PedidoController@eliminar_detalle_futuro');
+Route::post('pedidos/eliminar_detalle_pedido_futuro', 'Comercializacion\PedidoController@eliminar_detalle_pedido_futuro');
+Route::get('pedidos/add_caja_futuro', 'Comercializacion\PedidoController@add_caja_futuro');
+Route::post('pedidos/agregar_caja_futuro', 'Comercializacion\PedidoController@agregar_caja_futuro');
+Route::get('pedidos/agregar_detalle_caja', 'Comercializacion\PedidoController@agregar_detalle_caja');

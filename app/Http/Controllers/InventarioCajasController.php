@@ -23,6 +23,7 @@ class InventarioCajasController extends Controller
     public function listar_reporte(Request $request)
     {
         $listado = CajaFrio::where('armada', 0)
+            ->where('futuro', 0)
             ->where('nombre', 'like', '%' . espacios(mb_strtoupper($request->busqueda)) . '%');
         if ($request->fecha != '')
             $listado = $listado->where('fecha', $request->fecha);

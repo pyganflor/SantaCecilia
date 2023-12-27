@@ -70,6 +70,22 @@
         })
     }
 
+    function eliminar_pedido_futuro(ped) {
+        texto =
+            "<div class='alert alert-warning text-center' style='font-size: 1.5em'>Esta a punto de <b>ELIMINAR</b> el Pedido</div>";
+
+        modal_quest('modal_eliminar_pedido', texto, 'Eliminar pedido', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                id_pedido: ped,
+            };
+            post_jquery_m('pedidos/eliminar_pedido_futuro', datos, function() {
+                cerrar_modals();
+                listar_reporte();
+            });
+        })
+    }
+
     function buscar_inventario() {
         datos = {
             buscar: $('#buscar_inventario').val(),
@@ -131,5 +147,46 @@
             $('#body_seleccionados').addClass('hidden');
             $('#footer_seleccionados').addClass('hidden');
         }
+    }
+
+    function delete_armar_caja(p) {
+        $('#tr_armar_' + p).remove();
+    }
+
+    function add_armar_caja() {
+        cant_armar_caja++;
+        select_variedades = $('#select_variedades');
+        $('#table_armar_caja').append('<tr id="tr_armar_' + cant_armar_caja + '" class="tr_armar_manual" data-num="' +
+            cant_armar_caja + '">' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<select style="width: 100%; height: 26px" id="armar_variedad_' + cant_armar_caja + '">' +
+            select_variedades.html() +
+            '</select>' +
+            '</td>' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<input type="number" class="text-center" style="width: 100%" id="armar_longitud_' + cant_armar_caja +
+            '" min="0">' +
+            '</td>' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<input type="number" class="text-center" style="width: 100%" id="armar_tallos_x_ramo_' +
+            cant_armar_caja +
+            '" min="0">' +
+            '</td>' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<input type="number" class="text-center" style="width: 100%" id="armar_ramos_' + cant_armar_caja +
+            '" min="0">' +
+            '</td>' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<input type="number" class="text-center" style="width: 100%" id="armar_precio_' + cant_armar_caja +
+            '" min="0">' +
+            '</td>' +
+            '<td class="text-center" style="border-color: #9d9d9d">' +
+            '<button type="button" class="btn btn-xs btn-yura_danger" onclick="delete_armar_caja(' +
+            cant_armar_caja + ')">' +
+            '<i class="fa fa-fw fa-trash">' +
+            '</i>' +
+            '</button>' +
+            '</td>' +
+            '</tr>');
     }
 </script>

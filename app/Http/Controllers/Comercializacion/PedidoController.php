@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Storage as Almacenamiento;
+use yura\Modelos\Variedad;
 
 class PedidoController extends Controller
 {
@@ -68,9 +69,25 @@ class PedidoController extends Controller
             ->orderBy('nombre')
             ->get()->pluck('nombre')->toArray();
 
+        $variedades = Variedad::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
         return view('adminlte.gestion.comercializacion.pedidos.forms.add_pedido', [
             'clientes' => $clientes,
             'longitudes' => $longitudes,
+            'variedades' => $variedades,
+        ]);
+    }
+
+    public function agregar_detalle_caja(Request $request)
+    {
+        $variedades = Variedad::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('adminlte.gestion.comercializacion.pedidos.forms.agregar_detalle_caja', [
+            'variedades' => $variedades,
         ]);
     }
 
@@ -134,6 +151,7 @@ class PedidoController extends Controller
     {
         $listado = CajaFrio::where('nombre', 'like', '%' . espacios(mb_strtoupper($request->buscar)) . '%')
             ->where('armada', 0)
+            ->where('futuro', 0)
             ->orderBy('nombre')
             ->get();
         return view('adminlte.gestion.comercializacion.pedidos.forms._buscar_inventario', [
@@ -223,30 +241,96 @@ class PedidoController extends Controller
             $pedido->fecha_pedido = $request->fecha;
             $pedido->id_agencia_carga = $request->agencia;
             $pedido->id_consignatario = $request->consignatario;
+            $pedido->tipo = $request->tipo;
             $pedido->marcacion = mb_strtoupper(espacios($request->marcacion));
             $pedido->save();
-            $pedido = Pedido::All()->last();
+            $pedido->id_pedido = DB::table('pedido')
+                ->select(DB::raw('max(id_pedido) as id'))
+                ->get()[0]->id;
 
-            foreach (json_decode($request->data_caja) as $d) {
-                $detalle = new DetallePedido();
-                $detalle->id_pedido = $pedido->id_pedido;
-                $detalle->id_caja_frio = $d->id;
-                $detalle->marcacion_po = $d->marcacion_po;
-                $detalle->orden = 1;
-                $detalle->save();
+            if ($request->tipo == 'A') {
+                foreach (json_decode($request->data_caja) as $d) {
+                    $detalle = new DetallePedido();
+                    $detalle->id_pedido = $pedido->id_pedido;
+                    $detalle->id_caja_frio = $d->id;
+                    $detalle->marcacion_po = $d->marcacion_po;
+                    $detalle->orden = 1;
+                    $detalle->save();
 
-                $caja = CajaFrio::find($d->id);
-                $caja->armada = 1;
-                $caja->save();
-            }
-            foreach (json_decode($request->data_precio) as $d) {
-                $detalle_caja = DetalleCajaFrio::find($d->id);
-                $detalle_caja->precio = $d->precio;
-                $detalle_caja->save();
+                    $caja = CajaFrio::find($d->id);
+                    $caja->armada = 1;
+                    $caja->save();
+                }
+                foreach (json_decode($request->data_precio) as $d) {
+                    $detalle_caja = DetalleCajaFrio::find($d->id);
+                    $detalle_caja->precio = $d->precio;
+                    $detalle_caja->save();
+                }
+            } else {
+                foreach (json_decode($request->data) as $c) {
+                    /* NUEVA CAJA */
+                    $caja = new CajaFrio();
+                    $caja->nombre = $c->nombre_caja;
+                    $caja->fecha = $request->fecha;
+                    $caja->armada = 1;
+                    $caja->reservado = 1;
+                    $caja->futuro = 1;
+                    $caja->id_empresa = 1;
+                    $caja->save();
+                    $caja->id_caja_frio = DB::table('caja_frio')
+                        ->select(DB::raw('max(id_caja_frio) as id'))
+                        ->get()[0]->id;
+
+                    foreach (json_decode($c->detalles) as $d) {
+                        /* NUEVO DETALLE_CAJA */
+                        $detalle_caja = new DetalleCajaFrio();
+                        $detalle_caja->id_caja_frio = $caja->id_caja_frio;
+                        $detalle_caja->ramos = $d->ramos;
+                        $detalle_caja->id_variedad = $d->id_variedad;
+                        $detalle_caja->tallos_x_ramo = $d->tallos_x_ramo;
+                        $detalle_caja->longitud = $d->longitud;
+                        $detalle_caja->fecha = $caja->fecha;
+                        $detalle_caja->longitud = $d->longitud;
+                        $detalle_caja->precio = $d->precio;
+                        $detalle_caja->save();
+                    }
+
+                    /* NUEVO DETALLE_PEDIDO */
+                    $detalle_pedido = new DetallePedido();
+                    $detalle_pedido->id_pedido = $pedido->id_pedido;
+                    $detalle_pedido->id_caja_frio = $caja->id_caja_frio;
+                    $detalle_pedido->marcacion_po = $c->marcacion;
+                    $detalle_pedido->save();
+                }
             }
 
             $success = true;
             $msg = 'Se ha <b>GUARDADO</b> el pedido correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function eliminar_detalle_futuro(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $model = DetalleCajaFrio::find($request->det);
+            $model->delete();
+
+            $success = true;
+            $msg = 'Se ha <b>ELIMINADO</b> el contenido de la caja correctamente';
 
             DB::commit();
         } catch (\Exception $e) {
@@ -275,6 +359,35 @@ class PedidoController extends Controller
                     $caja->reservado = 0;
                     $caja->save();
                 }
+            $pedido->delete();
+
+            $success = true;
+            $msg = 'Se ha <b>ELIMINADO</b> el pedido correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function eliminar_pedido_futuro(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $pedido = Pedido::find($request->id_pedido);
+            foreach ($pedido->detalles as $d) {
+                $caja = $d->caja_frio;
+                $caja->delete();
+            }
             $pedido->delete();
 
             $success = true;
@@ -327,6 +440,32 @@ class PedidoController extends Controller
 
             $success = true;
             $msg = 'Se ha <b>CAMBIADO</b> el precio correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function update_ramos(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $detalle = DetalleCajaFrio::find($request->det_caja);
+            $detalle->ramos = $request->ramos;
+            $detalle->save();
+
+            $success = true;
+            $msg = 'Se han <b>CAMBIADO</b> los ramos correctamente';
 
             DB::commit();
         } catch (\Exception $e) {
@@ -415,6 +554,33 @@ class PedidoController extends Controller
         ];
     }
 
+    public function eliminar_detalle_pedido_futuro(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $detalle_pedido = DetallePedido::find($request->det_ped);
+            $caja = $detalle_pedido->caja_frio;
+            $caja->delete();
+            $detalle_pedido->delete();
+
+            $success = true;
+            $msg = 'Se ha <b>ELIMINADO</b> la caja del pedido correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
     public function add_caja(Request $request)
     {
         $listado = CajaFrio::where('armada', 0)
@@ -424,6 +590,17 @@ class PedidoController extends Controller
 
         return view('adminlte.gestion.comercializacion.pedidos.forms.add_caja', [
             'listado' => $listado
+        ]);
+    }
+
+    public function add_caja_futuro(Request $request)
+    {
+        $variedades = Variedad::where('estado', 1)
+            ->orderBy('nombre')
+            ->get();
+
+        return view('adminlte.gestion.comercializacion.pedidos.forms.add_caja_futuro', [
+            'variedades' => $variedades
         ]);
     }
 
@@ -1087,5 +1264,61 @@ class PedidoController extends Controller
 
         for ($i = 0; $i <= $col; $i++)
             $sheet->getColumnDimension($columnas[$i])->setAutoSize(true);
+    }
+
+    public function agregar_caja_futuro(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $pedido = Pedido::find($request->id_pedido);
+            /* NUEVA CAJA */
+            $caja = new CajaFrio();
+            $caja->nombre = $request->nombre_caja;
+            $caja->fecha = $pedido->fecha_pedido;
+            $caja->armada = 1;
+            $caja->reservado = 1;
+            $caja->futuro = 1;
+            $caja->id_empresa = 1;
+            $caja->save();
+            $caja->id_caja_frio = DB::table('caja_frio')
+                ->select(DB::raw('max(id_caja_frio) as id'))
+                ->get()[0]->id;
+
+            foreach (json_decode($request->detalles) as $d) {
+                /* NUEVO DETALLE_CAJA */
+                $detalle_caja = new DetalleCajaFrio();
+                $detalle_caja->id_caja_frio = $caja->id_caja_frio;
+                $detalle_caja->ramos = $d->ramos;
+                $detalle_caja->id_variedad = $d->id_variedad;
+                $detalle_caja->tallos_x_ramo = $d->tallos_x_ramo;
+                $detalle_caja->longitud = $d->longitud;
+                $detalle_caja->fecha = $caja->fecha;
+                $detalle_caja->longitud = $d->longitud;
+                $detalle_caja->precio = $d->precio;
+                $detalle_caja->save();
+            }
+
+            /* NUEVO DETALLE_PEDIDO */
+            $detalle_pedido = new DetallePedido();
+            $detalle_pedido->id_pedido = $pedido->id_pedido;
+            $detalle_pedido->id_caja_frio = $caja->id_caja_frio;
+            $detalle_pedido->save();
+
+            $success = true;
+            $msg = 'Se ha <b>AGREGADO</b> la caja correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
     }
 }

@@ -393,7 +393,10 @@ class ReporteCuartoFrioController extends Controller
         $totales_dias = [];
         foreach ($dias as $pos => $l) {
             $col++;
-            setValueToCeldaExcel($sheet, $columnas[$col] . $row, $l . $pos == count($dias) - 1 ? '...' : '');
+            $text = $l;
+            if ($pos == count($dias) - 1)
+                $text .= '...';
+            setValueToCeldaExcel($sheet, $columnas[$col] . $row, $text);
             setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
             $totales_dias[] = 0;
         }
@@ -410,7 +413,7 @@ class ReporteCuartoFrioController extends Controller
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
                 setColorTextToCeldaExcel($sheet, $columnas[$col] . $row, 'ffffff');
                 $col++;
-                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $var['variedad']->nombre);
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $var['variedad']->longitud);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '5a7177');
                 setColorTextToCeldaExcel($sheet, $columnas[$col] . $row, 'ffffff');
                 $total_var = 0;
