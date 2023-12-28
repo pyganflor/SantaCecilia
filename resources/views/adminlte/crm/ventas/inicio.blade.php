@@ -93,7 +93,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2">
+                <td>
                     <div class="input-group">
                         <span class="input-group-addon bg-yura_dark">
                             Flor
@@ -104,6 +104,15 @@
                                 <option value="{{ $p->id_variedad }}">{{ $p->nombre }}</option>
                             @endforeach
                         </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-addon bg-yura_dark ">
+                            Longitud
+                        </span>
+                        <input type="number" id="filtro_longitud" style="width: 100%" min="0"
+                            class="form-control text-center" required>
                     </div>
                 </td>
                 <td>

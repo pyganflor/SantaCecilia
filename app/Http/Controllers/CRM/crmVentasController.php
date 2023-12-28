@@ -93,6 +93,8 @@ class crmVentasController extends Controller
                         ->where('p.fecha_pedido', $l);
                     if ($request->variedad != 'T')
                         $query = $query->where('dc.id_variedad', $request->variedad);
+                    if ($request->longitud != '')
+                        $query = $query->where('dc.longitud', $request->longitud);
                     $query = $query->get()[0];
 
                     $data[] = $query;
@@ -123,6 +125,8 @@ class crmVentasController extends Controller
                         ->whereYear('p.fecha_pedido', '=', date('Y', strtotime($l)));
                     if ($request->variedad != 'T')
                         $query = $query->where('dc.id_variedad', $request->variedad);
+                    if ($request->longitud != '')
+                        $query = $query->where('dc.longitud', $request->longitud);
                     $query = $query->get()[0];
 
                     $data[] = $query;
@@ -151,6 +155,8 @@ class crmVentasController extends Controller
                         ->where('p.fecha_pedido', '<=', $l->fecha_final);
                     if ($request->variedad != 'T')
                         $query = $query->where('dc.id_variedad', $request->variedad);
+                    if ($request->longitud != '')
+                        $query = $query->where('dc.longitud', $request->longitud);
                     $query = $query->get()[0];
 
                     $data[] = $query;

@@ -10,6 +10,7 @@
             desde: $('#filtro_desde').val(),
             hasta: $('#filtro_hasta').val(),
             variedad: $('#variedad').val(),
+            longitud: $('#filtro_longitud').val(),
             annos: $('#annos').val(),
         };
 
