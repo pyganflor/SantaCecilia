@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Storage as Almacenamiento;
+use yura\Modelos\InventarioFrio;
 use yura\Modelos\Variedad;
 
 class PedidoController extends Controller
@@ -85,9 +86,13 @@ class PedidoController extends Controller
         $variedades = Variedad::where('estado', 1)
             ->orderBy('nombre')
             ->get();
+        $detalle_pedido = DetallePedido::find($request->det);
+        $caja = $detalle_pedido->caja_frio;
 
         return view('adminlte.gestion.comercializacion.pedidos.forms.agregar_detalle_caja', [
             'variedades' => $variedades,
+            'caja' => $caja,
+            'detalle_pedido' => $detalle_pedido,
         ]);
     }
 
@@ -290,7 +295,6 @@ class PedidoController extends Controller
                         $detalle_caja->tallos_x_ramo = $d->tallos_x_ramo;
                         $detalle_caja->longitud = $d->longitud;
                         $detalle_caja->fecha = $caja->fecha;
-                        $detalle_caja->longitud = $d->longitud;
                         $detalle_caja->precio = $d->precio;
                         $detalle_caja->save();
                     }
@@ -1293,7 +1297,6 @@ class PedidoController extends Controller
                 $detalle_caja->tallos_x_ramo = $d->tallos_x_ramo;
                 $detalle_caja->longitud = $d->longitud;
                 $detalle_caja->fecha = $caja->fecha;
-                $detalle_caja->longitud = $d->longitud;
                 $detalle_caja->precio = $d->precio;
                 $detalle_caja->save();
             }
@@ -1306,6 +1309,166 @@ class PedidoController extends Controller
 
             $success = true;
             $msg = 'Se ha <b>AGREGADO</b> la caja correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function store_detalle_caja(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $caja = CajaFrio::find($request->id_caja);
+
+            foreach (json_decode($request->detalles) as $d) {
+                /* NUEVO DETALLE_CAJA */
+                $detalle_caja = new DetalleCajaFrio();
+                $detalle_caja->id_caja_frio = $caja->id_caja_frio;
+                $detalle_caja->ramos = $d->ramos;
+                $detalle_caja->id_variedad = $d->id_variedad;
+                $detalle_caja->tallos_x_ramo = $d->tallos_x_ramo;
+                $detalle_caja->longitud = $d->longitud;
+                $detalle_caja->fecha = $caja->fecha;
+                $detalle_caja->precio = $d->precio;
+                $detalle_caja->save();
+            }
+
+            $success = true;
+            $msg = 'Se ha <b>AGREGADO</b> la flor a la caja correctamente';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $success = false;
+            $msg = '<div class="alert alert-danger text-center">' .
+                '<p> Ha ocurrido un problema al guardar la informacion al sistema</p>' .
+                '<p>' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . '</p>'
+                . '</div>';
+        }
+        return [
+            'success' => $success,
+            'mensaje' => $msg,
+        ];
+    }
+
+    public function store_armar_pedido_futuro(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $pedido = Pedido::find($request->id_pedido);
+            $faltantes = [];
+            foreach ($pedido->detalles as $det_ped) {
+                $caja = $det_ped->caja_frio;
+                foreach ($caja->detalles as $det_caj) {
+                    $disponibles = DB::table('inventario_frio as i')
+                        ->join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'i.id_clasificacion_ramo')
+                        ->select(DB::raw('sum(disponibles) as cant'))
+                        ->where('i.id_variedad', $det_caj->id_variedad)
+                        ->where('i.tallos_x_ramo', $det_caj->tallos_x_ramo)
+                        ->where('i.disponibles', '>', 0)
+                        ->where('i.basura', 0)
+                        ->get()[0]->cant;
+                    if ($disponibles < $det_caj->ramos) {
+                        $texto = $det_caj->variedad->nombre . ' ' . $det_caj->longitud . 'cm' . ' de ' . $det_caj->tallos_x_ramo . ' tallos';
+                        if (!in_array($texto, $faltantes))
+                            $faltantes[] = $texto;
+                    }
+                }
+            }
+            if (count($faltantes) == 0) { // hay disponibles
+                foreach ($pedido->detalles as $det_ped) {
+                    $caja = $det_ped->caja_frio;
+                    $deletes_det_caj = [];
+                    foreach ($caja->detalles as $det_caj) {
+                        $deletes_det_caj[] = $det_caj;
+                        $inventarios = InventarioFrio::join('clasificacion_ramo as c', 'c.id_clasificacion_ramo', '=', 'inventario_frio.id_clasificacion_ramo')
+                            ->select('inventario_frio.*')->distinct()
+                            ->where('inventario_frio.id_variedad', $det_caj->id_variedad)
+                            ->where('inventario_frio.tallos_x_ramo', $det_caj->tallos_x_ramo)
+                            ->where('c.nombre', $det_caj->longitud)
+                            ->where('inventario_frio.disponibles', '>', 0)
+                            ->where('inventario_frio.basura', 0)
+                            ->orderBy('inventario_frio.fecha', 'asc')
+                            ->get();
+
+                        $meta = $det_caj->ramos;
+                        foreach ($inventarios as $pos => $model) {
+                            if ($meta > 0) {
+                                if ($model->disponibles >= $meta) {
+                                    $model->disponibles = $model->disponibles - $meta;
+
+                                    /*CREAR DETALLE_CAJA */
+                                    $detalle_caja = new DetalleCajaFrio();
+                                    $detalle_caja->id_caja_frio = $caja->id_caja_frio;
+                                    $detalle_caja->ramos = $meta;
+                                    $detalle_caja->id_variedad = $det_caj->id_variedad;
+                                    $detalle_caja->tallos_x_ramo = $det_caj->tallos_x_ramo;
+                                    $detalle_caja->longitud = $det_caj->longitud;
+                                    $detalle_caja->fecha = $caja->fecha;
+                                    $detalle_caja->precio = $det_caj->precio;
+                                    $detalle_caja->id_inventario_frio = $model->id_inventario_frio;
+                                    $detalle_caja->save();
+
+                                    $meta = 0;
+                                } else {
+                                    $meta -= $model->disponibles;
+
+                                    /*CREAR DETALLE_CAJA */
+                                    $detalle_caja = new DetalleCajaFrio();
+                                    $detalle_caja->id_caja_frio = $caja->id_caja_frio;
+                                    $detalle_caja->ramos = $model->disponibles;
+                                    $detalle_caja->id_variedad = $det_caj->id_variedad;
+                                    $detalle_caja->tallos_x_ramo = $det_caj->tallos_x_ramo;
+                                    $detalle_caja->longitud = $det_caj->longitud;
+                                    $detalle_caja->fecha = $caja->fecha;
+                                    $detalle_caja->precio = $det_caj->precio;
+                                    $detalle_caja->id_inventario_frio = $model->id_inventario_frio;
+                                    $detalle_caja->save();
+
+                                    $model->disponibles = 0;
+                                }
+
+                                if ($model->disponibles == 0)
+                                    $model->disponibilidad = 0;
+
+                                $model->save();
+                                $id = $model->id_inventario_frio;
+                                bitacora('inventario_frio', $id, 'U', 'Actualizacion de un inventario en frio');
+                            }
+                        }
+                    }
+                    $caja->futuro = 0;
+                    $caja->save();
+                }
+
+                foreach ($deletes_det_caj as $del) {
+                    $del->delete();
+                }
+
+                $pedido->tipo = 'A';
+                $pedido->save();
+
+                $success = true;
+                $msg = 'Se ha <b>ARMADO</b> el pedido correctamente';
+            } else {    // hay faltantes
+                $success = false;
+                $msg = '<div class="alert alert-danger">Faltan las flores suficientes para armar el pedido:<br><ul>';
+                foreach ($faltantes as $f) {
+                    $msg .= '<li>' . $f . '</li>';
+                }
+                $msg .= '</ul></div>';
+            }
 
             DB::commit();
         } catch (\Exception $e) {

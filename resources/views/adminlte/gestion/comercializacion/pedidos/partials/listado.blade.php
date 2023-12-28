@@ -159,42 +159,57 @@
                                                     <i class="fa fa-fw fa-pencil"></i> Editar Pedido
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="javascript:void(0)" title="Generar Packing"
-                                                    onclick="generar_packing('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-gift"></i> Generar Packing
-                                                </a>
-                                            </li>
-                                            {{-- <li>
+                                            @if ($ped->tipo == 'A')
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Generar Packing"
+                                                        onclick="generar_packing('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-gift"></i> Generar Packing
+                                                    </a>
+                                                </li>
+                                                {{-- <li>
                                                 <a href="javascript:void(0)" title="Generar Factura"
                                                     onclick="generar_factura('{{ $ped->id_pedido }}')">
                                                     <i class="fa fa-fw fa-money"></i> Generar Factura
                                                 </a>
                                             </li> --}}
-                                            <li>
-                                                <a href="javascript:void(0)" title="Exportar Factura"
-                                                    onclick="exportar_factura('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-file-excel-o"></i> Exportar Factura
-                                                </a>
-                                            </li>
-                                            <li class="hidden">
-                                                <a href="javascript:void(0)" title="Generar Packing"
-                                                    onclick="generar_prefactura('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-shopping-cart"></i> Generar Pre-Factura
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0)" title="Generar Packing"
-                                                    onclick="exportar_etiqueta('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-file"></i> Exportar Etiqueta
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0)" title="Eliminar"
-                                                    onclick="eliminar_pedido('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
-                                                </a>
-                                            </li>
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Exportar Factura"
+                                                        onclick="exportar_factura('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-file-excel-o"></i> Exportar Factura
+                                                    </a>
+                                                </li>
+                                                <li class="hidden">
+                                                    <a href="javascript:void(0)" title="Generar Packing"
+                                                        onclick="generar_prefactura('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-shopping-cart"></i> Generar Pre-Factura
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Generar Packing"
+                                                        onclick="exportar_etiqueta('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-file"></i> Exportar Etiqueta
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Eliminar"
+                                                        onclick="eliminar_pedido('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
+                                                    </a>
+                                                </li>
+                                            @elseif($ped->tipo == 'F')
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Armar Pedido"
+                                                        onclick="store_armar_pedido_futuro('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-refresh"></i> Armar Pedido
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0)" title="Eliminar"
+                                                        onclick="eliminar_pedido_futuro('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
+                                                    </a>
+                                                </li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>
@@ -331,5 +346,21 @@
         $.LoadingOverlay('show');
         window.open('{{ url('pedidos/generar_prefactura') }}?ped=' + ped, '_blank');
         $.LoadingOverlay('hide');
+    }
+
+    function store_armar_pedido_futuro(ped) {
+        texto =
+            "<div class='alert alert-info text-center' style='font-size: 1.5em'>Esta a punto de <b>ARMAR</b> el Pedido</div>";
+
+        modal_quest('modal_store_armar_pedido_futuro', texto, 'Armar pedido', true, false, '40%', function() {
+            datos = {
+                _token: '{{ csrf_token() }}',
+                id_pedido: ped,
+            };
+            post_jquery_m('pedidos/store_armar_pedido_futuro', datos, function() {
+                cerrar_modals();
+                listar_reporte();
+            });
+        })
     }
 </script>

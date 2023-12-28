@@ -34,3 +34,5 @@ Route::post('pedidos/eliminar_detalle_pedido_futuro', 'Comercializacion\PedidoCo
 Route::get('pedidos/add_caja_futuro', 'Comercializacion\PedidoController@add_caja_futuro');
 Route::post('pedidos/agregar_caja_futuro', 'Comercializacion\PedidoController@agregar_caja_futuro');
 Route::get('pedidos/agregar_detalle_caja', 'Comercializacion\PedidoController@agregar_detalle_caja');
+Route::post('pedidos/store_detalle_caja', 'Comercializacion\PedidoController@store_detalle_caja');
+Route::post('pedidos/store_armar_pedido_futuro', 'Comercializacion\PedidoController@store_armar_pedido_futuro');

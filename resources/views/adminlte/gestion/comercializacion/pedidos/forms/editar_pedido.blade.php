@@ -341,7 +341,7 @@
                                                     <div class="btn-group">
                                                         <button type="button" class="btn btn-yura_dark btn-xs"
                                                             title="Agregar flor a la caja"
-                                                            onclick="agregar_detalle_caja('{{ $caja_frio->id_caja_frio }}')">
+                                                            onclick="agregar_detalle_caja('{{ $det->id_detalle_pedido }}')">
                                                             <i class="fa fa-fw fa-plus"></i>
                                                         </button>
                                                         @if (count($pedido->detalles) > 1)
@@ -575,9 +575,13 @@
         });
     }
 
-    function agregar_detalle_caja() {
+    function agregar_detalle_caja(det) {
+        datos = {
+            det: det
+        };
         get_jquery('{{ url('pedidos/agregar_detalle_caja') }}', datos, function(retorno) {
-            modal_view('modal_agregar_detalle_caja', retorno, '<i class="fa fa-fw fa-plus"></i> Agregar flor a la caja',
+            modal_view('modal_agregar_detalle_caja', retorno,
+                '<i class="fa fa-fw fa-plus"></i> Agregar flor a la caja...',
                 true, false, '{{ isPC() ? '75%' : '' }}',
                 function() {});
         });
