@@ -50,9 +50,6 @@
                                 <button class="btn btn-yura_dark" onclick="listar_reporte()">
                                     <i class="fa fa-fw fa-search"></i> Buscar
                                 </button>
-                                <button class="btn btn-yura_primary" onclick="add_flor_nacional()">
-                                    <i class="fa fa-fw fa-plus"></i> Ingresar
-                                </button>
                             </div>
                         </div>
                     </td>
