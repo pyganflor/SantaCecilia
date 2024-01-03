@@ -21,7 +21,8 @@
         </tr>
         <tr>
             @foreach ($motivos_nacional as $item)
-                <th class="padding_lateral_5 bg-yura_dark" style="width: 160px">
+                <th class="padding_lateral_5 bg-yura_dark td_motivos" style="width: 160px"
+                    data-id_motivo="{{ $item->id_motivos_nacional }}">
                     <div style="width: 80px">
                         {{ $item->nombre }}
                     </div>
@@ -33,12 +34,16 @@
         @endphp
         @foreach ($listado as $pos => $item)
             <tr>
-                <th class="padding_lateral_5" style="border-color: #9d9d9d; background-color: #eeeeee">
+                <th class="padding_lateral_5 td_variedad" style="border-color: #9d9d9d; background-color: #eeeeee"
+                    data-id_variedad="{{ $item['variedad']->id_variedad }}">
                     {{ $item['variedad']->nombre }}
                 </th>
+                @php
+                    $total_nacional_var = 0;
+                @endphp
                 @foreach ($item['valores'] as $pos_val => $val)
                     @php
-                        $total_nacional += $val;
+                        $total_nacional_var += $val;
                     @endphp
                     <td style="border-color: #9d9d9d">
                         <input type="number" class="text-center" value="{{ $val }}" style="width: 100%"
@@ -47,17 +52,20 @@
                     </td>
                 @endforeach
                 <th style="border-color: #9d9d9d">
-                    <input type="text" class="text-center" readonly value="{{ number_format($total_nacional) }}"
-                        style="width: 100%; background-color: #eeeeee">
+                    <input type="text" class="text-center" readonly value="{{ number_format($total_nacional_var) }}"
+                        style="width: 100%; background-color: #eeeeee"
+                        id="total_nacional_{{ $item['variedad']->id_variedad }}">
                 </th>
                 <th style="border-color: #9d9d9d">
                     <input type="text" class="text-center" readonly value="{{ number_format($item['cosechados']) }}"
-                        style="width: 100%; background-color: #eeeeee">
+                        style="width: 100%; background-color: #eeeeee"
+                        id="total_cosecha_{{ $item['variedad']->id_variedad }}">
                 </th>
                 <th style="border-color: #9d9d9d">
                     <input type="text" class="text-center" readonly
-                        value="{{ porcentaje($total_nacional, $total_nacional + $item['cosechados'], 1) }}"
-                        style="width: 100%; background-color: #eeeeee">
+                        value="{{ porcentaje($total_nacional_var, $total_nacional_var + $item['cosechados'], 1) }}"
+                        style="width: 100%; background-color: #eeeeee"
+                        id="porcentaje_nacional_{{ $item['variedad']->id_variedad }}">
                 </th>
             </tr>
         @endforeach
@@ -88,6 +96,23 @@
     }
 
     function calcular_totales() {
-
+        td_variedad = $('.td_variedad');
+        td_motivos = $('.td_motivos');
+        for (i = 0; i < td_variedad.length; i++) {
+            id_var = td_variedad[i].getAttribute('data-id_variedad');
+            total_nacional_var = 0;
+            for (x = 0; x < td_motivos.length; x++) {
+                id_motivo = td_motivos[x].getAttribute('data-id_motivo');
+                tallos = parseInt($('#tallos_' + id_var + '_' + id_motivo).val());
+                if (tallos > 0)
+                    total_nacional_var += tallos;
+            }
+            $('#total_nacional_' + id_var).val(total_nacional_var);
+            total_cosecha_var = parseInt($('#total_cosecha_' + id_var).val());
+            total_var = total_nacional_var + total_cosecha_var;
+            porcentaje_var = Math.round(((total_nacional_var / total_var) * 100) / 100) * 100;
+            if (porcentaje_var > 0)
+                $('#porcentaje_nacional_' + id_var).val(porcentaje_var);
+        }
     }
 </script>
