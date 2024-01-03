@@ -151,7 +151,7 @@ class RecepcionController extends Controller
             $desglose->id_variedad = $d->variedad;
             $desglose->id_modulo = $d->modulo;
             $desglose->tallos_x_malla = $d->tallos_x_malla;
-            $desglose->id_cosechador = $d->cosechador;
+            $desglose->id_cosechador = $d->cosechador != '' ? $d->cosechador : null;
             $desglose->cantidad_mallas = $d->mallas;
             $desglose->id_recepcion = $recepcion->id_recepcion;
             $desglose->fecha_registro = date('Y-m-d H:i:s');

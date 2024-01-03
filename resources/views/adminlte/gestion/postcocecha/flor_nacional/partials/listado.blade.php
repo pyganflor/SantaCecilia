@@ -16,10 +16,16 @@
                 Total Cosechado
             </th>
             <th class="padding_lateral_5 th_yura_green" style="width: 60px" rowspan="2">
+                Total Procesado
+            </th>
+            <th class="padding_lateral_5 th_yura_green" style="width: 60px" rowspan="2">
                 % Nacional
             </th>
         </tr>
         <tr>
+            @php
+                $totales_motivos = [];
+            @endphp
             @foreach ($motivos_nacional as $item)
                 <th class="padding_lateral_5 bg-yura_dark td_motivos" style="width: 160px"
                     data-id_motivo="{{ $item->id_motivos_nacional }}">
@@ -27,10 +33,15 @@
                         {{ $item->nombre }}
                     </div>
                 </th>
+                @php
+                    $totales_motivos[] = 0;
+                @endphp
             @endforeach
         </tr>
         @php
             $total_nacional = 0;
+            $total_cosecha = 0;
+            $total_procesado = 0;
         @endphp
         @foreach ($listado as $pos => $item)
             <tr>
@@ -44,6 +55,7 @@
                 @foreach ($item['valores'] as $pos_val => $val)
                     @php
                         $total_nacional_var += $val;
+                        $totales_motivos[$pos_val] += $val;
                     @endphp
                     <td style="border-color: #9d9d9d">
                         <input type="number" class="text-center" value="{{ $val }}" style="width: 100%"
@@ -63,12 +75,45 @@
                 </th>
                 <th style="border-color: #9d9d9d">
                     <input type="text" class="text-center" readonly
+                        value="{{ number_format($total_nacional_var + $item['cosechados']) }}"
+                        style="width: 100%; background-color: #eeeeee"
+                        id="total_procesado_{{ $item['variedad']->id_variedad }}">
+                </th>
+                <th style="border-color: #9d9d9d">
+                    <input type="text" class="text-center" readonly
                         value="{{ porcentaje($total_nacional_var, $total_nacional_var + $item['cosechados'], 1) }}"
                         style="width: 100%; background-color: #eeeeee"
                         id="porcentaje_nacional_{{ $item['variedad']->id_variedad }}">
                 </th>
+                @php
+                    $total_nacional += $total_nacional_var;
+                    $total_cosecha += $item['cosechados'];
+                    $total_procesado = $total_nacional_var + $item['cosechados'];
+                @endphp
             </tr>
         @endforeach
+        <tr class="tr_fija_bottom_0">
+            <th class="text-center th_yura_green">
+                TOTALES
+            </th>
+            @foreach ($totales_motivos as $val)
+                <th class="text-center bg-yura_dark">
+                    {{ number_format($val) }}
+                </th>
+            @endforeach
+            <th class="text-center th_yura_green">
+                {{ number_format($total_nacional) }}
+            </th>
+            <th class="text-center th_yura_green">
+                {{ number_format($total_cosecha) }}
+            </th>
+            <th class="text-center th_yura_green">
+                {{ number_format($total_procesado) }}
+            </th>
+            <th class="text-center th_yura_green">
+                100%
+            </th>
+        </tr>
     </table>
 </div>
 
@@ -110,6 +155,8 @@
             $('#total_nacional_' + id_var).val(total_nacional_var);
             total_cosecha_var = parseInt($('#total_cosecha_' + id_var).val());
             total_var = total_nacional_var + total_cosecha_var;
+            if (total_var > 0)
+                $('#total_procesado_' + id_var).val(total_var);
             porcentaje_var = Math.round(((total_nacional_var / total_var) * 100) / 100) * 100;
             if (porcentaje_var > 0)
                 $('#porcentaje_nacional_' + id_var).val(porcentaje_var);
