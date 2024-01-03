@@ -105,7 +105,8 @@
                 </th>
             @endforeach
             <th class="text-center th_yura_green">
-                {{ number_format($total_nacional) }}
+                <input type="text" class="text-center th_yura_green" readonly value="{{ $total_nacional }}"
+                    style="width: 100%" id="total_nacional">
             </th>
             <th class="text-center th_yura_green">
                 {{ number_format($total_cosecha) }}
@@ -165,16 +166,20 @@
                 $('#porcentaje_nacional_' + id_var).val(porcentaje_var);
         }
 
+        total_nacional = 0;
         for (x = 0; x < td_motivos.length; x++) {
             id_motivo = td_motivos[x].getAttribute('data-id_motivo');
             tallos_motivo = $('.tallos_motivo_' + id_motivo);
             total_motivo = 0;
             for (y = 0; y < tallos_motivo.length; y++) {
                 tallos = parseInt(tallos_motivo[y].value);
-                if (tallos > 0)
+                if (tallos > 0) {
                     total_motivo += tallos;
+                    total_nacional += tallos;
+                }
             }
             $('#total_motivo_' + id_motivo).val(total_motivo);
         }
+        $('#total_nacional').val(total_nacional);
     }
 </script>
