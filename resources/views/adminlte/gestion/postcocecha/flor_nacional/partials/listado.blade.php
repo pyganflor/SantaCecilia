@@ -58,7 +58,9 @@
                         $totales_motivos[$pos_val] += $val;
                     @endphp
                     <td style="border-color: #9d9d9d">
-                        <input type="number" class="text-center" value="{{ $val }}" style="width: 100%"
+                        <input type="number"
+                            class="text-center tallos_motivo_{{ $motivos_nacional[$pos_val]->id_motivos_nacional }}"
+                            value="{{ $val }}" style="width: 100%"
                             id="tallos_{{ $item['variedad']->id_variedad }}_{{ $motivos_nacional[$pos_val]->id_motivos_nacional }}"
                             onchange="store_flor_nacional('{{ $item['variedad']->id_variedad }}', '{{ $motivos_nacional[$pos_val]->id_motivos_nacional }}')">
                     </td>
@@ -96,9 +98,10 @@
             <th class="text-center th_yura_green">
                 TOTALES
             </th>
-            @foreach ($totales_motivos as $val)
+            @foreach ($totales_motivos as $pos => $val)
                 <th class="text-center bg-yura_dark">
-                    {{ number_format($val) }}
+                    <input type="text" class="text-center bg-yura_dark" readonly value="{{ $val }}"
+                        style="width: 100%" id="total_motivo_{{ $motivos_nacional[$pos]->id_motivos_nacional }}">
                 </th>
             @endforeach
             <th class="text-center th_yura_green">
@@ -160,6 +163,18 @@
             porcentaje_var = Math.round(((total_nacional_var / total_var) * 100) / 100) * 100;
             if (porcentaje_var > 0)
                 $('#porcentaje_nacional_' + id_var).val(porcentaje_var);
+        }
+
+        for (x = 0; x < td_motivos.length; x++) {
+            id_motivo = td_motivos[x].getAttribute('data-id_motivo');
+            tallos_motivo = $('.tallos_motivo_' + id_motivo);
+            total_motivo = 0;
+            for (y = 0; y < tallos_motivo.length; y++) {
+                tallos = parseInt(tallos_motivo[y].value);
+                if (tallos > 0)
+                    total_motivo += tallos;
+            }
+            $('#total_motivo_' + id_motivo).val(total_motivo);
         }
     }
 </script>
