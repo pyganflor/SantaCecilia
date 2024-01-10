@@ -59,14 +59,6 @@
             </div>
         </div>
     </section>
-
-    <style>
-        .tr_fija_top_0 {
-            position: sticky;
-            top: 0;
-            z-index: 9;
-        }
-    </style>
 @endsection
 
 @section('script_final')
