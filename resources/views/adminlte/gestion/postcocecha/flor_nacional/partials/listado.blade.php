@@ -90,8 +90,8 @@
                 </th>
                 @php
                     $total_nacional += $total_nacional_var;
-                    $total_exportable += $item['cosechados'];
-                    $total_procesado = $total_nacional_var + $item['cosechados'];
+                    $total_exportable += $item['cosechados'] - $total_nacional_var;
+                    $total_procesado += $item['cosechados'];
                 @endphp
             </tr>
         @endforeach
@@ -110,13 +110,17 @@
                     style="width: 100%" id="total_nacional">
             </th>
             <th class="text-center th_yura_green">
-                {{ number_format($total_exportable) }}
+                <input type="text" class="text-center th_yura_green" readonly value="{{ $total_exportable }}"
+                    style="width: 100%" id="total_exportable">
             </th>
             <th class="text-center th_yura_green">
-                {{ number_format($total_procesado) }}
+                <input type="text" class="text-center th_yura_green" readonly value="{{ $total_procesado }}"
+                    style="width: 100%" id="total_procesado">
             </th>
             <th class="text-center th_yura_green">
-                100%
+                <input type="text" class="text-center th_yura_green" readonly
+                    value="{{ porcentaje($total_nacional, $total_procesado, 1) }}" style="width: 100%"
+                    id="total_porcentaje">
             </th>
         </tr>
     </table>
@@ -182,5 +186,11 @@
             $('#total_motivo_' + id_motivo).val(total_motivo);
         }
         $('#total_nacional').val(total_nacional);
+        total_procesado = parseInt($('#total_procesado').val());
+        total_exportable = total_procesado - total_nacional;
+        if (total_exportable > 0)
+            $('#total_exportable').val(total_exportable);
+        porcentaje = Math.round(((total_nacional / total_procesado) * 100) * 100) / 100;
+        $('#total_porcentaje').val(porcentaje);
     }
 </script>
