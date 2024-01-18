@@ -31,6 +31,10 @@
             </tr>
             @php
                 $resumen_variedades = [];
+                $total_cajas = 0;
+                $total_tallos = 0;
+                $total_ramos = 0;
+                $total_monto = 0;
             @endphp
             @foreach ($listado as $pos_ped => $ped)
                 @php
@@ -41,6 +45,7 @@
                     @php
                         $det_getTotales = $det->getTotales();
                         $caja_frio = $det->caja_frio;
+                        $total_cajas += 1;
                     @endphp
                     @foreach ($caja_frio->detalles as $pos_item => $item)
                         @php
@@ -65,6 +70,9 @@
                                     'monto' => $item->ramos * $item->tallos_x_ramo * $item->precio,
                                 ];
                             }
+                            $total_tallos += $item->ramos * $item->tallos_x_ramo;
+                            $total_ramos += $item->ramos;
+                            $total_monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
                         @endphp
                         <tr class="tr_pedido_{{ $ped->id_pedido }}"
                             onmouseover="$('.tr_pedido_{{ $ped->id_pedido }}').addClass('bg-yura_dark')"
@@ -218,6 +226,31 @@
                     @endforeach
                 @endforeach
             @endforeach
+            <tr class="tr_fija_bottom_0">
+                <th class="text-center th_yura_green">
+                    TOTALES
+                </th>
+                <th class="text-center th_yura_green">
+                    {{ number_format($total_cajas) }}
+                </th>
+                <th class="text-center th_yura_green">
+                </th>
+                <th class="text-center th_yura_green">
+                </th>
+                <th class="text-center th_yura_green" colspan="3">
+                    {{ number_format($total_tallos) }}
+                </th>
+                <th class="text-center th_yura_green" colspan="3">
+                    {{ number_format($total_ramos) }}
+                </th>
+                <th class="text-center th_yura_green">
+                </th>
+                <th class="text-center th_yura_green" colspan="3">
+                    ${{ number_format($total_monto, 2) }}
+                </th>
+                <th class="text-center th_yura_green">
+                </th>
+            </tr>
         </table>
     </div>
 
