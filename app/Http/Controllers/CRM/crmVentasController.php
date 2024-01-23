@@ -66,7 +66,7 @@ class crmVentasController extends Controller
 
     public function listar_graficas(Request $request)
     {
-        if ($request->annos == '') {
+        if ($request->annos == '' || $request->rango == 'L') {
             $view = 'graficas_rango';
 
             if ($request->rango == 'D') {   // diario
@@ -131,7 +131,7 @@ class crmVentasController extends Controller
 
                     $data[] = $query;
                 }
-            } else {    // semanal
+            } else if ($request->rango == 'S') {    // semanal
                 $labels = DB::table('semana')
                     ->select('codigo', 'fecha_inicial', 'fecha_final')->distinct()
                     ->where('fecha_final', '>=', $request->desde)
@@ -161,8 +161,57 @@ class crmVentasController extends Controller
 
                     $data[] = $query;
                 }
+            } else if ($request->rango == 'L') {  // longitud x variedad
+                $view = 'graficas_multiple';
+                $labels = DB::table('pedido')
+                    ->select('fecha_pedido')->distinct()
+                    ->where('estado', 1)
+                    ->where('fecha_pedido', '>=', $request->desde)
+                    ->where('fecha_pedido', '<=', $request->hasta)
+                    ->orderBy('fecha_pedido')
+                    ->get()->pluck('fecha_pedido')->toArray();
+
+                $longitudes = DB::table('pedido as p')
+                    ->join('detalle_pedido as dp', 'dp.id_pedido', '=', 'p.id_pedido')
+                    ->join('detalle_caja_frio as dc', 'dc.id_caja_frio', '=', 'dp.id_caja_frio')
+                    ->select('dc.longitud')->distinct()
+                    ->where('p.estado', 1)
+                    ->where('p.fecha_pedido', '>=', $request->desde)
+                    ->where('p.fecha_pedido', '<=', $request->hasta);
+                if ($request->variedad != 'T')
+                    $longitudes = $longitudes->where('dc.id_variedad', $request->variedad);
+                $longitudes = $longitudes->orderBy('dc.longitud')
+                    ->get()->pluck('longitud')->toArray();
+
+                $data = [];
+                foreach ($longitudes as $long) {
+                    $valores = [];
+                    foreach ($labels as $l) {
+                        $query = DB::table('pedido as p')
+                            ->join('detalle_pedido as dp', 'dp.id_pedido', '=', 'p.id_pedido')
+                            ->join('caja_frio as c', 'c.id_caja_frio', '=', 'dp.id_caja_frio')
+                            ->join('detalle_caja_frio as dc', 'dc.id_caja_frio', '=', 'c.id_caja_frio')
+                            ->select(
+                                DB::raw('sum(dc.ramos * dc.tallos_x_ramo * dc.precio) as monto'),
+                                DB::raw('sum(dc.ramos) as ramos'),
+                                DB::raw('sum(dc.ramos * dc.tallos_x_ramo) as tallos'),
+                            )
+                            ->where('p.estado', 1)
+                            ->where('p.fecha_pedido', $l)
+                            ->where('dc.longitud', $long);
+                        if ($request->variedad != 'T')
+                            $query = $query->where('dc.id_variedad', $request->variedad);
+                        $query = $query->get()[0];
+
+                        $valores[] = $query;
+                    }
+                    $data[] = [
+                        'longitud' => $long,
+                        'valores' => $valores,
+                    ];
+                }
             }
-            if ($request->tipo_grafica == 'line') {
+            if ($request->tipo_grafica == 'line' || $request->rango == 'L') {
                 $tipo_grafica = 'line';
                 $fill_grafica = 'false';
             } else if ($request->tipo_grafica == 'area') {

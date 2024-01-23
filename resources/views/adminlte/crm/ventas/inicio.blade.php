@@ -69,6 +69,7 @@
                             <option value="D">Diario</option>
                             <option value="S">Semanal</option>
                             <option value="M">Mensual</option>
+                            <option value="L">Longitudes x Variedad</option>
                         </select>
                     </div>
                 </td>
