@@ -19,12 +19,18 @@
                 </th>
                 <th class="text-center th_yura_green" style="width: 110px">
                     DAE
+                    <input type="number" id="all_dae" style="width: 100%;" class="text-center th_yura_green"
+                        onchange="$('.codigo_dae').val($(this).val())" onkeyup="$('.codigo_dae').val($(this).val())">
                 </th>
                 <th class="text-center th_yura_green" style="width: 110px">
                     Guia Madre
+                    <input type="number" id="all_guia_madre" style="width: 100%;" class="text-center th_yura_green"
+                        onchange="$('.guia_madre').val($(this).val())" onkeyup="$('.guia_madre').val($(this).val())">
                 </th>
                 <th class="text-center th_yura_green" style="width: 110px">
                     Guia Hija
+                    <input type="number" id="all_guia_hija" style="width: 100%;" class="text-center th_yura_green"
+                        onchange="$('.guia_hija').val($(this).val())" onkeyup="$('.guia_hija').val($(this).val())">
                 </th>
             </tr>
         </thead>
@@ -56,16 +62,15 @@
                         {{ $item['pedido']->pais_nombre }}
                     </th>
                     <th class="text-center" style="border-color: #9d9d9d">
-                        <input type="text" class="text-center" style="width: 100%; color: black"
-                            id="codigo_dae_{{ $item['pedido']->id_pedido }}"
-                            value="{{ $dae }}">
+                        <input type="text" class="text-center codigo_dae" style="width: 100%; color: black"
+                            id="codigo_dae_{{ $item['pedido']->id_pedido }}" value="{{ $dae }}">
                     </th>
                     <td class="text-center" style="border-color: #9d9d9d">
-                        <input type="text" class="text-center" style="width: 100%; color: black"
+                        <input type="text" class="text-center guia_madre" style="width: 100%; color: black"
                             id="guia_madre_{{ $item['pedido']->id_pedido }}" value="{{ $item['pedido']->guia_madre }}">
                     </td>
                     <td class="text-center" style="border-color: #9d9d9d">
-                        <input type="text" class="text-center" style="width: 100%; color: black"
+                        <input type="text" class="text-center guia_hija" style="width: 100%; color: black"
                             id="guia_hija_{{ $item['pedido']->id_pedido }}" value="{{ $item['pedido']->guia_hija }}">
                     </td>
                 </tr>
