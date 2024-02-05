@@ -93,11 +93,7 @@
                 </td>
             </tr>
         </table>
-        <div class="row">
-            <div class="col-md-12">
-                <div id="div_listado_cosecha_diaria"></div>
-            </div>
-        </div>
+        <div id="div_listado_cosecha_diaria"></div>
     </section>
 @endsection
 

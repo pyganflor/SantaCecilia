@@ -27,7 +27,7 @@
                     Plantas Iniciales
                 </th>
                 <th class="text-center th_yura_green fila_fija1">
-                    Productividad
+                    Prod./T/P/Mes
                 </th>
                 <th class="text-center th_yura_green fila_fija1" style="border-radius: 0 18px 0 0">
                     %
@@ -130,6 +130,9 @@
                                 <span style="margin-left: 5px; margin-right: 5px">{{ number_format($valor) }}</span>
                             </td>
                         @endforeach
+                        @php
+                            $productividad_mes = ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30;
+                        @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
@@ -145,7 +148,7 @@
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
-                                {{ $d['plantas_iniciales'] > 0 ? number_format($total_fila / $d['plantas_iniciales'], 2) : 0 }}
+                                {{ $d['plantas_iniciales'] > 0 ? number_format($productividad_mes, 2) : 0 }}
                             </span>
                         </th>
                         <input type="hidden" id="total_variedad_{{ $d['variedad']->id_variedad }}"
@@ -184,6 +187,9 @@
                                 <span style="margin-left: 5px; margin-right: 5px">{{ number_format($valor) }}</span>
                             </td>
                         @endforeach
+                        @php
+                            $productividad_mes = ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30;
+                        @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
@@ -199,7 +205,7 @@
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
-                                {{ $d['plantas_iniciales'] > 0 ? number_format($total_fila / $d['plantas_iniciales'], 2) : 0 }}
+                                {{ $d['plantas_iniciales'] > 0 ? number_format($productividad_mes, 2) : 0 }}
                             </span>
                         </th>
                         <input type="hidden" id="total_variedad_{{ $d['variedad']->id_variedad }}"
