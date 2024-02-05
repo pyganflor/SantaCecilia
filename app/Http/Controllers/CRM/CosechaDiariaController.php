@@ -715,6 +715,7 @@ class CosechaDiariaController extends Controller
                     setBgToCeldaExcel($sheet, $columnas[$col] . $row, '8fdbc9');
                 }
                 $total_plantas_iniciales += $d['plantas_iniciales_resumen'];
+                $productividad_mes = $d['plantas_iniciales_resumen'] > 0 ? ($total_fila / $d['plantas_iniciales_resumen'] / count($fechas)) * 30 : 0;
                 $col++;
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_fila);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '8fdbc9');
@@ -722,7 +723,7 @@ class CosechaDiariaController extends Controller
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales_resumen']);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '8fdbc9');
                 $col++;
-                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales_resumen'] > 0 ? round($total_fila / $d['plantas_iniciales_resumen'], 2) : 0);
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($productividad_mes, 2));
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, '8fdbc9');
 
                 $row++;
@@ -741,6 +742,7 @@ class CosechaDiariaController extends Controller
                     $col++;
                     setValueToCeldaExcel($sheet, $columnas[$col] . $row, $valor);
                 }
+                $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
                 $col++;
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_fila);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
@@ -748,7 +750,7 @@ class CosechaDiariaController extends Controller
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales']);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
                 $col++;
-                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales'] > 0 ? round($total_fila / $d['plantas_iniciales'], 2) : 0);
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($productividad_mes, 2));
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
             } else {
                 $row++;
@@ -767,6 +769,7 @@ class CosechaDiariaController extends Controller
                     $col++;
                     setValueToCeldaExcel($sheet, $columnas[$col] . $row, $valor);
                 }
+                $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
                 $col++;
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $total_fila);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
@@ -774,7 +777,7 @@ class CosechaDiariaController extends Controller
                 setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales']);
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
                 $col++;
-                setValueToCeldaExcel($sheet, $columnas[$col] . $row, $d['plantas_iniciales'] > 0 ? round($total_fila / $d['plantas_iniciales'], 2) : 0);
+                setValueToCeldaExcel($sheet, $columnas[$col] . $row, round($productividad_mes, 2));
                 setBgToCeldaExcel($sheet, $columnas[$col] . $row, 'e9ecef');
             }
         }

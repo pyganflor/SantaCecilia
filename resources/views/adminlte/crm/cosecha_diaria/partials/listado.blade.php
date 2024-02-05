@@ -77,6 +77,7 @@
                         @endforeach
                         @php
                             $total_plantas_iniciales += $d['plantas_iniciales_resumen'];
+                            $productividad_mes = $d['plantas_iniciales_resumen'] > 0 ? ($total_fila / $d['plantas_iniciales_resumen'] / count($fechas)) * 30 : 0;
                         @endphp
                         <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px">
@@ -92,7 +93,7 @@
                         <th class="text-center bg-yura_dark" style="border-color: #9d9d9d">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
-                                {{ $d['plantas_iniciales_resumen'] > 0 ? number_format($total_fila / $d['plantas_iniciales_resumen'], 2) : 0 }}
+                                {{ number_format($productividad_mes, 2) }}
                             </span>
                             <input type="hidden" id="total_planta_{{ $d['variedad']->id_planta }}"
                                 value="{{ $total_fila }}">
@@ -131,7 +132,7 @@
                             </td>
                         @endforeach
                         @php
-                            $productividad_mes = ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30;
+                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -148,7 +149,7 @@
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
-                                {{ $d['plantas_iniciales'] > 0 ? number_format($productividad_mes, 2) : 0 }}
+                                {{ number_format($productividad_mes, 2) }}
                             </span>
                         </th>
                         <input type="hidden" id="total_variedad_{{ $d['variedad']->id_variedad }}"
@@ -188,7 +189,7 @@
                             </td>
                         @endforeach
                         @php
-                            $productividad_mes = ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30;
+                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -205,7 +206,7 @@
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
                                 id="th_total_fila_variedad_{{ $d['variedad']->id_variedad }}">
-                                {{ $d['plantas_iniciales'] > 0 ? number_format($productividad_mes, 2) : 0 }}
+                                {{ number_format($productividad_mes, 2) }}
                             </span>
                         </th>
                         <input type="hidden" id="total_variedad_{{ $d['variedad']->id_variedad }}"
