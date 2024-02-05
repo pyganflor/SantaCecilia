@@ -38,6 +38,8 @@
             @php
                 $total = 0;
                 $total_plantas_iniciales = 0;
+                $total_productividad = 0;
+                $total_flores = 0;
             @endphp
             @foreach ($data as $d)
                 <input type="hidden" class="ids_variedad" value="{{ $d['variedad']->id_variedad }}">
@@ -137,6 +139,8 @@
                         @endforeach
                         @php
                             $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / $total_fechas_positivos) * 30 : 0;
+                            $total_productividad += $productividad_mes;
+                            $total_flores++;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -198,6 +202,8 @@
                         @endforeach
                         @php
                             $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / $total_fechas_positivos) * 30 : 0;
+                            $total_productividad += $productividad_mes;
+                            $total_flores++;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -238,7 +244,7 @@
                 </th>
             @endforeach
             @php
-                $productividad_mes = $total_plantas_iniciales > 0 ? ($total / $total_plantas_iniciales / count($fechas)) * 30 : 0;
+                $productividad_mes = $total_productividad / $total_flores;
             @endphp
             <th class="text-center th_yura_green">
                 {{ number_format($total) }}
