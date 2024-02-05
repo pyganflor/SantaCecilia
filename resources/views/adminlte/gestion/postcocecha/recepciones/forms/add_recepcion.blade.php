@@ -18,7 +18,7 @@
         <th class="text-center th_yura_green" style="width: 60px">
             Total Tallos
         </th>
-        <th class="text-center th_yura_green">
+        <th class="text-center th_yura_green hidden">
             COSECHADOR
         </th>
         <th class="text-center th_yura_green">
@@ -69,7 +69,7 @@
             <input type="number" id="new_total_tallos_1" class="text-center" value="0" style="width: 100%"
                 readonly>
         </td>
-        <td style="border-color: #9d9d9d">
+        <td style="border-color: #9d9d9d" class="hidden">
             <select id="new_cosechador_1" style="width: 100%; height: 26px;">
                 @if (count($cosechadores) > 1)
                     <option value="">Seleccione</option>
@@ -153,7 +153,7 @@
             ' readonly>' +
             '</td>' +
             '<td style="border-color: #9d9d9d">' +
-            '<select id="new_cosechador_' + cant_forms + '" style="width: 100%; height: 26px;">' +
+            '<select id="new_cosechador_' + cant_forms + '" style="width: 100%; height: 26px;" class="hidden">' +
             select_cosechadores +
             '</select>' +
             '</td>' +

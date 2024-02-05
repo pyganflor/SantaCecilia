@@ -95,6 +95,9 @@
                 @endphp
             </tr>
         @endforeach
+        @php
+            $porcentaje_nacional = porcentaje($total_nacional, $total_procesado, 1);
+        @endphp
         <tr class="tr_fija_bottom_0">
             <th class="text-center th_yura_green col_fija_left_0">
                 TOTALES
@@ -118,10 +121,23 @@
                     style="width: 100%" id="total_procesado">
             </th>
             <th class="text-center th_yura_green">
-                <input type="text" class="text-center th_yura_green" readonly
-                    value="{{ porcentaje($total_nacional, $total_procesado, 1) }}" style="width: 100%"
-                    id="total_porcentaje">
+                <input type="text" class="text-center th_yura_green" readonly value="{{ $porcentaje_nacional }}"
+                    style="width: 100%" id="total_porcentaje">
             </th>
+        </tr>
+        <tr>
+            <th class="text-center th_yura_green col_fija_left_0">
+                %
+            </th>
+            @foreach ($totales_motivos as $pos => $val)
+                @php
+                    $valor = round(($val * $porcentaje_nacional) / $total_nacional, 2);
+                @endphp
+                <th class="text-center bg-yura_dark">
+                    <input type="text" class="text-center bg-yura_dark" readonly value="{{ $valor }}"
+                        style="width: 100%" id="total_motivo_{{ $motivos_nacional[$pos]->id_motivos_nacional }}">
+                </th>
+            @endforeach
         </tr>
     </table>
 </div>
