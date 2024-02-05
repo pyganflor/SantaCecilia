@@ -45,7 +45,9 @@
                     @php
                         $det_getTotales = $det->getTotales();
                         $caja_frio = $det->caja_frio;
-                        $total_cajas += 1;
+                        if (count($caja_frio->detalles) > 0) {
+                            $total_cajas += 1;
+                        }
                     @endphp
                     @foreach ($caja_frio->detalles as $pos_item => $item)
                         @php
