@@ -112,6 +112,7 @@
                         </th>
                         @php
                             $total_fila = 0;
+                            $total_fechas_positivos = 0;
                         @endphp
                         @foreach ($fechas as $pos_f => $f)
                             @php
@@ -126,13 +127,16 @@
                             @endforeach
                             @php
                                 $total_fila += $valor;
+                                if ($valor > 0) {
+                                    $total_fechas_positivos++;
+                                }
                             @endphp
                             <td class="text-center" style="border-color: #9d9d9d" title="{{ $v->fecha }}">
                                 <span style="margin-left: 5px; margin-right: 5px">{{ number_format($valor) }}</span>
                             </td>
                         @endforeach
                         @php
-                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
+                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / $total_fechas_positivos) * 30 : 0;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -169,6 +173,7 @@
                         </th>
                         @php
                             $total_fila = 0;
+                            $total_fechas_positivos = 0;
                         @endphp
                         @foreach ($fechas as $pos_f => $f)
                             @php
@@ -183,13 +188,16 @@
                             @endforeach
                             @php
                                 $total_fila += $valor;
+                                if ($valor > 0) {
+                                    $total_fechas_positivos++;
+                                }
                             @endphp
                             <td class="text-center" style="border-color: #9d9d9d" title="{{ $v->fecha }}">
                                 <span style="margin-left: 5px; margin-right: 5px">{{ number_format($valor) }}</span>
                             </td>
                         @endforeach
                         @php
-                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / count($fechas)) * 30 : 0;
+                            $productividad_mes = $d['plantas_iniciales'] > 0 ? ($total_fila / $d['plantas_iniciales'] / $total_fechas_positivos) * 30 : 0;
                         @endphp
                         <th class="text-center" style="border-color: #9d9d9d; background-color: #e9ecef">
                             <span style="margin-left: 5px; margin-right: 5px"
@@ -229,6 +237,9 @@
                     {{ number_format($v) }}
                 </th>
             @endforeach
+            @php
+                $productividad_mes = $total_plantas_iniciales > 0 ? ($total / $total_plantas_iniciales / count($fechas)) * 30 : 0;
+            @endphp
             <th class="text-center th_yura_green">
                 {{ number_format($total) }}
                 <input type="hidden" id="input_total" value="{{ $total }}">
@@ -237,7 +248,7 @@
                 {{ number_format($total_plantas_iniciales) }}
                 </span>
             <th class="text-center th_yura_green">
-                {{ $total_plantas_iniciales > 0 ? number_format($total / $total_plantas_iniciales, 2) : 0 }}
+                {{ round($productividad_mes, 2) }}
             </th>
             <th class="text-center th_yura_green">
                 100%
