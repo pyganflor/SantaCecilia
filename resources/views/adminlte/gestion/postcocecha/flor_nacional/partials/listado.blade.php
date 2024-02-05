@@ -131,7 +131,7 @@
             </th>
             @foreach ($totales_motivos as $pos => $val)
                 @php
-                    $valor = round(($val * $porcentaje_nacional) / $total_nacional, 2);
+                    $valor = $total_nacional > 0 ? round(($val * $porcentaje_nacional) / $total_nacional, 2) : 0;
                 @endphp
                 <th class="text-center bg-yura_dark">
                     <input type="text" class="text-center bg-yura_dark" readonly value="{{ $valor }}"
