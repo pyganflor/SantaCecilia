@@ -5,7 +5,7 @@
             <tr>
                 <th class="text-left th_yura_green fila_fija1 columna_fija_left_0"
                     style="border-radius: 18px 0 0 0; padding-left: 5px; z-index: 10 !important">
-                    Variedad/Tipo
+                    Variedad/Tipo <sup>{{ count($fechas) }} dias</sup>
                 </th>
                 @php
                     $total_fechas = [];
