@@ -1256,9 +1256,14 @@ function getEspecificacion($idEspecificacion)
 function getCantidadDetallesByPedido($pedido)
 {
     $r = 0;
-    foreach ($pedido->detalles as $det_ped)
-        foreach ($det_ped->caja_frio->detalles as $item)
-            $r++;
+    foreach ($pedido->detalles as $det_ped) {
+        if ($det_ped->caja_frio != '')
+            foreach ($det_ped->caja_frio->detalles as $item) {
+                $r++;
+            }
+        else
+            $det_ped->delete();
+    }
     return $r;
 }
 

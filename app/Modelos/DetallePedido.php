@@ -33,11 +33,15 @@ class DetallePedido extends Model
         $tallos = 0;
         $ramos = 0;
         $monto = 0;
-        foreach ($this->caja_frio->detalles as $item) {
-            $tallos += $item->ramos * $item->tallos_x_ramo;
-            $ramos += $item->ramos;
-            $monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
-        }
+        $caja_frio = $this->caja_frio;
+        if ($caja_frio != '')
+            foreach ($caja_frio->detalles as $item) {
+                $tallos += $item->ramos * $item->tallos_x_ramo;
+                $ramos += $item->ramos;
+                $monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
+            }
+        else
+            $this->delete();
         return [
             'tallos' => $tallos,
             'ramos' => $ramos,

@@ -52,25 +52,28 @@ class Pedido extends Model
         $full_box = 0;
         foreach ($this->detalles as $det) {
             $caja_frio = $det->caja_frio;
-            switch ($caja_frio->tipo) {
-                case 'HB':
-                    $full_box += 0.5;
-                    break;
-                case 'QB':
-                    $full_box += 0.25;
-                    break;
-                case 'EB':
-                    $full_box += 0.125;
-                    break;
+            if ($caja_frio != '') {
+                switch ($caja_frio->tipo) {
+                    case 'HB':
+                        $full_box += 0.5;
+                        break;
+                    case 'QB':
+                        $full_box += 0.25;
+                        break;
+                    case 'EB':
+                        $full_box += 0.125;
+                        break;
 
-                default:
-                    break;
-            }
-            foreach ($det->caja_frio->detalles as $item) {
-                $tallos += $item->ramos * $item->tallos_x_ramo;
-                $ramos += $item->ramos;
-                $monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
-            }
+                    default:
+                        break;
+                }
+                foreach ($caja_frio->detalles as $item) {
+                    $tallos += $item->ramos * $item->tallos_x_ramo;
+                    $ramos += $item->ramos;
+                    $monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
+                }
+            } else
+                $det->delete();
         }
         return [
             'tallos' => $tallos,

@@ -45,187 +45,190 @@
                     @php
                         $det_getTotales = $det->getTotales();
                         $caja_frio = $det->caja_frio;
-                        if (count($caja_frio->detalles) > 0) {
+                        if ($caja_frio != '' && count($caja_frio->detalles) > 0) {
                             $total_cajas += 1;
                         }
                     @endphp
-                    @foreach ($caja_frio->detalles as $pos_item => $item)
-                        @php
-                            $variedad = $item->variedad;
-                            $pos_en_resumen = -1;
-                            foreach ($resumen_variedades as $pos => $r) {
-                                if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud && $r['precio'] == $item->precio) {
-                                    $pos_en_resumen = $pos;
+                    @if ($caja_frio != '')
+                        @foreach ($caja_frio->detalles as $pos_item => $item)
+                            @php
+                                $variedad = $item->variedad;
+                                $pos_en_resumen = -1;
+                                foreach ($resumen_variedades as $pos => $r) {
+                                    if ($r['variedad']->id_variedad == $item->id_variedad && $r['longitud'] == $item->longitud && $r['precio'] == $item->precio) {
+                                        $pos_en_resumen = $pos;
+                                    }
                                 }
-                            }
-                            if ($pos_en_resumen != -1) {
-                                $resumen_variedades[$pos_en_resumen]['tallos'] += $item->ramos * $item->tallos_x_ramo;
-                                $resumen_variedades[$pos_en_resumen]['ramos'] += $item->ramos;
-                                $resumen_variedades[$pos_en_resumen]['monto'] += $item->ramos * $item->tallos_x_ramo * $item->precio;
-                            } else {
-                                $resumen_variedades[] = [
-                                    'variedad' => $variedad,
-                                    'longitud' => $item->longitud,
-                                    'tallos' => $item->ramos * $item->tallos_x_ramo,
-                                    'ramos' => $item->ramos,
-                                    'precio' => $item->precio,
-                                    'monto' => $item->ramos * $item->tallos_x_ramo * $item->precio,
-                                ];
-                            }
-                            $total_tallos += $item->ramos * $item->tallos_x_ramo;
-                            $total_ramos += $item->ramos;
-                            $total_monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
-                        @endphp
-                        <tr class="tr_pedido_{{ $ped->id_pedido }}"
-                            onmouseover="$('.tr_pedido_{{ $ped->id_pedido }}').addClass('bg-yura_dark')"
-                            onmouseleave="$('.tr_pedido_{{ $ped->id_pedido }}').removeClass('bg-yura_dark')">
-                            @if ($pos_det == 0 && $pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ $getCantidadDetallesByPedido }}">
-                                    <b>{{ $ped->cliente->detalle()->nombre }}</b>
-                                    <br>
-                                    <small><b>Consignatario:</b></small>{{ $ped->consignatario->nombre }}
-                                    <br>
-                                    <small><b>Agencia:</b></small>{{ $ped->agencia_carga->nombre }}
-                                    <br>
-                                    <small><b>Marcacion:</b></small>{{ $ped->marcacion }}
+                                if ($pos_en_resumen != -1) {
+                                    $resumen_variedades[$pos_en_resumen]['tallos'] += $item->ramos * $item->tallos_x_ramo;
+                                    $resumen_variedades[$pos_en_resumen]['ramos'] += $item->ramos;
+                                    $resumen_variedades[$pos_en_resumen]['monto'] += $item->ramos * $item->tallos_x_ramo * $item->precio;
+                                } else {
+                                    $resumen_variedades[] = [
+                                        'variedad' => $variedad,
+                                        'longitud' => $item->longitud,
+                                        'tallos' => $item->ramos * $item->tallos_x_ramo,
+                                        'ramos' => $item->ramos,
+                                        'precio' => $item->precio,
+                                        'monto' => $item->ramos * $item->tallos_x_ramo * $item->precio,
+                                    ];
+                                }
+                                $total_tallos += $item->ramos * $item->tallos_x_ramo;
+                                $total_ramos += $item->ramos;
+                                $total_monto += $item->ramos * $item->tallos_x_ramo * $item->precio;
+                            @endphp
+                            <tr class="tr_pedido_{{ $ped->id_pedido }}"
+                                onmouseover="$('.tr_pedido_{{ $ped->id_pedido }}').addClass('bg-yura_dark')"
+                                onmouseleave="$('.tr_pedido_{{ $ped->id_pedido }}').removeClass('bg-yura_dark')">
+                                @if ($pos_det == 0 && $pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ $getCantidadDetallesByPedido }}">
+                                        <b>{{ $ped->cliente->detalle()->nombre }}</b>
+                                        <br>
+                                        <small><b>Consignatario:</b></small>{{ $ped->consignatario->nombre }}
+                                        <br>
+                                        <small><b>Agencia:</b></small>{{ $ped->agencia_carga->nombre }}
+                                        <br>
+                                        <small><b>Marcacion:</b></small>{{ $ped->marcacion }}
+                                    </td>
+                                @endif
+                                @if ($pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ count($caja_frio->detalles) }}">
+                                        {{ $caja_frio->nombre }}
+                                        <br>
+                                        <b>{{ $det->marcacion_po }}</b>
+                                    </td>
+                                @endif
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    {{ $variedad->nombre }}
                                 </td>
-                            @endif
-                            @if ($pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ count($caja_frio->detalles) }}">
-                                    {{ $caja_frio->nombre }}
-                                    <br>
-                                    <b>{{ $det->marcacion_po }}</b>
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    {{ $item->longitud }} <sup><b>cm</b></sup>
                                 </td>
-                            @endif
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                {{ $variedad->nombre }}
-                            </td>
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                {{ $item->longitud }} <sup><b>cm</b></sup>
-                            </td>
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                {{ number_format($item->ramos * $item->tallos_x_ramo) }}
-                            </td>
-                            @if ($pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ count($caja_frio->detalles) }}">
-                                    {{ number_format($det_getTotales['tallos']) }}
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    {{ number_format($item->ramos * $item->tallos_x_ramo) }}
                                 </td>
-                            @endif
-                            @if ($pos_det == 0 && $pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ $getCantidadDetallesByPedido }}">
-                                    {{ number_format($ped_getTotales['tallos']) }}
+                                @if ($pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ count($caja_frio->detalles) }}">
+                                        {{ number_format($det_getTotales['tallos']) }}
+                                    </td>
+                                @endif
+                                @if ($pos_det == 0 && $pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ $getCantidadDetallesByPedido }}">
+                                        {{ number_format($ped_getTotales['tallos']) }}
+                                    </td>
+                                @endif
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    {{ number_format($item->ramos) }} <sup>x{{ $item->tallos_x_ramo }}</sup>
                                 </td>
-                            @endif
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                {{ number_format($item->ramos) }} <sup>x{{ $item->tallos_x_ramo }}</sup>
-                            </td>
-                            @if ($pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ count($caja_frio->detalles) }}">
-                                    {{ number_format($det_getTotales['ramos']) }}
+                                @if ($pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ count($caja_frio->detalles) }}">
+                                        {{ number_format($det_getTotales['ramos']) }}
+                                    </td>
+                                @endif
+                                @if ($pos_det == 0 && $pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ $getCantidadDetallesByPedido }}">
+                                        {{ number_format($ped_getTotales['ramos']) }}
+                                    </td>
+                                @endif
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    ${{ $item->precio }}
                                 </td>
-                            @endif
-                            @if ($pos_det == 0 && $pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ $getCantidadDetallesByPedido }}">
-                                    {{ number_format($ped_getTotales['ramos']) }}
+                                <td class="text-center" style="border-color: #9d9d9d">
+                                    ${{ number_format($item->ramos * $item->tallos_x_ramo * $item->precio, 2) }}
                                 </td>
-                            @endif
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                ${{ $item->precio }}
-                            </td>
-                            <td class="text-center" style="border-color: #9d9d9d">
-                                ${{ number_format($item->ramos * $item->tallos_x_ramo * $item->precio, 2) }}
-                            </td>
-                            @if ($pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ count($caja_frio->detalles) }}">
-                                    ${{ number_format($det_getTotales['monto'], 2) }}
-                                </td>
-                            @endif
-                            @if ($pos_det == 0 && $pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ $getCantidadDetallesByPedido }}">
-                                    ${{ number_format($ped_getTotales['monto'], 2) }}
-                                </td>
-                            @endif
-                            @if ($pos_det == 0 && $pos_item == 0)
-                                <td class="text-center" style="border-color: #9d9d9d"
-                                    rowspan="{{ $getCantidadDetallesByPedido }}">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-yura_default btn-xs dropdown-toggle"
-                                            data-toggle="dropdown">
-                                            <i class="fa fa-fw fa-gears"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-right sombra_pequeña" role="menu"
-                                            style="z-index: 10 !important">
-                                            <li>
-                                                <a href="javascript:void(0)" title="Editar"
-                                                    onclick="editar_pedido('{{ $ped->id_pedido }}')">
-                                                    <i class="fa fa-fw fa-pencil"></i> Editar Pedido
-                                                </a>
-                                            </li>
-                                            @if ($ped->tipo == 'A')
+                                @if ($pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ count($caja_frio->detalles) }}">
+                                        ${{ number_format($det_getTotales['monto'], 2) }}
+                                    </td>
+                                @endif
+                                @if ($pos_det == 0 && $pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ $getCantidadDetallesByPedido }}">
+                                        ${{ number_format($ped_getTotales['monto'], 2) }}
+                                    </td>
+                                @endif
+                                @if ($pos_det == 0 && $pos_item == 0)
+                                    <td class="text-center" style="border-color: #9d9d9d"
+                                        rowspan="{{ $getCantidadDetallesByPedido }}">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-yura_default btn-xs dropdown-toggle"
+                                                data-toggle="dropdown">
+                                                <i class="fa fa-fw fa-gears"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right sombra_pequeña" role="menu"
+                                                style="z-index: 10 !important">
                                                 <li>
-                                                    <a href="javascript:void(0)" title="Generar Packing"
-                                                        onclick="generar_packing('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-gift"></i> Generar Packing
+                                                    <a href="javascript:void(0)" title="Editar"
+                                                        onclick="editar_pedido('{{ $ped->id_pedido }}')">
+                                                        <i class="fa fa-fw fa-pencil"></i> Editar Pedido
                                                     </a>
                                                 </li>
-                                                {{-- <li>
+                                                @if ($ped->tipo == 'A')
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Generar Packing"
+                                                            onclick="generar_packing('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-gift"></i> Generar Packing
+                                                        </a>
+                                                    </li>
+                                                    {{-- <li>
                                                 <a href="javascript:void(0)" title="Generar Factura"
                                                     onclick="generar_factura('{{ $ped->id_pedido }}')">
                                                     <i class="fa fa-fw fa-money"></i> Generar Factura
                                                 </a>
                                             </li> --}}
-                                                <li>
-                                                    <a href="javascript:void(0)" title="Exportar Factura"
-                                                        onclick="exportar_factura('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-file-excel-o"></i> Exportar Factura
-                                                    </a>
-                                                </li>
-                                                <li class="hidden">
-                                                    <a href="javascript:void(0)" title="Generar Packing"
-                                                        onclick="generar_prefactura('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-shopping-cart"></i> Generar Pre-Factura
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0)" title="Generar Packing"
-                                                        onclick="exportar_etiqueta('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-file"></i> Exportar Etiqueta
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0)" title="Eliminar"
-                                                        onclick="eliminar_pedido('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
-                                                    </a>
-                                                </li>
-                                            @elseif($ped->tipo == 'F')
-                                                <li>
-                                                    <a href="javascript:void(0)" title="Armar Pedido"
-                                                        onclick="store_armar_pedido_futuro('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-refresh"></i> Armar Pedido
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0)" title="Eliminar"
-                                                        onclick="eliminar_pedido_futuro('{{ $ped->id_pedido }}')">
-                                                        <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
-                                                    </a>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </div>
-                                </td>
-                            @endif
-                        </tr>
-                    @endforeach
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Exportar Factura"
+                                                            onclick="exportar_factura('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-file-excel-o"></i> Exportar Factura
+                                                        </a>
+                                                    </li>
+                                                    <li class="hidden">
+                                                        <a href="javascript:void(0)" title="Generar Packing"
+                                                            onclick="generar_prefactura('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-shopping-cart"></i> Generar
+                                                            Pre-Factura
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Generar Packing"
+                                                            onclick="exportar_etiqueta('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-file"></i> Exportar Etiqueta
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Eliminar"
+                                                            onclick="eliminar_pedido('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
+                                                        </a>
+                                                    </li>
+                                                @elseif($ped->tipo == 'F')
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Armar Pedido"
+                                                            onclick="store_armar_pedido_futuro('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-refresh"></i> Armar Pedido
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0)" title="Eliminar"
+                                                            onclick="eliminar_pedido_futuro('{{ $ped->id_pedido }}')">
+                                                            <i class="fa fa-fw fa-trash"></i> Eliminar Pedido
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
+                                    </td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
             @endforeach
             <tr class="tr_fija_bottom_0">
