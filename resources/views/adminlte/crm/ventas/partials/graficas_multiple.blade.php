@@ -1,4 +1,4 @@
-<div class="nav-tabs-custom" style="cursor: move;">
+<div class="nav-tabs-custom">
     <!-- Tabs within a box -->
     <ul class="nav nav-pills nav-justified">
         <li class="active">
@@ -97,8 +97,8 @@
                     display: true,
                     position: 'bottom',
                     fullWidth: false,
-                    onClick: function() {},
-                    onHover: function() {},
+                    /*onClick: function() {},
+                    onHover: function() {},*/
                     reverse: true,
                 },
                 showLines: true, // for all datasets

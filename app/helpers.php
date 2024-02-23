@@ -130,7 +130,17 @@ define('A_Z', serialize(range('A', 'Z')));
 
 function getListColores()
 {
-    return ['#d01c62', '#1000ff', '#00b388', '#ef6e11', '#fff700', '#5e5e5e', '#ff00eb', '#00ffff'];
+    return [
+        '#d01c62',
+        '#1000ff',
+        '#00b388',
+        '#ef6e11',
+        '#fff700',
+        '#5e5e5e',
+        '#ff00eb',
+        '#00ffff',
+        '#00ffff',
+    ];
 }
 
 function getHorasDiarias()

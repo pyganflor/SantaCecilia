@@ -1,3 +1,4 @@
+
 <script>
     listar_resumen_pedidos($("#fecha_pedidos_search").val(),'',$("#id_configuracion_empresa_despacho").val());
     

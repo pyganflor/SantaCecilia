@@ -60,6 +60,7 @@ Route::group(['middleware' => 'autenticacion'], function () {
             include "postcosecha/flor_nacional.php";
             include "postcosecha/param_disponibilidad.php";
             include "postcosecha/posco_disponibilidad.php";
+            include "postcosecha/reporte_flor_nacional.php";
 
             /* ========================== POSTCOCECHA ========================*/
             include 'postcocecha/lotes.php';
