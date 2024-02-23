@@ -30,6 +30,18 @@
     </div>
 </div>
 
+
+@php
+    $total_tallos = 0;
+    $total_ramos = 0;
+    $total_monto = 0;
+    foreach ($data as $d) {
+        $total_tallos += $d->tallos;
+        $total_ramos += $d->ramos;
+        $total_monto += $d->monto;
+    }
+@endphp
+
 <script>
     construir_char('Tallos', 'chart_tallos');
     construir_char('Ramos', 'chart_ramos');
@@ -55,8 +67,15 @@
                 data_list.push("{{ round($data[$i]->monto, 2) }}");
         @endfor
 
+        if (label == 'Tallos')
+            text_label = label + ': {{ number_format($total_tallos) }}';
+        if (label == 'Ramos')
+            text_label = label + ': {{ number_format($total_ramos) }}';
+        if (label == 'Monto')
+            text_label = label + ': ${{ number_format($total_monto, 2) }}';
+
         datasets = [{
-            label: label + ' ',
+            label: text_label,
             data: data_list,
             //backgroundColor: '#8c99ff54',
             borderColor: 'black',
@@ -89,7 +108,7 @@
                 },
                 legend: {
                     display: true,
-                    position: 'bottom',
+                    position: 'top',
                     fullWidth: false,
                     onClick: function() {},
                     onHover: function() {},
